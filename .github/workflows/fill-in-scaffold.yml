@@ -19,18 +19,21 @@ jobs:
       contents: write
 
     steps:
-      # fill-in-scaffold.mjs derives every PHP global rename from this repository custom
-      # property and crashes without it — after the rename commits are already pushed. Failing
-      # before anything runs keeps a misconfigured repository pristine.
-      - name: Require the php-globals-short-prefix custom property.
+      # fill-in-scaffold.mjs derives every PHP global rename from php-globals-short-prefix and
+      # every title/namespace rename from human-title. A missing property would bake broken
+      # renames into commits that are already pushed; failing before anything runs keeps a
+      # misconfigured repository pristine.
+      - name: Require the php-globals-short-prefix and human-title custom properties.
         env:
           CUSTOM_PROPERTIES: ${{ toJSON( github.event.repository.custom_properties ) }}
         run: |
-          prefix=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '."php-globals-short-prefix" // empty')
-          if [ -z "$prefix" ]; then
-            echo "::error::repository custom property 'php-globals-short-prefix' is missing or empty; set it on the repository and re-run this workflow"
-            exit 1
-          fi
+          for property in php-globals-short-prefix human-title; do
+            value=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r --arg property "$property" '.[$property] // empty')
+            if [ -z "$value" ]; then
+              echo "::error::repository custom property '$property' is missing or empty; set it on the repository and re-run this workflow"
+              exit 1
+            fi
+          done
 
       # Credentials are persisted on purpose: the final step pushes the
       # scaffolding commits back to the repo via the checkout-provided token.

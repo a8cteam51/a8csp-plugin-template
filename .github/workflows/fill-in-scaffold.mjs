@@ -45,7 +45,7 @@ const buildTemplate = async ( filePath ) => {
 	const templateFile   = await readFile( filePath, 'utf-8' );
 	let renderedTemplate = templateFile, replacements;
 
-	const title = repository.custom_properties['human-title'] ?? repository.name;
+	const title = repository.custom_properties['human-title'];
 	if ( 'README.md' === filePath ) {
 		replacements = {
 			'EXAMPLE_REPO_NAME': title,
@@ -63,8 +63,9 @@ const buildTemplate = async ( filePath ) => {
 			'a8csp-template-plugin.php': repository.name + '.php',
 			'a8csp-template-plugin': toKebabCase( title ),
 			'a8csp-plugin-template': repository.name,
-			// Matches the JSON-escaped namespace form composer.json's psr-4 autoload keys carry on disk.
-			'A8C\\\\SpecialProjects\\\\Template': 'A8C\\\\SpecialProjects\\\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			// Matches the JSON-escaped namespace form composer.json's psr-4 autoload keys carry on disk;
+			// the raw namespace value is escaped by the .json rendering path.
+			'A8C\\\\SpecialProjects\\\\Template': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			'A8C\\SpecialProjects\\Template': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			'A8C\\SpecialProjects\\\\Template': 'A8C\\SpecialProjects\\\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			'a8csp_template': repository.custom_properties['php-globals-short-prefix'],
@@ -73,7 +74,10 @@ const buildTemplate = async ( filePath ) => {
 	}
 
 	for ( const [ key, value ] of Object.entries( replacements ) ) {
-		renderedTemplate = renderedTemplate.replaceAll( key, value );
+		// Substitution values land inside JSON string literals, so quotes/backslashes in free-text
+		// repository metadata must be escaped to keep the document valid.
+		const renderedValue = filePath.endsWith( '.json' ) ? JSON.stringify( value ).slice( 1, -1 ) : value;
+		renderedTemplate = renderedTemplate.replaceAll( key, renderedValue );
 	}
 
 	if ( filePath.endsWith( '.php' ) ) {
