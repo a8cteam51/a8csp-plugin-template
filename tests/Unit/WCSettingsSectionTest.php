@@ -4,11 +4,12 @@ namespace A8C\SpecialProjects\Template\Tests\Unit;
 
 use A8C\SpecialProjects\Template\Integrations\WC_Settings_Section;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Exercises the WooCommerce-core gate's negative case and the pure version comparison without
- * WordPress.
+ * Exercises the WooCommerce presence gate, initialization branches, and pure version comparison
+ * without WordPress.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -28,10 +29,28 @@ final class WCSettingsSectionTest extends TestCase {
 		if ( ! defined( 'ABSPATH' ) ) {
 			define( 'ABSPATH', __DIR__ . '/' );
 		}
+
+		require_once __DIR__ . '/wp-hook-stubs.php';
+		require_once __DIR__ . '/plugin-metadata-stubs.php';
 	}
 
 	/**
-	 * Without WooCommerce core loaded, the settings section reports itself as not needed.
+	 * Starts each test with an empty hook-registration ledger.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	protected function setUp(): void {
+		parent::setUp();
+
+		$GLOBALS['a8csp_template_test_hooks'] = array();
+	}
+
+	/**
+	 * Without WooCommerce core present, the presence gate reports the settings section as not
+	 * needed.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -40,6 +59,48 @@ final class WCSettingsSectionTest extends TestCase {
 	 */
 	public function test_is_needed_is_false_without_the_real_plugin(): void {
 		self::assertFalse( ( new WC_Settings_Section() )->is_needed() );
+	}
+
+	/**
+	 * With WooCommerce present but below the header floor, the misconfiguration speaks through one
+	 * notice and registers no settings wiring.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_initialize_below_floor_registers_only_the_notice(): void {
+		\define( 'WC_VERSION', '9.0.0' );
+
+		( new WC_Settings_Section() )->initialize();
+
+		self::assertContains( 'admin_notices', $GLOBALS['a8csp_template_test_hooks'] );
+
+		foreach ( $GLOBALS['a8csp_template_test_hooks'] as $hook_name ) {
+			self::assertStringStartsNotWith( 'woocommerce_', $hook_name );
+		}
+	}
+
+	/**
+	 * With WooCommerce at the header floor, initialization registers both settings filters and no
+	 * version notice.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_initialize_at_floor_registers_the_settings_filters(): void {
+		\define( 'WC_VERSION', '10.0.0' );
+
+		( new WC_Settings_Section() )->initialize();
+
+		self::assertContains( 'woocommerce_get_sections_advanced', $GLOBALS['a8csp_template_test_hooks'] );
+		self::assertContains( 'woocommerce_get_settings_advanced', $GLOBALS['a8csp_template_test_hooks'] );
+		self::assertNotContains( 'admin_notices', $GLOBALS['a8csp_template_test_hooks'] );
 	}
 
 	/**

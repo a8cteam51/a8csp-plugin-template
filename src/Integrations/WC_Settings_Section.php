@@ -11,6 +11,9 @@ defined( 'ABSPATH' ) || exit;
  * header-declared `WC requires at least` floor, then adds a real section to WooCommerce → Settings
  * → Advanced.
  *
+ * An absent WooCommerce stays silent because the plugin runs as its base tier by design; a present
+ * WooCommerce below the floor is explained by an admin notice instead of silently gating off.
+ *
  * This folder is the deletable WooCommerce tier; see the README's "Watering down to plain
  * WordPress" sequence.
  *
@@ -39,10 +42,10 @@ class WC_Settings_Section implements Component {
 	// region METHODS
 
 	/**
-	 * Returns true if WooCommerce core is active on a version that meets the `WC requires at least`
-	 * floor declared in the plugin header. To require a specific WooCommerce extension instead, add
-	 * its own `class_exists()` check here, such as `class_exists( 'WC_Subscriptions' )` for
-	 * Subscriptions.
+	 * Returns true when WooCommerce core is present. This gate checks presence, not full satisfaction;
+	 * `initialize()` checks the version floor and explains a below-floor install with an admin notice.
+	 * To require a specific WooCommerce extension instead, add its own `class_exists()` check here,
+	 * such as `class_exists( 'WC_Subscriptions' )` for Subscriptions.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -50,11 +53,7 @@ class WC_Settings_Section implements Component {
 	 * @return  bool
 	 */
 	public function is_needed(): bool {
-		if ( ! \class_exists( 'WooCommerce' ) || ! \defined( 'WC_VERSION' ) ) {
-			return false;
-		}
-
-		return self::meets_minimum_wc_version( WC_VERSION, a8csp_template_get_plugin_metadata( 'WC requires at least' ) );
+		return \class_exists( 'WooCommerce' ) && \defined( 'WC_VERSION' );
 	}
 
 	/**
@@ -80,8 +79,8 @@ class WC_Settings_Section implements Component {
 	}
 
 	/**
-	 * Wires the section into WooCommerce's Advanced settings tab. WooCommerce renders and saves the
-	 * declared fields itself; this component owns only the declaration.
+	 * Registers the section when the running WooCommerce meets the header-declared floor. Below the
+	 * floor, registers only the explanatory admin notice.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -89,6 +88,11 @@ class WC_Settings_Section implements Component {
 	 * @return  void
 	 */
 	public function initialize(): void {
+		if ( ! self::meets_minimum_wc_version( (string) \constant( 'WC_VERSION' ), a8csp_template_get_plugin_metadata( 'WC requires at least' ) ) ) {
+			\add_action( 'admin_notices', array( $this, 'render_version_notice' ) );
+			return;
+		}
+
 		\add_filter( 'woocommerce_get_sections_advanced', array( $this, 'add_section' ) );
 		\add_filter( 'woocommerce_get_settings_advanced', array( $this, 'get_settings' ), 10, 2 );
 	}
@@ -96,6 +100,32 @@ class WC_Settings_Section implements Component {
 	// endregion
 
 	// region HOOKS
+
+	/**
+	 * Renders the below-floor explanation: which plugin's integration is off, the floor it requires,
+	 * and the WooCommerce version running. Capability-gated to the people who can act on it.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	public function render_version_notice(): void {
+		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- WooCommerce registers this capability for store managers and administrators.
+		if ( ! \current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+
+		$notice = \wp_sprintf(
+			/* translators: 1: Plugin name, 2: Minimum WooCommerce version, 3: Running WooCommerce version */
+			\__( 'The %1$s WooCommerce settings section requires WooCommerce %2$s or newer; version %3$s is running, so the section stayed off.', 'a8csp-plugin-template' ),
+			a8csp_template_get_plugin_name(),
+			(string) a8csp_template_get_plugin_metadata( 'WC requires at least' ),
+			(string) \constant( 'WC_VERSION' )
+		);
+
+		\wp_admin_notice( \esc_html( $notice ), array( 'type' => 'error' ) );
+	}
 
 	/**
 	 * Adds the plugin's section to the Advanced settings tab. The section slug carries the prefix
