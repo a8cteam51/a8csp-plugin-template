@@ -18,8 +18,8 @@ use PHPUnit\Framework\TestCase;
 final class PluginBootTest extends TestCase {
 	/**
 	 * On an at-floor runtime the requirements gate passes, `plugins_loaded` is wired to the named
-	 * void wrapper `a8csp_template_boot_plugin()` (not the accessor directly, since the accessor
-	 * itself returns `Plugin`), and by request time the registry has run the demo components far
+	 * accessor `a8csp_template_plugin()` (hooked directly; WordPress ignores an action callback's
+	 * return value), and by request time the registry has run the demo components far
 	 * enough to register the block, wire and register the base setting, and expose the WooCommerce
 	 * section and its persisted field.
 	 *
@@ -31,7 +31,7 @@ final class PluginBootTest extends TestCase {
 	public function test_plugin_boots_on_supported_runtime(): void {
 		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS );
 		self::assertTrue( \function_exists( 'a8csp_template_plugin' ) );
-		self::assertNotFalse( \has_action( 'plugins_loaded', 'a8csp_template_boot_plugin' ) );
+		self::assertNotFalse( \has_action( 'plugins_loaded', 'a8csp_template_plugin' ) );
 		self::assertInstanceOf( Plugin::class, \a8csp_template_plugin() );
 
 		$block_metadata = \json_decode(

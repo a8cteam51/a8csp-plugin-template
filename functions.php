@@ -9,6 +9,11 @@ defined( 'ABSPATH' ) || exit;
 /**
  * Returns the plugin instance, booting it on first access.
  *
+ * Doubles as the `plugins_loaded` hook target: WordPress ignores an action callback's return
+ * value, so the accessor is hooked directly. Named, rather than an anonymous closure, so
+ * `remove_action( 'plugins_loaded', 'a8csp_template_plugin' )` can unhook the boot and
+ * `has_action()` can assert the wiring by name.
+ *
  * @since   1.0.0
  * @version 1.0.0
  *
@@ -24,22 +29,6 @@ function a8csp_template_plugin(): Plugin {
 
 	return $plugin;
 }
-
-/**
- * The `plugins_loaded` hook target. A void wrapper, not the accessor directly: the accessor
- * returns `Plugin` for its other callers (e.g. tests), and WordPress's action-callback contract
- * requires void. Named, rather than an anonymous closure, so it can be unhooked and so
- * `has_action()` can assert the wiring by name.
- *
- * @since   1.0.0
- * @version 1.0.0
- *
- * @return  void
- */
-function a8csp_template_boot_plugin(): void {
-	a8csp_template_plugin();
-}
-
 // endregion
 
 // region OTHER
