@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template\Integrations;
 
-use A8C\SpecialProjects\Template\Boot\Component;
+use A8C\SpecialProjects\Template\Component;
 
 defined( 'ABSPATH' ) || exit;
 

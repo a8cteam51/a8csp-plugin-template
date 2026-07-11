@@ -2,15 +2,12 @@
 
 namespace A8C\SpecialProjects\Template;
 
-use A8C\SpecialProjects\Template\Boot\Component;
-use A8C\SpecialProjects\Template\Boot\ComponentTree;
-
 defined( 'ABSPATH' ) || exit;
 
 /**
- * This is the plugin file engineers edit: `COMPONENTS` holds the top-level component registry,
- * and `is_needed()` provides the optional whole-plugin gate. The boot plumbing lives in
- * `src/Boot/`.
+ * A plugin is a list of components: `COMPONENTS` below is that list, and `boot()` runs it — a
+ * component is a class with `is_needed()` and `initialize()`, and the boot is a foreach you can
+ * read. This is the one file you edit to wire a component in.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -19,8 +16,7 @@ final class Plugin {
 	// region FIELDS AND CONSTANTS
 
 	/**
-	 * Add the plugin's top-level components here; they boot in registration order. A component
-	 * implementing `ComponentContainer` boots its declared children immediately after itself.
+	 * Add the plugin's top-level components here; they boot in registration order.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -30,7 +26,7 @@ final class Plugin {
 	private const COMPONENTS = array(
 		Blocks::class,
 		Settings::class,
-		Integrations::class,
+		Integrations\WC_Settings_Section::class,
 	);
 
 	/**
@@ -67,8 +63,8 @@ final class Plugin {
 	// region HOOKS
 
 	/**
-	 * Boots the plugin's component tree through the `Boot\ComponentTree` loader when the plugin
-	 * reports itself as needed. Idempotent: only the first eligible call has any effect.
+	 * Boots every registered component whose gate is open; idempotent — only the first eligible call
+	 * has any effect.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -82,7 +78,12 @@ final class Plugin {
 
 		$this->booted = true;
 
-		( new ComponentTree() )->boot( self::COMPONENTS );
+		foreach ( self::COMPONENTS as $component_class ) {
+			$component = new $component_class();
+			if ( $component->is_needed() ) {
+				$component->initialize();
+			}
+		}
 	}
 
 	// endregion

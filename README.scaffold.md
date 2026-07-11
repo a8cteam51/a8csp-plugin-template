@@ -40,15 +40,17 @@ If the minimum required version of WooCommerce is present, you will find a secti
 To convert this plugin from a WooCommerce extension to a plain WordPress plugin, remove the WooCommerce tier:
 
 1. Delete the `src/Integrations/` directory.
-2. Delete `src/Integrations.php`.
-3. Remove `Integrations::class` from the `COMPONENTS` list in `src/Plugin.php`.
-4. Remove the `Integrations\WC_Settings_Section` option line from the `uninstall.php` footprint.
-5. Remove the `wp-plugin/woocommerce` and `php-stubs/woocommerce-stubs` development dependencies from `composer.json`; run `composer update`.
-6. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
-7. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the `WC requires at least` / `WC tested up to` plugin-header lines.
-8. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`, `tests/Unit/WCSettingsSectionTest.php`, and the `RecordingWCSettingsSection` test double; drop the WooCommerce assertions from `tests/Integration/PluginBootTest.php`.
-9. Remove the WooCommerce-less proof section from `tests/README.md`.
-10. Run `composer quality-check`. What remains — blocks, settings, the component tree, the `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
+2. Remove `Integrations\WC_Settings_Section::class` from the `COMPONENTS` list in `src/Plugin.php`.
+3. Remove the `Integrations\WC_Settings_Section` option line from the `uninstall.php` footprint.
+4. Remove the `wp-plugin/woocommerce` and `php-stubs/woocommerce-stubs` development dependencies from `composer.json`; run `composer update`.
+5. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
+6. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the `WC requires at least` / `WC tested up to` plugin-header lines.
+7. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php` and `tests/Unit/WCSettingsSectionTest.php`; drop the WooCommerce assertions from `tests/Integration/PluginBootTest.php`.
+8. Remove the WooCommerce-less proof section from `tests/README.md`.
+9. Run `composer quality-check`. What remains — blocks, settings, the component list, the `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
+
+When integrations multiply behind one shared gate, give them a parent component whose
+`initialize()` constructs and gates its children — five lines, written the day they're needed.
 
 ## Frequently Asked Questions
 

@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Boot;
+namespace A8C\SpecialProjects\Template;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -8,9 +8,7 @@ defined( 'ABSPATH' ) || exit;
  * Contract for a self-contained plugin component.
  *
  * Implementations are constructed with no arguments. `initialize()` is called at most once,
- * only when `is_needed()` returns true, during `plugins_loaded`. For a component that also
- * implements `ComponentContainer`, `is_needed()` gates its entire subtree: false prunes the
- * whole branch before any child is constructed.
+ * only when `is_needed()` returns true, during `plugins_loaded`.
  *
  * @since   1.0.0
  * @version 1.0.0

@@ -15,24 +15,23 @@ GitHub Actions workflow used to turn this template into a new plugin repository.
   metadata, version-compatibility checks, the requirements gate, and its admin-notice
   reporter. Both root bootstrap files stay parsable below the plugin's PHP floor, and
   CI lints them against the older PHP versions.
-- `functions.php` boots the plugin's component registry and loads the PHP helper files under `includes/`.
-- `src/` contains the PSR-4 classes. `src/Boot/` holds the three files that boot
-  your components — you never edit them. A component is a class with `is_needed()`
-  and `initialize()`; a container is a component that also lists children. You edit
-  exactly one file, `src/Plugin.php`: add your components to the `COMPONENTS` list;
-  they boot in registration order.
+- `functions.php` boots the plugin's component list and loads the PHP helper files under `includes/`.
+- `src/` contains the PSR-4 classes. A plugin is a list of components; a component
+  is a class with `is_needed()` and `initialize()`; the boot is a foreach you can
+  read. `src/Component.php` is the one contract, and you edit exactly one file,
+  `src/Plugin.php`: add your components to the `COMPONENTS` list; they boot in
+  registration order.
 - `src/Settings.php` is the base-WordPress example component. It persists
   `a8csp_template_example_option` through the Settings API on the General options
   page and serves as the worked example for the uninstall footprint. For a plugin
   that persists nothing, delete `src/Settings.php`, its `COMPONENTS` entry in
   `src/Plugin.php`, its option line in the `uninstall.php` footprint, and
   `includes/settings.php`.
-- `src/Integrations.php` is the worked example of a `ComponentContainer`. Its one
-  declared child, `src/Integrations/WC_Settings_Section.php`, is a
-  WooCommerce-core-gated component that registers a real section in WooCommerce →
-  Settings → Advanced and persists `a8csp_template_wc_example_option`. The
-  `src/Integrations/` folder is the deletable WooCommerce tier; see "Watering down to
-  plain WordPress" in `README.scaffold.md`.
+- `src/Integrations/` groups the WooCommerce tier by folder.
+  `src/Integrations/WC_Settings_Section.php` is a WooCommerce-core-gated component
+  that registers a real section in WooCommerce → Settings → Advanced and persists
+  `a8csp_template_wc_example_option`. The folder is the deletable WooCommerce tier
+  (see "Watering down to plain WordPress" in `README.scaffold.md`).
 - `includes/` contains automatically loaded procedural helpers, including typed option readers,
   and `languages/` contains translations. PHP files dropped into `includes/` load automatically
   inside WordPress; files prefixed with an underscore are skipped. `languages/` ships an example
@@ -54,6 +53,9 @@ GitHub Actions workflow used to turn this template into a new plugin repository.
   local test workflow.
 - `.github/workflows/` contains PHP, JavaScript, CSS, syntax, and
   scaffold-fill workflows.
+
+When integrations multiply behind one shared gate, give them a parent component whose
+`initialize()` constructs and gates its children — five lines, written the day they're needed.
 
 ## Scaffold generation
 
@@ -111,7 +113,7 @@ The tracked template files declare these runtime targets:
   tooling.
 - Docker for the `wp-env` local environment.
 
-The plugin boots its component registry unconditionally. The WooCommerce-dependent example
+The plugin boots its component list unconditionally. The WooCommerce-dependent example
 settings-section component (`src/Integrations/WC_Settings_Section.php`) gates itself through `is_needed()`, checking
 that WooCommerce is active and meets the `WC requires at least` header floor. The main bootstrap
 declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is active.

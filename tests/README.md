@@ -6,7 +6,8 @@ fixtures at three WordPress-version tiers.
 ## Suites
 
 - **Unit** (`tests/Unit/`) — no WordPress, no wp-env. Runs against plain PHPUnit `TestCase` with
-  hand-rolled recording doubles instead of Mockery or Brain Monkey (see `tests/Unit/Doubles/`).
+  recording `add_action()`/`add_filter()` stubs (`tests/Unit/wp-hook-stubs.php`) instead of Mockery
+  or Brain Monkey, so the real `Plugin::boot()` loop is exercised outside WordPress.
   Fast; this is the suite `composer quality-check` runs on every push.
 - **Integration** (`tests/Integration/`) — boots inside wp-env against a supported WordPress
   version and exercises the plugin's real boot path. `UninstallTest` runs the real

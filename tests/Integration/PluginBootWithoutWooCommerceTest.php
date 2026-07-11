@@ -2,18 +2,17 @@
 
 namespace A8C\SpecialProjects\Template\Tests\Integration;
 
-use A8C\SpecialProjects\Template\Integrations;
 use A8C\SpecialProjects\Template\Integrations\WC_Settings_Section;
 use A8C\SpecialProjects\Template\Settings;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Proves Plugin::boot() boots the whole component tree independently of WooCommerce: a
- * WooCommerce-independent block registers and Settings wires itself when WooCommerce is inactive,
- * while the WooCommerce-dependent component (WC_Settings_Section, nested under the Integrations
- * container) reports itself as not needed. Only meaningful with WooCommerce deactivated, so it
- * self-skips in the standard `composer test:integration` run (WooCommerce is active there) — see
- * tests/README.md for how to exercise it against a WooCommerce-less runtime.
+ * Proves Plugin::boot() boots the component classes named directly in its registry independently
+ * of WooCommerce: Blocks registers its block and Settings wires itself when WooCommerce is
+ * inactive, while WC_Settings_Section reports itself as not needed and registers no WooCommerce
+ * hooks. The test is meaningful only with WooCommerce deactivated, so it self-skips in the
+ * standard `composer test:integration` run (WooCommerce is active there) — see tests/README.md for
+ * how to exercise it against a WooCommerce-less runtime.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -21,8 +20,8 @@ use PHPUnit\Framework\TestCase;
 final class PluginBootWithoutWooCommerceTest extends TestCase {
 	/**
 	 * With WooCommerce inactive, the boot hook runs, Blocks registers its block, Settings wires its
-	 * registration callback, the Integrations container declares WC_Settings_Section as its child,
-	 * and the WC-dependent leaf reports itself as not needed.
+	 * registration callback, and WC_Settings_Section reports itself as not needed and registers no
+	 * WooCommerce hooks. Each component is named directly in Plugin's registry.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -47,7 +46,7 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 
 		self::assertTrue( \WP_Block_Type_Registry::get_instance()->is_registered( $block_metadata['name'] ) );
 		self::assertSame( 1, $this->count_settings_admin_init_registrations() );
-		self::assertSame( array( WC_Settings_Section::class ), Integrations::get_child_component_classes() );
+		self::assertFalse( \has_filter( 'woocommerce_get_sections_advanced' ) );
 		self::assertFalse( ( new WC_Settings_Section() )->is_needed() );
 	}
 

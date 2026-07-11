@@ -2,23 +2,18 @@
 
 namespace A8C\SpecialProjects\Template\Tests\Unit;
 
-use A8C\SpecialProjects\Template\Boot\ComponentTree;
 use A8C\SpecialProjects\Template\Integrations\WC_Settings_Section;
-use A8C\SpecialProjects\Template\Tests\Unit\Doubles\RecordingWCSettingsSection;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Exercises WC_Settings_Section::is_needed(), WC_Settings_Section::meets_minimum_wc_version(), and
- * the public ComponentTree::boot() walker: the negative integration gate, its pure version
- * comparison, and component gating. The production classes require only the ABSPATH boot guard
- * for these Unit tests, which use hand-rolled recording doubles instead of Mockery or Brain-Monkey.
+ * Exercises the WooCommerce-core gate's negative case and the pure version comparison without
+ * WordPress.
  *
  * @since   1.0.0
  * @version 1.0.0
  */
 #[CoversClass( WC_Settings_Section::class )]
-#[CoversClass( ComponentTree::class )]
 final class WCSettingsSectionTest extends TestCase {
 	/**
 	 * Satisfies the production files' `ABSPATH` boot guard before their classes are first
@@ -45,39 +40,6 @@ final class WCSettingsSectionTest extends TestCase {
 	 */
 	public function test_is_needed_is_false_without_the_real_plugin(): void {
 		self::assertFalse( ( new WC_Settings_Section() )->is_needed() );
-	}
-
-	/**
-	 * The registry gate never initializes a component that reports itself as not needed.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public function test_component_tree_skips_initialization_when_not_needed(): void {
-		RecordingWCSettingsSection::reset();
-		RecordingWCSettingsSection::$needed = false;
-
-		( new ComponentTree() )->boot( array( RecordingWCSettingsSection::class ) );
-
-		self::assertFalse( RecordingWCSettingsSection::$initialized );
-	}
-
-	/**
-	 * The registry gate initializes a component that reports itself as needed.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public function test_component_tree_runs_initialization_when_needed(): void {
-		RecordingWCSettingsSection::reset();
-
-		( new ComponentTree() )->boot( array( RecordingWCSettingsSection::class ) );
-
-		self::assertTrue( RecordingWCSettingsSection::$initialized );
 	}
 
 	/**
