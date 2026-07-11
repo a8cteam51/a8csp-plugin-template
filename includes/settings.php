@@ -3,12 +3,16 @@
 defined( 'ABSPATH' ) || exit;
 
 /**
- * Procedural settings code (options, sections, fields, and integration registration) belongs
- * here. This file loads automatically through the `includes/` drop-in loader in functions.php.
- *
- * The class-based alternative is the `Settings` component in `src/Settings.php`. Both are
- * legitimate homes; choose deliberately between procedural and component-based organization.
+ * Returns the example option's value. Each typed option reader names its option, applies its
+ * default, and casts the return so callers never touch raw `get_option()` mixed values. The write
+ * side — registration, sanitization, and rendering — lives in the `Settings` component in
+ * `src/Settings.php`.
  *
  * @since   1.0.0
  * @version 1.0.0
+ *
+ * @return  string
  */
+function a8csp_template_get_example_option(): string {
+	return (string) get_option( 'a8csp_template_example_option', '' );
+}

@@ -5,7 +5,8 @@
         "functions.php",
         "a8csp-template-plugin.php",
         "functions-bootstrap.php",
-        "includes/assets.php"
+        "includes/assets.php",
+        "includes/settings.php"
     ],
     "symbol-whitelist": [
         "ARRAY_A",

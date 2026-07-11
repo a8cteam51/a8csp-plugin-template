@@ -103,6 +103,8 @@ final class Settings implements Component {
 	/**
 	 * Renders the persisted value as a text field. Escaping on output is the point this example
 	 * models, even though the value is also sanitized before WordPress persists it.
+	 * The value comes through the typed reader in `includes/settings.php`, the worked example of
+	 * reading an option this component registers.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -113,7 +115,7 @@ final class Settings implements Component {
 		\printf(
 			'<input type="text" id="%1$s" name="%1$s" value="%2$s" />',
 			\esc_attr( self::OPTION_KEY ),
-			\esc_attr( (string) \get_option( self::OPTION_KEY, '' ) )
+			\esc_attr( a8csp_template_get_example_option() )
 		);
 	}
 

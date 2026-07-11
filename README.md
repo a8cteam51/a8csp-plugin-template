@@ -23,14 +23,20 @@ GitHub Actions workflow used to turn this template into a new plugin repository.
   they boot in registration order.
 - `src/Settings.php` is the base-WordPress example component. It persists
   `a8csp_template_example_option` through the Settings API on the General options
-  page and serves as the worked example for the uninstall footprint.
+  page and serves as the worked example for the uninstall footprint. For a plugin
+  that persists nothing, delete `src/Settings.php`, its `COMPONENTS` entry in
+  `src/Plugin.php`, its option line in the `uninstall.php` footprint, and
+  `includes/settings.php`.
 - `src/Integrations.php` is the worked example of a `ComponentContainer`. Its one
   declared child, `src/Integrations/WC_Settings_Section.php`, is a
   WooCommerce-core-gated component that registers a real section in WooCommerce →
   Settings → Advanced and persists `a8csp_template_wc_example_option`. The
   `src/Integrations/` folder is the deletable WooCommerce tier; see "Watering down to
   plain WordPress" in `README.scaffold.md`.
-- `includes/` and `languages/` (translations) are extension points. PHP files dropped into `includes/` load automatically inside WordPress; files prefixed with an underscore are skipped. `languages/` ships an example POT generated from the template's own strings; regenerate it with `composer i18n:makepot`.
+- `includes/` contains automatically loaded procedural helpers, including typed option readers,
+  and `languages/` contains translations. PHP files dropped into `includes/` load automatically
+  inside WordPress; files prefixed with an underscore are skipped. `languages/` ships an example
+  POT generated from the template's own strings; regenerate it with `composer i18n:makepot`.
 - `models/` is an extension point for classmapped data/model classes.
 - `templates/` is an extension point for template partials rendered by components.
 - `uninstall.php` holds the plugin's complete persisted footprint inline — every
