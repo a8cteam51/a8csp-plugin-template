@@ -7,7 +7,7 @@
 **Requires PHP:** 8.5
 **Stable tag:** 1.0.0
 **License:** GPL v2 or later
-**License URI:** https://www.gnu.org/licenses/gpl-2.0.html
+**License URI:** <https://www.gnu.org/licenses/gpl-2.0.html>
 
 EXAMPLE_REPO_DESCRIPTION
 
@@ -27,7 +27,7 @@ This plugin boots whether or not WooCommerce is active. The example WooCommerce 
 
 ### INSTALL MANUALLY
 
-1. Download the plugin from https://wordpress.org/plugins/ and unzip the archive.
+1. Download the plugin from <https://wordpress.org/plugins/> and unzip the archive.
 1. Upload the `EXAMPLE_REPO_NAME` folder to the `/wp-content/plugins/` directory.
 1. Activate the plugin through the `Plugins` menu in WordPress.
 

@@ -76,6 +76,11 @@ const buildTemplate = async ( filePath ) => {
 		renderedTemplate = renderedTemplate.replaceAll( key, value );
 	}
 
+	if ( filePath.endsWith( '.php' ) ) {
+		// PHP files never need trailing whitespace; stripping it prevents empty descriptions from leaving phpcs-failing blank lines.
+		renderedTemplate = renderedTemplate.replace( /[ \t]+$/gm, '' );
+	}
+
 	if ( renderedTemplate !== templateFile ) {
 		console.log( 'Changes were made. Overwriting file.' );
 		await writeFile( filePath, renderedTemplate );
