@@ -7,7 +7,7 @@
  *
  * @since       1.0.0
  * @version     1.0.0
- * @package     A8C\SpecialProjects\Plugins
+ * @package     A8C\SpecialProjects\Template
  */
 
 \defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
