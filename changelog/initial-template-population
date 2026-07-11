@@ -1,0 +1,4 @@
+Significance: major
+Type: added
+
+Provides a WordPress plugin bootstrap split across an entry file and a below-floor `functions-bootstrap.php`; a composable component-tree runtime under `src/Framework/` (`Component`, `ComponentContainer`, and the `ComponentTree` boot walker) with `Plugin` as the editable registry; a three-rung example ladder — a Gutenberg block, a base-WordPress `Settings` component persisting an option, and a WooCommerce-gated Advanced-tab settings section — with a live uninstall footprint; an example POT; a three-tier PHPUnit suite plus Playwright end-to-end tests; and centralized CI and QA wired to the `a8csp/configs` shared package.
