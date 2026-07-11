@@ -26,8 +26,8 @@ final class PluginBootGateTest extends TestCase {
 	 * @return  void
 	 */
 	public static function setUpBeforeClass(): void {
-		if ( ! defined( 'ABSPATH' ) ) {
-			define( 'ABSPATH', __DIR__ . '/' );
+		if ( ! \defined( 'ABSPATH' ) ) {
+			\define( 'ABSPATH', __DIR__ . '/' );
 		}
 
 		require_once __DIR__ . '/wp-hook-stubs.php';

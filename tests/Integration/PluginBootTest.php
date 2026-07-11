@@ -31,8 +31,8 @@ final class PluginBootTest extends TestCase {
 	public function test_plugin_boots_on_supported_runtime(): void {
 		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS );
 		self::assertTrue( \function_exists( 'a8csp_template_plugin' ) );
-		self::assertNotFalse( \has_action( 'plugins_loaded', 'a8csp_template_plugin' ) );
-		self::assertInstanceOf( Plugin::class, \a8csp_template_plugin() );
+		self::assertNotFalse( has_action( 'plugins_loaded', 'a8csp_template_plugin' ) );
+		self::assertInstanceOf( Plugin::class, a8csp_template_plugin() );
 
 		$block_metadata = \json_decode(
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local filesystem read of a tracked build artifact, not a remote resource.
@@ -52,12 +52,12 @@ final class PluginBootTest extends TestCase {
 
 		// A direct call verifies registration without firing every shared `admin_init` callback.
 		( new Settings() )->register_settings();
-		self::assertTrue( \array_key_exists( 'a8csp_template_example_option', \get_registered_settings() ) );
+		self::assertTrue( \array_key_exists( 'a8csp_template_example_option', get_registered_settings() ) );
 
-		$sections = \apply_filters( 'woocommerce_get_sections_advanced', array() );
+		$sections = apply_filters( 'woocommerce_get_sections_advanced', array() );
 		self::assertArrayHasKey( 'a8csp_template', $sections );
 
-		$rows = \apply_filters( 'woocommerce_get_settings_advanced', array(), 'a8csp_template' );
+		$rows = apply_filters( 'woocommerce_get_settings_advanced', array(), 'a8csp_template' );
 		self::assertContains( 'a8csp_template_wc_example_option', \array_column( $rows, 'id' ) );
 	}
 
@@ -74,7 +74,7 @@ final class PluginBootTest extends TestCase {
 	public function test_second_boot_does_not_rewire_components(): void {
 		self::assertSame( 1, $this->count_blocks_init_registrations() );
 
-		$plugin = \a8csp_template_plugin();
+		$plugin = a8csp_template_plugin();
 		self::assertInstanceOf( Plugin::class, $plugin );
 		$plugin->boot();
 

@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template;
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * Contract for a self-contained plugin component.

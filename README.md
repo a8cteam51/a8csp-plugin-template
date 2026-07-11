@@ -8,54 +8,45 @@ GitHub Actions workflow used to turn this template into a new plugin repository.
 
 ## What is in this repository
 
-- `a8csp-template-plugin.php` is the plugin entry. It defines the header and
-  constants, then wires the requirements gate and plugin boot. It first requires
-  `functions-bootstrap.php`, where the gate's helper functions live.
-- `functions-bootstrap.php` contains the bootstrap gate's helpers for plugin
-  metadata, version-compatibility checks, the requirements gate, and its admin-notice
-  reporter. Both root bootstrap files stay parsable below the plugin's PHP floor, and
-  CI lints them against the older PHP versions.
-- `functions.php` boots the plugin's component list and loads the PHP helper files under `includes/`.
-- `src/` contains the PSR-4 classes. A plugin is a list of components; a component
-  is a class with `is_needed()` and `initialize()`; the boot is a foreach you can
-  read. `src/Component.php` is the one contract, and you edit exactly one file,
-  `src/Plugin.php`: add your components to the `COMPONENTS` list; they boot in
-  registration order.
-- `src/Settings.php` is the base-WordPress example component. It persists
-  `a8csp_template_example_option` through the Settings API on the General options
-  page and serves as the worked example for the uninstall footprint. For a plugin
-  that persists nothing, delete `src/Settings.php`, its `COMPONENTS` entry in
-  `src/Plugin.php`, its option line in the `uninstall.php` footprint, and
-  `includes/settings.php`.
-- `src/Integrations/` groups the WooCommerce tier by folder.
-  `src/Integrations/WC_Settings_Section.php` is a WooCommerce-core-gated component
-  that registers a real section in WooCommerce → Settings → Advanced and persists
-  `a8csp_template_wc_example_option`. The folder is the deletable WooCommerce tier
-  (see "Watering down to plain WordPress" in `README.scaffold.md`).
-- `includes/` contains automatically loaded procedural helpers, including typed option readers,
-  and `languages/` contains translations. PHP files dropped into `includes/` load automatically
-  inside WordPress; files prefixed with an underscore are skipped. `languages/` ships an example
-  POT generated from the template's own strings; regenerate it with `composer i18n:makepot`.
+A plugin is a list of components; a component is a class with `is_needed()` and
+`initialize()`; the boot is a foreach you can read.
+
+- `a8csp-template-plugin.php` defines the plugin header and constants, requires
+  `functions-bootstrap.php`, and wires the requirements gate and plugin boot.
+- `functions-bootstrap.php` provides plugin metadata, version-compatibility checks, the requirements
+  gate, and its admin-notice reporter; both root bootstrap files stay parsable below the plugin's PHP
+  floor, and CI lints them against the older PHP versions.
+- `functions.php` boots the component list and loads the PHP helper files under `includes/`.
+- `src/` contains the PSR-4 classes: `src/Component.php` is the one contract, and `src/Plugin.php` is
+  the one file to edit when adding components to `COMPONENTS`; they boot in registration order.
+- `src/Settings.php` is the base-WordPress example component, persists
+  `a8csp_template_example_option` through the Settings API on the General options page, and
+  demonstrates the uninstall footprint. Teardown recipes live in `README.scaffold.md`.
+- `src/Integrations/` groups the deletable WooCommerce tier;
+  `src/Integrations/WC_Settings_Section.php` gates itself on WooCommerce core, registers a section in
+  WooCommerce → Settings → Advanced, and persists `a8csp_template_wc_example_option`. See "Watering
+  down to plain WordPress" in `README.scaffold.md`.
+
+  When integrations multiply behind one shared gate, give them a parent component whose
+  `initialize()` constructs and gates its children — five lines, written the day they're needed.
+
+- `includes/` contains automatically loaded procedural helpers, including typed option readers; PHP
+  files dropped there load automatically inside WordPress, while underscore-prefixed files are skipped.
+- `languages/` contains translations and an example POT generated from the template's strings;
+  regenerate it with `composer i18n:makepot`.
 - `models/` is an extension point for classmapped data/model classes.
 - `templates/` is an extension point for template partials rendered by components.
-- `uninstall.php` holds the plugin's complete persisted footprint inline — every
-  option and user-meta key any component writes, grouped by owning component — and
-  deletes them during WordPress's cold uninstall bootstrap. Add an entry in the same
-  change that introduces the corresponding write; a component that persists state
-  cross-references its keys with `@see uninstall.php` in its class docblock.
-- `blocks/src/foobar/` is the source for an example block. `blocks/build/` is the
-  tracked build output. `npm run build` generates `blocks/build/blocks-manifest.php`;
-  it is committed with that output, and `src/Blocks.php` uses it to register all
-  built blocks as one metadata collection.
-- `assets/js/src/editor.js` defines the shared editor hook entry point.
-  `assets/js/build/` contains the tracked build output used in the editor.
-- `tests/` contains the automated test suite. See `tests/README.md` for the
-  local test workflow.
-- `.github/workflows/` contains PHP, JavaScript, CSS, syntax, and
-  scaffold-fill workflows.
-
-When integrations multiply behind one shared gate, give them a parent component whose
-`initialize()` constructs and gates its children — five lines, written the day they're needed.
+- `uninstall.php` holds and deletes the complete persisted footprint during WordPress's cold uninstall
+  bootstrap, with every option and user-meta key grouped by owning component; add an entry with each
+  corresponding write, and cross-reference persisted keys with `@see uninstall.php` in the component
+  class docblock.
+- `blocks/src/foobar/` contains the example block source, while `blocks/build/` contains tracked build
+  output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`, which
+  `src/Blocks.php` uses to register all built blocks as one metadata collection.
+- `assets/js/src/editor.js` defines the shared editor hook entry point, and `assets/js/build/` contains
+  its tracked output.
+- `tests/` contains the automated test suite; see `tests/README.md` for the local workflow.
+- `.github/workflows/` contains PHP, JavaScript, CSS, syntax, and scaffold-fill workflows.
 
 ## Scaffold generation
 

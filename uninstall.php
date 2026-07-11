@@ -10,7 +10,7 @@
  * @package     A8C\SpecialProjects\Plugins
  */
 
-defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
+\defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /*
  * The plugin's persisted footprint. Every option and user-meta key any component writes is

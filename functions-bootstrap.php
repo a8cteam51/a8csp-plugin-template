@@ -16,10 +16,13 @@
  * @license     GPL-2.0-or-later
  */
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * Returns the plugin's metadata.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
  *
  * @template PluginMetaKey of key-of<PluginMetaData>
  *
@@ -34,11 +37,11 @@ function a8csp_template_get_plugin_metadata( $property = null ) {
 	$cache_key     = $can_translate ? 'translated' : 'raw';
 
 	if ( ! isset( $plugin_data[ $cache_key ] ) ) {
-		if ( ! function_exists( 'get_plugin_data' ) ) {
+		if ( ! \function_exists( 'get_plugin_data' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_file               = trailingslashit( WP_PLUGIN_DIR ) . constant( 'A8CSP_TEMPLATE_BASENAME' );
+		$plugin_file               = trailingslashit( WP_PLUGIN_DIR ) . \constant( 'A8CSP_TEMPLATE_BASENAME' );
 		$plugin_data[ $cache_key ] = get_plugin_data( $plugin_file, false, $can_translate );
 	}
 
@@ -47,7 +50,7 @@ function a8csp_template_get_plugin_metadata( $property = null ) {
 		return $metadata;
 	}
 
-	if ( is_string( $property ) && isset( $metadata[ $property ] ) ) {
+	if ( \is_string( $property ) && isset( $metadata[ $property ] ) ) {
 		return $metadata[ $property ];
 	}
 
@@ -99,7 +102,7 @@ function a8csp_template_get_plugin_version() {
  * @return  bool
  */
 function a8csp_template_is_wp_version_compatible( $min_wp_version ) {
-	if ( ! function_exists( 'is_wp_version_compatible' ) ) {
+	if ( ! \function_exists( 'is_wp_version_compatible' ) ) {
 		return false;
 	}
 
@@ -114,7 +117,7 @@ function a8csp_template_is_wp_version_compatible( $min_wp_version ) {
  * @return  bool
  */
 function a8csp_template_is_php_version_compatible( $min_php_version ) {
-	if ( ! function_exists( 'is_php_version_compatible' ) ) {
+	if ( ! \function_exists( 'is_php_version_compatible' ) ) {
 		return false;
 	}
 
@@ -164,7 +167,7 @@ function a8csp_template_output_requirements_error( $error ) {
 				return;
 			}
 
-			$requirements_error = \wp_sprintf(
+			$requirements_error = wp_sprintf(
 				/* translators: 1: Plugin name, 2: Plugin version */
 				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'a8csp-plugin-template' ),
 				a8csp_template_get_plugin_metadata( 'Name' ),
@@ -172,12 +175,12 @@ function a8csp_template_output_requirements_error( $error ) {
 			);
 
 			if ( $error->has_errors() ) {
-				$requirements_error .= ' ' . \__( 'Your environment does not meet all the system requirements listed below:', 'a8csp-plugin-template' );
+				$requirements_error .= ' ' . __( 'Your environment does not meet all the system requirements listed below:', 'a8csp-plugin-template' );
 				$requirements_error .= '<ul class="ul-disc">';
 
 				foreach ( $error->get_error_codes() as $error_code ) {
 					$error_data = $error->get_error_data( $error_code );
-					if ( ! is_array( $error_data ) ) {
+					if ( ! \is_array( $error_data ) ) {
 						$error_data = array();
 					}
 

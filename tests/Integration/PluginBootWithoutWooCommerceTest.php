@@ -46,7 +46,7 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 
 		self::assertTrue( \WP_Block_Type_Registry::get_instance()->is_registered( $block_metadata['name'] ) );
 		self::assertSame( 1, $this->count_settings_admin_init_registrations() );
-		self::assertFalse( \has_filter( 'woocommerce_get_sections_advanced' ) );
+		self::assertFalse( has_filter( 'woocommerce_get_sections_advanced' ) );
 		self::assertFalse( ( new WC_Settings_Section() )->is_needed() );
 	}
 

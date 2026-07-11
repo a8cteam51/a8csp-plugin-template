@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * Returns the example option's value. Each typed option reader names its option, applies its

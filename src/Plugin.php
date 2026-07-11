@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template;
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * A plugin is a list of components: `COMPONENTS` below is that list, and `boot()` runs it — a

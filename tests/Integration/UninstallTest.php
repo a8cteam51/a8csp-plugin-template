@@ -38,7 +38,7 @@ final class UninstallTest extends TestCase {
 	 * @return  void
 	 */
 	protected function tearDown(): void {
-		\delete_option( self::CANARY_OPTION );
+		delete_option( self::CANARY_OPTION );
 
 		parent::tearDown();
 	}
@@ -61,27 +61,27 @@ final class UninstallTest extends TestCase {
 		$user_id   = self::an_existing_user_id();
 
 		foreach ( $footprint['options'] as $option ) {
-			\update_option( $option, 'sentinel' );
+			update_option( $option, 'sentinel' );
 		}
 
 		foreach ( $footprint['user_meta'] as $meta_key ) {
-			\update_user_meta( $user_id, $meta_key, 'sentinel' );
+			update_user_meta( $user_id, $meta_key, 'sentinel' );
 		}
 
-		\update_option( self::CANARY_OPTION, 'sentinel' );
+		update_option( self::CANARY_OPTION, 'sentinel' );
 
 		\define( 'WP_UNINSTALL_PLUGIN', true );
 		require \dirname( __DIR__, 2 ) . '/uninstall.php';
 
 		foreach ( $footprint['options'] as $option ) {
-			self::assertFalse( \get_option( $option ), "uninstall.php must delete the '{$option}' option" );
+			self::assertFalse( get_option( $option ), "uninstall.php must delete the '{$option}' option" );
 		}
 
 		foreach ( $footprint['user_meta'] as $meta_key ) {
-			self::assertSame( '', \get_user_meta( $user_id, $meta_key, true ), "uninstall.php must delete the '{$meta_key}' user-meta key" );
+			self::assertSame( '', get_user_meta( $user_id, $meta_key, true ), "uninstall.php must delete the '{$meta_key}' user-meta key" );
 		}
 
-		self::assertSame( 'sentinel', \get_option( self::CANARY_OPTION ), 'uninstall.php must not delete keys outside its footprint' );
+		self::assertSame( 'sentinel', get_option( self::CANARY_OPTION ), 'uninstall.php must not delete keys outside its footprint' );
 	}
 
 	/**
@@ -95,7 +95,7 @@ final class UninstallTest extends TestCase {
 	 * @return  int
 	 */
 	private static function an_existing_user_id(): int {
-		$users = \get_users(
+		$users = get_users(
 			array(
 				'number' => 1,
 				'fields' => 'ID',

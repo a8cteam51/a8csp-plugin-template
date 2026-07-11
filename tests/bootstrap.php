@@ -12,7 +12,7 @@
 require_once __DIR__ . '/../vendor/autoload.php';
 
 $a8csp_template_wp_load = '/var/www/html/wp-load.php';
-if ( file_exists( $a8csp_template_wp_load ) ) {
+if ( \file_exists( $a8csp_template_wp_load ) ) {
 	require_once $a8csp_template_wp_load;
 	require_once __DIR__ . '/../a8csp-template-plugin.php';
 }

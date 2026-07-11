@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template;
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * Provides the canonical base-WordPress component. It registers and persists one setting through
@@ -55,7 +55,7 @@ final class Settings implements Component {
 	 * @return  void
 	 */
 	public function initialize(): void {
-		\add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_init', array( $this, 'register_settings' ) );
 	}
 
 	// endregion
@@ -72,7 +72,7 @@ final class Settings implements Component {
 	 * @return  void
 	 */
 	public function register_settings(): void {
-		\register_setting(
+		register_setting(
 			'general',
 			self::OPTION_KEY,
 			array(
@@ -82,16 +82,16 @@ final class Settings implements Component {
 			)
 		);
 
-		\add_settings_section(
+		add_settings_section(
 			'a8csp_template_example_section',
-			\__( 'A8CSP Template Plugin', 'a8csp-plugin-template' ),
+			__( 'A8CSP Template Plugin', 'a8csp-plugin-template' ),
 			'__return_empty_string',
 			'general'
 		);
 
-		\add_settings_field(
+		add_settings_field(
 			'a8csp_template_example_field',
-			\__( 'Example option', 'a8csp-plugin-template' ),
+			__( 'Example option', 'a8csp-plugin-template' ),
 			array( $this, 'render_field' ),
 			'general',
 			'a8csp_template_example_section'
@@ -112,8 +112,8 @@ final class Settings implements Component {
 	public function render_field(): void {
 		\printf(
 			'<input type="text" id="%1$s" name="%1$s" value="%2$s" />',
-			\esc_attr( self::OPTION_KEY ),
-			\esc_attr( a8csp_template_get_example_option() )
+			esc_attr( self::OPTION_KEY ),
+			esc_attr( a8csp_template_get_example_option() )
 		);
 	}
 

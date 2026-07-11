@@ -4,7 +4,7 @@ namespace A8C\SpecialProjects\Template\Integrations;
 
 use A8C\SpecialProjects\Template\Component;
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * Provides the full-tier WooCommerce extension. It gates on WooCommerce core and the
@@ -89,12 +89,12 @@ class WC_Settings_Section implements Component {
 	 */
 	public function initialize(): void {
 		if ( ! self::meets_minimum_wc_version( (string) \constant( 'WC_VERSION' ), a8csp_template_get_plugin_metadata( 'WC requires at least' ) ) ) {
-			\add_action( 'admin_notices', array( $this, 'render_version_notice' ) );
+			add_action( 'admin_notices', array( $this, 'render_version_notice' ) );
 			return;
 		}
 
-		\add_filter( 'woocommerce_get_sections_advanced', array( $this, 'add_section' ) );
-		\add_filter( 'woocommerce_get_settings_advanced', array( $this, 'get_settings' ), 10, 2 );
+		add_filter( 'woocommerce_get_sections_advanced', array( $this, 'add_section' ) );
+		add_filter( 'woocommerce_get_settings_advanced', array( $this, 'get_settings' ), 10, 2 );
 	}
 
 	// endregion
@@ -112,19 +112,19 @@ class WC_Settings_Section implements Component {
 	 */
 	public function render_version_notice(): void {
 		// phpcs:ignore WordPress.WP.Capabilities.Unknown -- WooCommerce registers this capability for store managers and administrators.
-		if ( ! \current_user_can( 'manage_woocommerce' ) ) {
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return;
 		}
 
-		$notice = \wp_sprintf(
+		$notice = wp_sprintf(
 			/* translators: 1: Plugin name, 2: Minimum WooCommerce version, 3: Running WooCommerce version */
-			\__( 'The %1$s WooCommerce settings section requires WooCommerce %2$s or newer; version %3$s is running, so the section stayed off.', 'a8csp-plugin-template' ),
+			__( 'The %1$s WooCommerce settings section requires WooCommerce %2$s or newer; version %3$s is running, so the section stayed off.', 'a8csp-plugin-template' ),
 			a8csp_template_get_plugin_name(),
 			(string) a8csp_template_get_plugin_metadata( 'WC requires at least' ),
 			(string) \constant( 'WC_VERSION' )
 		);
 
-		\wp_admin_notice( \esc_html( $notice ), array( 'type' => 'error' ) );
+		wp_admin_notice( esc_html( $notice ), array( 'type' => 'error' ) );
 	}
 
 	/**
@@ -139,7 +139,7 @@ class WC_Settings_Section implements Component {
 	 * @return  array<string, string>
 	 */
 	public function add_section( array $sections ): array {
-		$sections['a8csp_template'] = \__( 'A8CSP Template Plugin', 'a8csp-plugin-template' );
+		$sections['a8csp_template'] = __( 'A8CSP Template Plugin', 'a8csp-plugin-template' );
 
 		return $sections;
 	}
@@ -165,13 +165,13 @@ class WC_Settings_Section implements Component {
 
 		return array(
 			array(
-				'title' => \__( 'A8CSP Template Plugin', 'a8csp-plugin-template' ),
+				'title' => __( 'A8CSP Template Plugin', 'a8csp-plugin-template' ),
 				'type'  => 'title',
 				'id'    => 'a8csp_template_wc_example_section',
 			),
 			array(
-				'title' => \__( 'Example option', 'a8csp-plugin-template' ),
-				'desc'  => \__( 'A persisted example setting owned by the WooCommerce integration.', 'a8csp-plugin-template' ),
+				'title' => __( 'Example option', 'a8csp-plugin-template' ),
+				'desc'  => __( 'A persisted example setting owned by the WooCommerce integration.', 'a8csp-plugin-template' ),
 				'id'    => self::OPTION_KEY,
 				'type'  => 'text',
 			),

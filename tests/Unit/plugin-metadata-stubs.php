@@ -10,7 +10,7 @@
  * @package A8C\SpecialProjects\Template
  */
 
-if ( ! function_exists( 'a8csp_template_get_plugin_metadata' ) ) {
+if ( ! \function_exists( 'a8csp_template_get_plugin_metadata' ) ) {
 	/**
 	 * Returns the canned plugin metadata value for a requested property.
 	 *
@@ -26,7 +26,7 @@ if ( ! function_exists( 'a8csp_template_get_plugin_metadata' ) ) {
 	}
 }
 
-if ( ! function_exists( 'a8csp_template_get_plugin_name' ) ) {
+if ( ! \function_exists( 'a8csp_template_get_plugin_name' ) ) {
 	/**
 	 * Returns the canned plugin name.
 	 *

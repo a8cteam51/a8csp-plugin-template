@@ -8,7 +8,7 @@
  *
  * @since       1.0.0
  * @version     1.0.0
- * @package     A8C\SpecialProjects\Plugins
+ * @package     A8C\SpecialProjects\Template
  * @author      A8C Special Projects
  * @license     GPL-2.0-or-later
  *
@@ -32,12 +32,12 @@
  * WC tested up to:         10.9
  */
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 // Define plugin constants.
-define( 'A8CSP_TEMPLATE_BASENAME', plugin_basename( __FILE__ ) );
-define( 'A8CSP_TEMPLATE_DIR_PATH', plugin_dir_path( __FILE__ ) );
-define( 'A8CSP_TEMPLATE_DIR_URL', plugin_dir_url( __FILE__ ) );
+\define( 'A8CSP_TEMPLATE_BASENAME', plugin_basename( __FILE__ ) );
+\define( 'A8CSP_TEMPLATE_DIR_PATH', plugin_dir_path( __FILE__ ) );
+\define( 'A8CSP_TEMPLATE_DIR_URL', plugin_dir_url( __FILE__ ) );
 
 // The gate's helper functions live in functions-bootstrap.php, which shares this file's
 // below-floor parse constraint; they must exist before the compatibility hook and the
@@ -53,21 +53,21 @@ require_once A8CSP_TEMPLATE_DIR_PATH . '/functions-bootstrap.php';
 add_action(
 	'before_woocommerce_init',
 	static function () {
-		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+		if ( \class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
 			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
 		}
 	}
 );
 
 // Load the autoloader.
-if ( ! is_file( A8CSP_TEMPLATE_DIR_PATH . '/vendor/autoload.php' ) ) {
+if ( ! \is_file( A8CSP_TEMPLATE_DIR_PATH . '/vendor/autoload.php' ) ) {
 	a8csp_template_output_requirements_error( new WP_Error( 'missing_autoloader' ) );
 	return;
 }
 require_once A8CSP_TEMPLATE_DIR_PATH . '/vendor/autoload.php';
 
 // Bootstrap the plugin (maybe)!
-define( 'A8CSP_TEMPLATE_REQUIREMENTS', a8csp_template_validate_requirements() );
+\define( 'A8CSP_TEMPLATE_REQUIREMENTS', a8csp_template_validate_requirements() );
 if ( is_wp_error( A8CSP_TEMPLATE_REQUIREMENTS ) ) {
 	a8csp_template_output_requirements_error( A8CSP_TEMPLATE_REQUIREMENTS );
 } else {

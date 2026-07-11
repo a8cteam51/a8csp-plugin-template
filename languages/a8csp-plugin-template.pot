@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2026-07-11T19:59:21+00:00\n"
+"POT-Creation-Date: 2026-07-11T20:06:56+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: a8csp-plugin-template\n"
@@ -40,28 +40,28 @@ msgid "A8C Special Projects"
 msgstr ""
 
 #. translators: 1: Plugin name, 2: Plugin version
-#: functions-bootstrap.php:169
+#: functions-bootstrap.php:172
 #, php-format
 msgid "<strong>%1$s (version %2$s)</strong> could not be initialized."
 msgstr ""
 
-#: functions-bootstrap.php:175
+#: functions-bootstrap.php:178
 msgid "Your environment does not meet all the system requirements listed below:"
 msgstr ""
 
 #. translators: 1: Current WP version, 2: Minimum WP version
-#: functions-bootstrap.php:188
+#: functions-bootstrap.php:191
 #, php-format
 msgid "Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s."
 msgstr ""
 
 #. translators: 1: Current PHP version, 2: Minimum PHP version
-#: functions-bootstrap.php:196
+#: functions-bootstrap.php:199
 #, php-format
 msgid "Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s."
 msgstr ""
 
-#: functions-bootstrap.php:202
+#: functions-bootstrap.php:205
 msgid "The autoloader file is missing. Please run <code>composer install</code> to generate it."
 msgstr ""
 

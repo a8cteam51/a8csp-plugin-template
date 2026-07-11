@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 /**
  * The leading `_` in this filename opts it out of the `includes/` glob loader because

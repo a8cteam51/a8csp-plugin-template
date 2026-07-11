@@ -11,7 +11,7 @@
  * @package A8C\SpecialProjects\Template
  */
 
-if ( ! function_exists( 'add_action' ) ) {
+if ( ! \function_exists( 'add_action' ) ) {
 	/**
 	 * Records an action registration in the test ledger.
 	 *
@@ -31,7 +31,7 @@ if ( ! function_exists( 'add_action' ) ) {
 	}
 }
 
-if ( ! function_exists( 'add_filter' ) ) {
+if ( ! \function_exists( 'add_filter' ) ) {
 	/**
 	 * Records a filter registration in the test ledger.
 	 *

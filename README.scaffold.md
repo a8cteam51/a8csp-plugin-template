@@ -39,7 +39,7 @@ If the minimum required version of WooCommerce is present, you will find a secti
 
 To convert this plugin from a WooCommerce extension to a plain WordPress plugin, remove the WooCommerce tier:
 
-1. Delete the `src/Integrations/` directory.
+1. Delete the `src/Integrations/` and `templates/myaccount/` directories.
 2. Remove `Integrations\WC_Settings_Section::class` from the `COMPONENTS` list in `src/Plugin.php`.
 3. Remove the `Integrations\WC_Settings_Section` option line from the `uninstall.php` footprint.
 4. Remove the `wp-plugin/woocommerce` and `php-stubs/woocommerce-stubs` development dependencies from `composer.json`; run `composer update`.
@@ -48,6 +48,8 @@ To convert this plugin from a WooCommerce extension to a plain WordPress plugin,
 7. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php` and `tests/Unit/WCSettingsSectionTest.php`; drop the WooCommerce assertions from `tests/Integration/PluginBootTest.php`.
 8. Remove the WooCommerce-less proof section from `tests/README.md`.
 9. Run `composer quality-check`. What remains — blocks, settings, the component list, the `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
+
+**For a plugin that persists nothing:** delete `src/Settings.php`, its `COMPONENTS` entry in `src/Plugin.php`, its option line in the `uninstall.php` footprint, and `includes/settings.php`.
 
 When integrations multiply behind one shared gate, give them a parent component whose
 `initialize()` constructs and gates its children — five lines, written the day they're needed.

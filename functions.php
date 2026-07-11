@@ -2,7 +2,7 @@
 
 use A8C\SpecialProjects\Template\Plugin;
 
-defined( 'ABSPATH' ) || exit;
+\defined( 'ABSPATH' ) || exit;
 
 // region META
 
@@ -33,11 +33,11 @@ function a8csp_template_plugin(): Plugin {
 
 // region OTHER
 
-$a8csp_template_includes = glob( constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'includes/*.php' );
+$a8csp_template_includes = \glob( \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'includes/*.php' );
 if ( false !== $a8csp_template_includes ) {
-	sort( $a8csp_template_includes ); // Glob order is filesystem-dependent, so sort for a deterministic load order.
+	\sort( $a8csp_template_includes ); // Glob order is filesystem-dependent, so sort for a deterministic load order.
 	foreach ( $a8csp_template_includes as $a8csp_template_include ) {
-		if ( str_starts_with( basename( $a8csp_template_include ), '_' ) ) {
+		if ( \str_starts_with( \basename( $a8csp_template_include ), '_' ) ) {
 			continue; // An underscore prefix opts a file out of automatic loading.
 		}
 
