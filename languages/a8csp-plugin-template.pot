@@ -1,0 +1,97 @@
+# Copyright (C) 2026 A8C Special Projects
+# This file is distributed under the GPL v2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: A8CSP Template Plugin 1.0.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/a8csp-plugin-template\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-11T14:00:52+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: a8csp-plugin-template\n"
+
+#. Plugin Name of the plugin
+#: a8csp-template-plugin.php:18
+#: src/Integrations/WC_Settings_Section.php:112
+#: src/Integrations/WC_Settings_Section.php:138
+#: src/Settings.php:89
+msgid "A8CSP Template Plugin"
+msgstr ""
+
+#. Plugin URI of the plugin
+#. Author URI of the plugin
+#: a8csp-template-plugin.php:19
+#: a8csp-template-plugin.php:26
+msgid "https://specialprojects.automattic.com"
+msgstr ""
+
+#. Description of the plugin
+#: a8csp-template-plugin.php:20
+msgid "A template for A8C Special Projects plugins."
+msgstr ""
+
+#. Author of the plugin
+#: a8csp-template-plugin.php:25
+msgid "A8C Special Projects"
+msgstr ""
+
+#. translators: 1: Plugin name, 2: Plugin version
+#: functions-bootstrap.php:169
+#, php-format
+msgid "<strong>%1$s (version %2$s)</strong> could not be initialized."
+msgstr ""
+
+#: functions-bootstrap.php:175
+msgid "Your environment does not meet all the system requirements listed below:"
+msgstr ""
+
+#. translators: 1: Current WP version, 2: Minimum WP version
+#: functions-bootstrap.php:188
+#, php-format
+msgid "Current <em>WordPress version (%1$s)</em> does not meet minimum required version of %2$s."
+msgstr ""
+
+#. translators: 1: Current PHP version, 2: Minimum PHP version
+#: functions-bootstrap.php:196
+#, php-format
+msgid "Current <em>PHP version (%1$s)</em> does not meet minimum required version of %2$s."
+msgstr ""
+
+#: functions-bootstrap.php:202
+msgid "The autoloader file is missing. Please run <code>composer install</code> to generate it."
+msgstr ""
+
+#: src/Integrations/WC_Settings_Section.php:143
+#: src/Settings.php:96
+msgid "Example option"
+msgstr ""
+
+#: src/Integrations/WC_Settings_Section.php:144
+msgid "A persisted example setting owned by the WooCommerce integration."
+msgstr ""
+
+#: blocks/build/foobar/index.js:1
+#: blocks/src/foobar/edit.js:35
+msgid "Todo List – hello from the editor!"
+msgstr ""
+
+#: blocks/build/foobar/index.js:1
+#: blocks/src/foobar/save.js:28
+msgid "Todo List – hello from the saved content from foobar!"
+msgstr ""
+
+#: blocks/build/foobar/block.json
+#: blocks/src/foobar/block.json
+msgctxt "block title"
+msgid "FooBar Block"
+msgstr ""
+
+#: blocks/build/foobar/block.json
+#: blocks/src/foobar/block.json
+msgctxt "block description"
+msgid "Example block scaffolded with Create Block tool."
+msgstr ""
