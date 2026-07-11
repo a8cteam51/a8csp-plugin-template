@@ -2,8 +2,8 @@
 
 namespace A8C\SpecialProjects\Template\Tests\Unit\Doubles;
 
-use A8C\SpecialProjects\Template\Framework\Component;
-use A8C\SpecialProjects\Template\Framework\ComponentContainer;
+use A8C\SpecialProjects\Template\Boot\Component;
+use A8C\SpecialProjects\Template\Boot\ComponentContainer;
 
 /**
  * Second configurable recording component container for boot-tree tests.
@@ -11,7 +11,7 @@ use A8C\SpecialProjects\Template\Framework\ComponentContainer;
  * @since   1.0.0
  * @version 1.0.0
  */
-final class RecordingContainerB implements Component, ComponentContainer {
+final class RecordingContainerB implements ComponentContainer {
 	/**
 	 * The configured return value for `is_needed()`.
 	 *

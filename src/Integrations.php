@@ -2,8 +2,8 @@
 
 namespace A8C\SpecialProjects\Template;
 
-use A8C\SpecialProjects\Template\Framework\Component;
-use A8C\SpecialProjects\Template\Framework\ComponentContainer;
+use A8C\SpecialProjects\Template\Boot\Component;
+use A8C\SpecialProjects\Template\Boot\ComponentContainer;
 
 defined( 'ABSPATH' ) || exit;
 
@@ -16,7 +16,7 @@ defined( 'ABSPATH' ) || exit;
  * @since   1.0.0
  * @version 1.0.0
  */
-final class Integrations implements Component, ComponentContainer {
+final class Integrations implements ComponentContainer {
 	// region METHODS
 
 	/**

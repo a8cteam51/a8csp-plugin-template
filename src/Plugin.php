@@ -2,15 +2,15 @@
 
 namespace A8C\SpecialProjects\Template;
 
-use A8C\SpecialProjects\Template\Framework\Component;
-use A8C\SpecialProjects\Template\Framework\ComponentTree;
+use A8C\SpecialProjects\Template\Boot\Component;
+use A8C\SpecialProjects\Template\Boot\ComponentTree;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
  * This is the plugin file engineers edit: `COMPONENTS` holds the top-level component registry,
- * and `is_needed()` provides the optional whole-plugin gate. The boot machinery lives in
- * `src/Framework/`.
+ * and `is_needed()` provides the optional whole-plugin gate. The boot plumbing lives in
+ * `src/Boot/`.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -67,8 +67,8 @@ final class Plugin {
 	// region HOOKS
 
 	/**
-	 * Boots the plugin's component tree through the framework walker when the plugin reports itself
-	 * as needed. Idempotent: only the first eligible call has any effect.
+	 * Boots the plugin's component tree through the `Boot\ComponentTree` loader when the plugin
+	 * reports itself as needed. Idempotent: only the first eligible call has any effect.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0

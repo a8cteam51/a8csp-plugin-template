@@ -16,11 +16,11 @@ GitHub Actions workflow used to turn this template into a new plugin repository.
   reporter. Both root bootstrap files stay parsable below the plugin's PHP floor, and
   CI lints them against the older PHP versions.
 - `functions.php` boots the plugin's component registry and loads the PHP helper files under `includes/`.
-- `src/` contains the PSR-4 classes. `src/Framework/` holds the never-edited
-  machinery: the `Component` and `ComponentContainer` contracts and the
-  `ComponentTree` boot walker. `src/Plugin.php` is the file engineers edit; it holds
-  the `COMPONENTS` registry and the optional whole-plugin `is_needed()` gate.
-  Components boot in registration order.
+- `src/` contains the PSR-4 classes. `src/Boot/` holds the three files that boot
+  your components — you never edit them. A component is a class with `is_needed()`
+  and `initialize()`; a container is a component that also lists children. You edit
+  exactly one file, `src/Plugin.php`: add your components to the `COMPONENTS` list;
+  they boot in registration order.
 - `src/Settings.php` is the base-WordPress example component. It persists
   `a8csp_template_example_option` through the Settings API on the General options
   page and serves as the worked example for the uninstall footprint.

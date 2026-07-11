@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template\Tests\Unit\Doubles;
 
-use A8C\SpecialProjects\Template\Framework\Component;
+use A8C\SpecialProjects\Template\Boot\Component;
 
 /**
  * Records component construction and initialization for boot-tree tests.

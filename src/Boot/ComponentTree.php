@@ -1,16 +1,17 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Framework;
+namespace A8C\SpecialProjects\Template\Boot;
 
 defined( 'ABSPATH' ) || exit;
 
 /**
- * This is the boot walker — it boots a registry of component classes pre-order (parent before
- * children), gates each component through `is_needed()` (a false gate prunes the whole subtree
- * unconstructed), descends into `ComponentContainer` children, and throws `LogicException` when
- * a class is reached twice anywhere in the graph (a component may belong to a single parent).
+ * The component loader: boots a registry of component classes pre-order (parent before children),
+ * gates each one through `is_needed()` — a false gate prunes the whole subtree unconstructed —
+ * descends into a container's listed children, and throws `LogicException` when a class is
+ * reached twice anywhere in the graph (a component may belong to a single parent).
  *
- * Part of the scaffold's framework: imitated never, edited never.
+ * You don't edit or subclass this — you list components in `Plugin::COMPONENTS` and it boots
+ * them.
  *
  * @since   1.0.0
  * @version 1.0.0

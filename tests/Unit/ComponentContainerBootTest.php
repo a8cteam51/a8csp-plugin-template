@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template\Tests\Unit;
 
-use A8C\SpecialProjects\Template\Framework\ComponentTree;
+use A8C\SpecialProjects\Template\Boot\ComponentTree;
 use A8C\SpecialProjects\Template\Integrations;
 use A8C\SpecialProjects\Template\Integrations\WC_Settings_Section;
 use A8C\SpecialProjects\Template\Plugin;

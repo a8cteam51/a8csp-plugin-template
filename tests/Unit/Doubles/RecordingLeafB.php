@@ -2,7 +2,7 @@
 
 namespace A8C\SpecialProjects\Template\Tests\Unit\Doubles;
 
-use A8C\SpecialProjects\Template\Framework\Component;
+use A8C\SpecialProjects\Template\Boot\Component;
 
 /**
  * Second configurable recording leaf component for boot-tree tests.
