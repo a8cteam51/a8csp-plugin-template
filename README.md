@@ -183,7 +183,7 @@ exist).
 ## Quality checks
 
 PHP checks are configured through `.phpcs.xml`, `.phpcs.tests.xml`, `.phpstan.neon`,
-`.composer-require-checker.json`, and the shared `a8csp/configs` package:
+and the shared `a8csp/configs` package:
 
 ```sh
 composer run-script lint:php

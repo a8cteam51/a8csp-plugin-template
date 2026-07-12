@@ -27,7 +27,6 @@ vendor/bin
 .phpcs.xml
 .phpcs.tests.xml
 .phpstan.neon
-.composer-require-checker.json
 infection.json
 playwright.config.js
 postcss.config.js
