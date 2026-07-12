@@ -109,6 +109,23 @@ settings-section component (`src/Integrations/WC_Settings_Section.php`) gates it
 that WooCommerce is active and meets the `WC requires at least` header floor. The main bootstrap
 declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is active.
 
+## Multisite
+
+Generated plugins are expected to support multisite networks and to be tested on one when the
+client runs one. Multisite is a design consideration while building, not a porting step at the
+end — when adding a component, decide its scope deliberately:
+
+- Options are per-site; user meta is network-global. `uninstall.php` models the consequence:
+  its options sweep visits every site of a network, while its user-meta pass runs once.
+- The requirements gate reports through `all_admin_notices`, which fires on site and network
+  admin screens alike, so a failed network activation is explained where it happened.
+- The template registers no activation or deactivation hooks. A plugin that adds them must
+  handle the `$network_wide` activation flag and provision sites created after network
+  activation (`wp_initialize_site`).
+- Component `is_needed()` gates run on every request, so per-site environmental differences —
+  such as WooCommerce being active on only some sites — resolve correctly site by site.
+- The wp-env fixtures are single-site; multisite behavior needs a converted network to observe.
+
 ## Development
 
 Install PHP dependencies:
