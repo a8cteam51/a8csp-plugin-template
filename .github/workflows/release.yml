@@ -11,8 +11,27 @@ concurrency:
 permissions: {}
 
 jobs:
+  # The template repository is trunk-only: it never tags or releases itself. A repository
+  # ruleset blocks tag creation at the platform level — a tag pointed at an old commit runs
+  # that commit's workflow version, so an in-repo guard cannot be the primary control. This
+  # job is the in-repo backstop, loud on purpose: a silent skip would leave a mistaken tag
+  # looking released. Generation never rewrites .github/, so both repository_id conditions
+  # ride into generated plugins, where the refusal is permanently skipped and the release
+  # below runs unimpeded.
+  refuse-template-release:
+    name: Refuse to release the template
+    if: github.repository_id == '1297277915'
+    runs-on: ubuntu-latest
+    permissions: {}
+    steps:
+      - name: Fail loudly
+        run: |
+          echo "::error::a8csp-plugin-template is trunk-only and never releases; delete this tag"
+          exit 1
+
   release:
     name: Release
+    if: github.repository_id != '1297277915'
     runs-on: ubuntu-latest
     permissions:
       contents: write
