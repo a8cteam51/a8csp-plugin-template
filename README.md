@@ -6,6 +6,25 @@ This repository is a template plugin, not a finished product plugin. It contains
 the PHP bootstrap, block and asset build setup, automated test suite, and
 GitHub Actions workflow used to turn this template into a new plugin repository.
 
+## Trunk-only
+
+This repository never versions itself: no tags, no releases, and no changelog
+fragments in template pull requests — its history lives in git. A repository
+ruleset blocks tag creation; `template-guard.yml` fails any tag run loudly and
+pins the fragment set, the header-only `CHANGELOG.md`, and the `1.0.0` spawn
+seed; and `release.yml` skips its release job here. Everything is keyed to this
+repository's ID, so none of it constrains generated plugins — and generation
+deletes `template-guard.yml` outright (the fill-in push may delete workflow
+files but never edit them), leaving only the one-line release condition behind.
+
+The versioning machinery itself is scaffold payload, not template process:
+changelogger and its `changelog/` fragments directory, `CHANGELOG.md`, and
+`release.yml` carry into generated plugins, which version by default — removing
+any of it is the generated plugin author's choice. The one tracked fragment,
+`changelog/initial-template-population`, is the machinery's fixture: it keeps
+`changelog:validate` non-vacuous here, and generation deletes it along with the
+example POT.
+
 ## What is in this repository
 
 A plugin is a list of components; a component is a class with `is_needed()` and

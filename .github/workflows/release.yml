@@ -13,6 +13,11 @@ permissions: {}
 jobs:
   release:
     name: Release
+    # The repository this file ships from — the trunk-only template, pinned by its immutable
+    # ID — never releases itself; generated plugins have their own IDs, so the condition is
+    # permanently true for them. It rides along because generation can delete workflow files
+    # but never edit them.
+    if: github.repository_id != '1297277915'
     runs-on: ubuntu-latest
     permissions:
       contents: write

@@ -119,12 +119,15 @@ jobs:
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: git commit -am "chore -- fill in scaffolding placeholders"
 
-      - name: Remove the spent fill-in-scaffold workflow.
+      # Deleting workflow files is the one .github/workflows change the push token permits
+      # (it can never create or update them), which is why the template guard is a whole
+      # separate workflow instead of steps inside quality.yml and release.yml.
+      - name: Remove the spent fill-in-scaffold workflow and the template guard.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
-          rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs
+          rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/template-guard.yml
           git add .github/workflows
-          git commit -m "chore -- remove the spent fill-in-scaffold workflow"
+          git commit -m "chore -- remove the spent fill-in-scaffold workflow and the template guard"
 
       - name: Push all the changed files.
         if: steps.scaffold-check.outputs.already-filled != 'true'
