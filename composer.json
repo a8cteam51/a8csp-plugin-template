@@ -96,6 +96,7 @@
     "test:unit:mutation": "@php vendor/bin/infection --threads=max",
     "test:integration": "npm --prefix=. run test:integration",
     "test:requirements": "npm --prefix=. run test:requirements",
+    "test:multisite": "npm --prefix=. run test:multisite",
 
     "quality-check": [
       "@lint:php",

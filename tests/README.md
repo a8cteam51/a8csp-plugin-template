@@ -17,6 +17,11 @@ fixtures at three WordPress-version tiers.
 - **Requirements** (`tests/Integration/RequirementsCheckTest.php`, run as its own suite) — boots
   inside wp-env against a below-floor WordPress version to verify the requirements gate degrades
   gracefully instead of fataling.
+- **Multisite** (`tests/Integration/MultisiteUninstallTest.php`, run as its own suite) — boots
+  inside a wp-env fixture converted into a multisite network and proves `uninstall.php`'s options
+  sweep cleans every site of the network, not just the site the uninstall runs on. The fixture is
+  dedicated because `wp core multisite-convert` is one-way; the test self-skips when the
+  Integration suite runs it against the single-site fixture.
 - **End-to-End** (`tests/EndToEnd/`) — Playwright, driving a real browser against the dev wp-env
   instance.
 
@@ -60,6 +65,15 @@ composer test:requirements
 npm run wp-env:belowfloor:stop
 ```
 
+Multisite (start the multisite wp-env instance first; its `afterStart` converts the fresh
+install into a subdirectory network):
+
+```sh
+npm run wp-env:multisite:start
+composer test:multisite
+npm run wp-env:multisite:stop
+```
+
 End-to-end (Playwright starts and stops the dev wp-env instance itself via its `webServer` config):
 
 ```sh
@@ -73,6 +87,7 @@ npm run test:e2e
 | Dev / E2E   | `.wp-env.json`            | 8893 |
 | Tests       | `.wp-env.tests.json`      | 8890 |
 | Below-floor | `.wp-env.belowfloor.json` | 8891 |
+| Multisite   | `.wp-env.multisite.json`  | 8892 |
 
 ## Why plain `TestCase`, not `WP_UnitTestCase`
 

@@ -124,7 +124,8 @@ end — when adding a component, decide its scope deliberately:
   activation (`wp_initialize_site`).
 - Component `is_needed()` gates run on every request, so per-site environmental differences —
   such as WooCommerce being active on only some sites — resolve correctly site by site.
-- The wp-env fixtures are single-site; multisite behavior needs a converted network to observe.
+- The multisite wp-env fixture (`.wp-env.multisite.json`) converts itself into a network on
+  start, and `composer test:multisite` proves the uninstall sweep against it.
 
 ## Development
 
@@ -199,14 +200,15 @@ on `trunk` pushes and on pull requests.
 
 ## Tests
 
-The suite has three PHPUnit tiers (Unit, Integration, Requirements) plus a Playwright end-to-end
-suite. See `tests/README.md` for how to run each suite, the wp-env ports involved, and why the rig
-runs PHPUnit 13 against plain `TestCase` instead of `WP_UnitTestCase`.
+The suite has four PHPUnit tiers (Unit, Integration, Requirements, Multisite) plus a Playwright
+end-to-end suite. See `tests/README.md` for how to run each suite, the wp-env ports involved, and
+why the rig runs PHPUnit 13 against plain `TestCase` instead of `WP_UnitTestCase`.
 
 ```sh
 composer test:unit
 npm run wp-env:tests:start && composer test:integration
 composer test:requirements
+npm run wp-env:multisite:start && composer test:multisite
 npm run test:e2e
 ```
 

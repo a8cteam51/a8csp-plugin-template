@@ -23,6 +23,11 @@
 		<testsuite name="Requirements">
 			<file>tests/Integration/RequirementsCheckTest.php</file>
 		</testsuite>
+		<!-- Multisite-only subset for the converted-network fixture; the same test self-skips
+		     when the Integration suite runs it against the single-site fixture. -->
+		<testsuite name="Multisite">
+			<file>tests/Integration/MultisiteUninstallTest.php</file>
+		</testsuite>
 	</testsuites>
 
 	<source>
