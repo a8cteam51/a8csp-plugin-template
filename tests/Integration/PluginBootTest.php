@@ -1,10 +1,10 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Tests\Integration;
+namespace A8C\SpecialProjects\PluginTemplate\Tests\Integration;
 
-use A8C\SpecialProjects\Template\Blocks;
-use A8C\SpecialProjects\Template\Plugin;
-use A8C\SpecialProjects\Template\Settings;
+use A8C\SpecialProjects\PluginTemplate\Blocks;
+use A8C\SpecialProjects\PluginTemplate\Plugin;
+use A8C\SpecialProjects\PluginTemplate\Settings;
 use PHPUnit\Framework\TestCase;
 
 /**

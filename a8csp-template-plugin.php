@@ -8,7 +8,7 @@
  *
  * @since       1.0.0
  * @version     1.0.0
- * @package     A8C\SpecialProjects\Template
+ * @package     A8C\SpecialProjects\PluginTemplate
  * @author      A8C Special Projects
  * @license     GPL-2.0-or-later
  *

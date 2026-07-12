@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template;
+namespace A8C\SpecialProjects\PluginTemplate;
 
 \defined( 'ABSPATH' ) || exit;
 

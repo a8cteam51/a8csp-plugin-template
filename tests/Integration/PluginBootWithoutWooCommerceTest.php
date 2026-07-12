@@ -1,9 +1,9 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Tests\Integration;
+namespace A8C\SpecialProjects\PluginTemplate\Tests\Integration;
 
-use A8C\SpecialProjects\Template\Integrations\WC_Settings_Section;
-use A8C\SpecialProjects\Template\Settings;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Settings_Section;
+use A8C\SpecialProjects\PluginTemplate\Settings;
 use PHPUnit\Framework\TestCase;
 
 /**

@@ -1,8 +1,8 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Tests\Unit;
+namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
-use A8C\SpecialProjects\Template\Integrations\WC_Settings_Section;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Settings_Section;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;

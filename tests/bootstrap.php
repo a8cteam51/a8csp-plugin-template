@@ -6,7 +6,7 @@
  *
  * @since   1.0.0
  * @version 1.0.0
- * @package A8C\SpecialProjects\Template
+ * @package A8C\SpecialProjects\PluginTemplate
  */
 
 require_once __DIR__ . '/../vendor/autoload.php';

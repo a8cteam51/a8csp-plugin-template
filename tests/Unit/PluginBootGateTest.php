@@ -1,8 +1,8 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Tests\Unit;
+namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
-use A8C\SpecialProjects\Template\Plugin;
+use A8C\SpecialProjects\PluginTemplate\Plugin;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
 

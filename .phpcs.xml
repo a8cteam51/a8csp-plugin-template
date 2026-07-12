@@ -18,7 +18,7 @@
 			<property name="prefixes" type="array">
 				<element value="a8csp_"/>
 				<element value="a8csp_template_"/>
-				<element value="A8C\SpecialProjects\Template"/>
+				<element value="A8C\SpecialProjects\PluginTemplate"/>
 			</property>
 		</properties>
 	</rule>

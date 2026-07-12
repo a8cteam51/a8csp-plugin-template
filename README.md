@@ -82,7 +82,7 @@ The script replaces the following tracked template values:
   with the title-derived slug.
 - `a8csp-plugin-template` (the repository slug and text domain, elsewhere) with
   the generated repository name.
-- `A8C\SpecialProjects\Template` (including the JSON-escaped form in
+- `A8C\SpecialProjects\PluginTemplate` (including the JSON-escaped form in
   `composer.json`'s autoload keys) with a title-derived namespace.
 - `a8csp_template` and `A8CSP_TEMPLATE` with the configured PHP prefix.
 

@@ -1,8 +1,8 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Integrations;
+namespace A8C\SpecialProjects\PluginTemplate\Integrations;
 
-use A8C\SpecialProjects\Template\Component;
+use A8C\SpecialProjects\PluginTemplate\Component;
 
 \defined( 'ABSPATH' ) || exit;
 

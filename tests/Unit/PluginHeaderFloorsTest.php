@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\Template\Tests\Unit;
+namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
 use PHPUnit\Framework\TestCase;
 
