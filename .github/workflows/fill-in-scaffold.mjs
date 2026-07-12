@@ -7,6 +7,8 @@ import process from 'process';
 // Approximates @wordpress/e2e-test-utils-playwright's runtime paramCase() conversion from a plugin Name header to its slug.
 const toKebabCase = ( str ) => str.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^-+|-+$/g, '' );
 
+const escapeRegExp = ( string ) => string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+
 const repository = JSON.parse( process.argv[2] );
 const skip_dirs = [ '.github', '.git' ];
 
@@ -58,8 +60,8 @@ const buildTemplate = async ( filePath ) => {
 			'a8csp/plugin-template': 'a8csp/' + repository.name,
 			// The entry file's own name (fill-in-scaffold.yml already renamed it to
 			// "$REPO_NAME.php" by this point) must resolve to the repo-name rule, not the
-			// kebab-title rule below it — ordered first so this more specific, ".php"-suffixed
-			// match consumes the substring before the bare kebab-title key can.
+			// kebab-title rule below it; longest-first alternation tries this more specific,
+			// ".php"-suffixed key before the bare kebab-title key.
 			'a8csp-template-plugin.php': repository.name + '.php',
 			'a8csp-template-plugin': toKebabCase( title ),
 			'a8csp-plugin-template': repository.name,
@@ -73,12 +75,22 @@ const buildTemplate = async ( filePath ) => {
 		};
 	}
 
-	for ( const [ key, value ] of Object.entries( replacements ) ) {
+	const replacementPattern = new RegExp(
+		Object.keys( replacements )
+			.sort( ( first, second ) => second.length - first.length )
+			.map( escapeRegExp )
+			.join( '|' ),
+		'g'
+	);
+
+	renderedTemplate = renderedTemplate.replace( replacementPattern, ( match ) => {
 		// Substitution values land inside JSON string literals, so quotes/backslashes in free-text
 		// repository metadata must be escaped to keep the document valid.
+		const value = replacements[ match ];
 		const renderedValue = filePath.endsWith( '.json' ) ? JSON.stringify( value ).slice( 1, -1 ) : value;
-		renderedTemplate = renderedTemplate.replaceAll( key, renderedValue );
-	}
+		// A callback inserts each value literally, and the single pass leaves inserted metadata untouched by other keys.
+		return renderedValue;
+	} );
 
 	if ( filePath.endsWith( '.php' ) ) {
 		// PHP files never need trailing whitespace; stripping it prevents empty descriptions from leaving phpcs-failing blank lines.
