@@ -37,11 +37,11 @@ jobs:
 
       - name: Guard against a vacuously-green zero-mutant run
         run: |
-          # Infection 0.34.0 has been observed to exit 0 with zero mutants generated on PHP 8.5
-          # (upstream bug, under investigation). When zero mutants are produced it also skips
-          # writing any log/report at all -- so a missing summary file is itself the failure
-          # signal, not just a zero count in it. A green mutation job that tested nothing is
-          # not a pass, so this fails closed rather than trusting the exit code alone.
+          # A guard-exit during Infection's in-process AST reflection can end a run
+          # "successfully" with zero mutants and no report (the ABSPATH bootstrap in
+          # infection.json prevents the known case). A green mutation job that tested
+          # nothing is not a pass, so this fails closed rather than trusting the exit
+          # code alone.
           summary=build/infection/infection-summary.json
           if [ ! -s "$summary" ]; then
             echo "::error::Infection produced no summary report at $summary -- zero mutants were generated (or the run aborted before reporting). A green mutation job with zero mutants is not a pass."

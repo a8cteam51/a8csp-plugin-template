@@ -72,8 +72,5 @@ if ( is_wp_error( A8CSP_TEMPLATE_REQUIREMENTS ) ) {
 	a8csp_template_output_requirements_error( A8CSP_TEMPLATE_REQUIREMENTS );
 } else {
 	require_once A8CSP_TEMPLATE_DIR_PATH . '/functions.php';
-	// WordPress discards an action callback's return value, so the instance-returning
-	// accessor is the hook target itself.
-	// @phpstan-ignore return.void
-	add_action( 'plugins_loaded', 'a8csp_template_plugin' );
+	add_action( 'plugins_loaded', 'a8csp_template_plugin' ); // @phpstan-ignore return.void
 }
