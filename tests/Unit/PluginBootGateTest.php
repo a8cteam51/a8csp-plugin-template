@@ -2,8 +2,12 @@
 
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
+use A8C\SpecialProjects\PluginTemplate\Blocks;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Settings_Section;
 use A8C\SpecialProjects\PluginTemplate\Plugin;
+use A8C\SpecialProjects\PluginTemplate\Settings;
 use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -15,6 +19,9 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 #[CoversClass( Plugin::class )]
+#[UsesClass( Blocks::class )]
+#[UsesClass( Settings::class )]
+#[UsesClass( WC_Settings_Section::class )]
 final class PluginBootGateTest extends TestCase {
 	/**
 	 * Satisfies the production files' `ABSPATH` boot guard and loads the recording hook stubs before
