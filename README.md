@@ -10,10 +10,12 @@ GitHub Actions workflow used to turn this template into a new plugin repository.
 
 This repository never versions itself: no tags, no releases, and no changelog
 fragments in template pull requests — its history lives in git. A repository
-ruleset blocks tag creation, `release.yml` refuses to release the template, and
-the `Quality` changelog job pins the fragment set, the header-only
-`CHANGELOG.md`, and the `1.0.0` spawn seed. All three are keyed to this
-repository's ID, so none of them constrains generated plugins.
+ruleset blocks tag creation; `template-guard.yml` fails any tag run loudly and
+pins the fragment set, the header-only `CHANGELOG.md`, and the `1.0.0` spawn
+seed; and `release.yml` skips its release job here. Everything is keyed to this
+repository's ID, so none of it constrains generated plugins — and generation
+deletes `template-guard.yml` outright (the fill-in push may delete workflow
+files but never edit them), leaving only the one-line release condition behind.
 
 The versioning machinery itself is scaffold payload, not template process:
 changelogger and its `changelog/` fragments directory, `CHANGELOG.md`, and

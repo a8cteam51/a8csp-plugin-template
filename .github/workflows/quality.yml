@@ -72,8 +72,6 @@ jobs:
           php -l "${entry_files[0]}"
           php -l "$GITHUB_WORKSPACE/functions-bootstrap.php"
 
-  # Validation is deliberately not a fragment-per-PR gate: it keeps fragment validation
-  # wired for generated plugins while never demanding a fragment of a template PR.
   changelog:
     name: Changelog
     runs-on: ubuntu-latest
@@ -88,31 +86,3 @@ jobs:
           tools: composer:v2
       - uses: ramsey/composer-install@65e4f84970763564f46a70b8a54b90d033b3bdda # 4.0.0
       - run: composer changelog:validate
-
-      # The template repository is trunk-only: it never versions itself, so on the template
-      # (and only there — generated plugins have different repository IDs and version by
-      # default) the fragment set, the header-only changelog, and the 1.0.0 spawn seed are
-      # pinned. The repository_id comparison survives renames and transfers.
-      - name: Enforce the trunk-only template state
-        if: github.repository_id == '1297277915'
-        run: |
-          set -euo pipefail
-
-          expected_fragments=$'changelog/.gitkeep\nchangelog/initial-template-population'
-          actual_fragments=$(git ls-files changelog)
-          if [ "$actual_fragments" != "$expected_fragments" ]; then
-            echo "::error::the template is trunk-only: its history lives in git, so template PRs never add changelog fragments (the changelog machinery is scaffold payload for generated plugins)"
-            exit 1
-          fi
-
-          if ! grep -Fxq '# Changelog' CHANGELOG.md || grep -Eq '^## ' CHANGELOG.md; then
-            echo "::error::the template is trunk-only: it never releases, so CHANGELOG.md stays exactly its fragment-instructions header"
-            exit 1
-          fi
-
-          if ! grep -Eq '^ \* Version:[[:space:]]+1\.0\.0$' a8csp-template-plugin.php ||
-             ! grep -Fq '"version": "1.0.0"' package.json ||
-             ! grep -Fq '**Stable tag:** 1.0.0' README.scaffold.md; then
-            echo "::error::the template never versions itself: 1.0.0 is the spawn seed of every generated plugin, not a number to bump"
-            exit 1
-          fi
