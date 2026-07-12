@@ -29,10 +29,34 @@ $a8csp_template_footprint = array(
 	'user_meta' => array(),
 );
 
-foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
-	delete_option( $a8csp_template_uninstall_option );
+/*
+ * Options are stored per site, and a multisite uninstall runs only once, network-wide — so the
+ * options sweep visits every site of the network. `get_sites()` returns at most 100 sites by
+ * default; `number => 0` lifts that cap so no site's options outlive the plugin.
+ */
+if ( is_multisite() ) {
+	$a8csp_template_uninstall_site_ids = get_sites(
+		array(
+			'fields' => 'ids',
+			'number' => 0,
+		)
+	);
+	foreach ( $a8csp_template_uninstall_site_ids as $a8csp_template_uninstall_site_id ) {
+		switch_to_blog( $a8csp_template_uninstall_site_id );
+
+		foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
+			delete_option( $a8csp_template_uninstall_option );
+		}
+
+		restore_current_blog();
+	}
+} else {
+	foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
+		delete_option( $a8csp_template_uninstall_option );
+	}
 }
 
+// User meta is stored network-globally, so one pass covers every site.
 foreach ( $a8csp_template_footprint['user_meta'] as $a8csp_template_uninstall_meta_key ) {
 	delete_metadata( 'user', 0, $a8csp_template_uninstall_meta_key, '', true );
 }
