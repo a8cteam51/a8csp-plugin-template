@@ -89,6 +89,12 @@ npm run test:e2e
 | Below-floor | `.wp-env.belowfloor.json` | 8891 |
 | Multisite   | `.wp-env.multisite.json`  | 8892 |
 
+Generated repositories get their own four-port block, derived from the repository name at
+generation, so plugins started side by side don't contend for the same host ports. If two
+environments still collide on one machine, wp-env's untracked override files take local
+precedence (`.wp-env.override.json`; custom configs pair with e.g.
+`.wp-env.tests.override.json`).
+
 ## Why plain `TestCase`, not `WP_UnitTestCase`
 
 WordPress core's own PHPUnit scaffold still caps at PHPUnit <=9, and core's migration plan

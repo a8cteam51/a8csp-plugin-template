@@ -1,3 +1,4 @@
+import { createHash } from 'crypto';
 import { statSync } from 'fs';
 import { readdir, readFile } from 'fs/promises';
 import { writeFile } from 'fs/promises';
@@ -11,6 +12,14 @@ const escapeRegExp = ( string ) => string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&'
 
 const repository = JSON.parse( process.argv[2] );
 const skip_dirs = [ '.github', '.git' ];
+
+// Every generated repository gets its own wp-env port block, derived from the repository name:
+// deterministic across re-generations of the same repo, and distinct fleet plugins land on
+// distinct blocks, so side-by-side `wp-env start`s don't contend for the same host ports.
+// Blocks span 10000-29996, clear of the OS ephemeral port ranges.
+const TEMPLATE_PORT_BASE = 8890;
+const nameHash           = parseInt( createHash( 'sha256' ).update( repository.name ).digest( 'hex' ).slice( 0, 8 ), 16 );
+const portBase           = 10000 + 4 * ( nameHash % 5000 );
 
 /**
  * @param {string} dirPath
@@ -91,6 +100,18 @@ const buildTemplate = async ( filePath ) => {
 		// A callback inserts each value literally, and the single pass leaves inserted metadata untouched by other keys.
 		return renderedValue;
 	} );
+
+	if ( 'README.md' !== filePath ) {
+		// Port literals are bare numbers, so they replace only inside their known anchors (the
+		// wp-env `"port":` keys, playwright's `localhost:` base URL, and the tests/README ports
+		// table) -- a tree-wide bare `8890` would also match inside package-lock.json integrity
+		// hashes. They also bypass the replacement map above: its values are JSON-escaped when
+		// landing in .json files, which would corrupt a match spanning structural JSON.
+		renderedTemplate = renderedTemplate.replace(
+			/(?<="port": |localhost:|\| )889[0-3](?=[,'\s|])/g,
+			( match ) => String( portBase + ( Number( match ) - TEMPLATE_PORT_BASE ) )
+		);
+	}
 
 	if ( filePath.endsWith( '.php' ) ) {
 		// PHP files never need trailing whitespace; stripping it prevents empty descriptions from leaving phpcs-failing blank lines.
