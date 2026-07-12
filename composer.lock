@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "e24671044521df16a7583929c15868ef",
+    "content-hash": "e57d195a22f62547fd0245a51be337de",
     "packages": [],
     "packages-dev": [
         {
@@ -12,13 +12,13 @@
             "version": "dev-trunk",
             "source": {
                 "type": "git",
-                "url": "https://github.com/a8cteam51/a8csp-configs.git",
-                "reference": "50c891417d6b56403987c38786b506d96b60409a"
+                "url": "git@github.com:a8cteam51/a8csp-configs.git",
+                "reference": "81a31fd1ad5030f2a1152460ddc8e791d2f289fb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/50c891417d6b56403987c38786b506d96b60409a",
-                "reference": "50c891417d6b56403987c38786b506d96b60409a",
+                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/81a31fd1ad5030f2a1152460ddc8e791d2f289fb",
+                "reference": "81a31fd1ad5030f2a1152460ddc8e791d2f289fb",
                 "shasum": ""
             },
             "require": {
@@ -77,11 +77,7 @@
                 }
             ],
             "description": "The canonical collection of shared configuration files and reusable CI workflows for A8C Special Projects repositories.",
-            "support": {
-                "source": "https://github.com/a8cteam51/a8csp-configs/tree/trunk",
-                "issues": "https://github.com/a8cteam51/a8csp-configs/issues"
-            },
-            "time": "2026-07-11T18:37:21+00:00"
+            "time": "2026-07-12T11:41:04+00:00"
         },
         {
             "name": "automattic/jetpack-changelogger",
@@ -7901,7 +7897,7 @@
         "phpcompatibility/phpcompatibility-wp": 15,
         "roave/security-advisories": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.5",
