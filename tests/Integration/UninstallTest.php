@@ -57,7 +57,7 @@ final class UninstallTest extends TestCase {
 	 */
 	#[RunInSeparateProcess]
 	public function test_uninstall_deletes_only_its_own_footprint(): void {
-		$footprint = self::read_inline_footprint();
+		$footprint = InlineFootprint::read();
 		$user_id   = self::an_existing_user_id();
 
 		foreach ( $footprint['options'] as $option ) {
@@ -105,64 +105,5 @@ final class UninstallTest extends TestCase {
 		self::assertNotEmpty( $users, 'wp-env must provision at least one user to seed user-meta against' );
 
 		return (int) $users[0];
-	}
-
-	/**
-	 * Extracts `$a8csp_template_footprint` from the real `uninstall.php` source without
-	 * requiring the file. Requiring it exits unless `WP_UNINSTALL_PLUGIN` is already defined,
-	 * and defining that just to read the array would run the delete loops before this test has
-	 * seeded anything for them to delete. Locates the array literal by balancing parens from
-	 * its own `array(` so the nested `options`/`user_meta` arrays don't confuse the match, then
-	 * evaluates only that expression — never uninstall.php's guard or its delete loops.
-	 * This eval is safe only because it parses this repository's own version-controlled
-	 * `uninstall.php` and must never be generalized to evaluate user input, remote data,
-	 * another file, or anything else from outside this repository; if the footprint's shape
-	 * grows complex enough that this string-slicing extraction becomes fragile, use a
-	 * `token_get_all()`-based reader as the eval-free alternative instead of trying to make
-	 * the eval safer.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  array{options: list<string>, user_meta: list<string>}
-	 */
-	private static function read_inline_footprint(): array {
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local filesystem read of a tracked source file, not a remote resource.
-		$source = (string) \file_get_contents( \dirname( __DIR__, 2 ) . '/uninstall.php' );
-
-		$needle = '$a8csp_template_footprint';
-		$assign = \strpos( $source, $needle );
-		self::assertIsInt( $assign, "uninstall.php must declare {$needle} inline" );
-
-		$array_start = \strpos( $source, 'array(', $assign );
-		self::assertIsInt( $array_start, "could not find the {$needle} array literal" );
-
-		$depth  = 0;
-		$end    = null;
-		$length = \strlen( $source );
-
-		for ( $i = $array_start; $i < $length; $i++ ) {
-			if ( '(' === $source[ $i ] ) {
-				++$depth;
-			} elseif ( ')' === $source[ $i ] ) {
-				--$depth;
-
-				if ( 0 === $depth ) {
-					$end = $i;
-					break;
-				}
-			}
-		}
-
-		self::assertIsInt( $end, "could not find the end of the {$needle} array literal" );
-
-		$expression = \substr( $source, $array_start, $end - $array_start + 1 );
-		$footprint  = eval( "return {$expression};" ); // phpcs:ignore Squiz.PHP.Eval -- evaluates a version-controlled array literal parsed out of this repo's own uninstall.php, never external input.
-
-		self::assertIsArray( $footprint );
-		self::assertArrayHasKey( 'options', $footprint );
-		self::assertArrayHasKey( 'user_meta', $footprint );
-
-		return $footprint;
 	}
 }
