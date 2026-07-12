@@ -155,13 +155,17 @@ function a8csp_template_validate_requirements() {
 /**
  * Outputs an error that the system requirements weren't met.
  *
+ * The notice hangs on `all_admin_notices`, which fires on site, network, and user admin screens
+ * alike — so a network activation that fails the gate is explained on the network admin screen
+ * where it happened, not just on per-site dashboards.
+ *
  * @param   \WP_Error $error          The error message to display.
  *
  * @return  void
  */
 function a8csp_template_output_requirements_error( $error ) {
 	add_action(
-		'admin_notices',
+		'all_admin_notices',
 		static function () use ( $error ) {
 			if ( ! current_user_can( 'activate_plugins' ) ) {
 				return;
