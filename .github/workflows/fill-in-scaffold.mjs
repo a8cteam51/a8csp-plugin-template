@@ -67,9 +67,9 @@ const buildTemplate = async ( filePath ) => {
 			'a8csp-plugin-template': repository.name,
 			// Matches the JSON-escaped namespace form composer.json's psr-4 autoload keys carry on disk;
 			// the raw namespace value is escaped by the .json rendering path.
-			'A8C\\\\SpecialProjects\\\\Template': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'A8C\\SpecialProjects\\Template': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'A8C\\SpecialProjects\\\\Template': 'A8C\\SpecialProjects\\\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			'A8C\\\\SpecialProjects\\\\PluginTemplate': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			'A8C\\SpecialProjects\\PluginTemplate': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			'A8C\\SpecialProjects\\\\PluginTemplate': 'A8C\\SpecialProjects\\\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			'a8csp_template': repository.custom_properties['php-globals-short-prefix'],
 			'A8CSP_TEMPLATE': repository.custom_properties['php-globals-short-prefix'].toUpperCase(),
 		};
