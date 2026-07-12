@@ -41,7 +41,6 @@
     "wp-cli/i18n-command": "^2",
 
     "wp-plugin/woocommerce": "10.9.*",
-    "php-stubs/woocommerce-stubs": "^10",
 
     "roave/security-advisories": "dev-latest"
   },
