@@ -42,7 +42,7 @@ To convert this plugin from a WooCommerce extension to a plain WordPress plugin,
 1. Delete the `src/Integrations/` and `templates/myaccount/` directories.
 2. Remove `Integrations\WC_Settings_Section::class` from the `COMPONENTS` list in `src/Plugin.php`.
 3. Remove the `Integrations\WC_Settings_Section` option line from the `uninstall.php` footprint.
-4. Remove the `wp-plugin/woocommerce` and `php-stubs/woocommerce-stubs` development dependencies from `composer.json`; run `composer update`.
+4. Remove the `wp-plugin/woocommerce` development dependency from `composer.json`; run `composer update`.
 5. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
 6. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the `WC requires at least` / `WC tested up to` plugin-header lines.
 7. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php` and `tests/Unit/WCSettingsSectionTest.php`; drop the WooCommerce assertions from `tests/Integration/PluginBootTest.php`.
