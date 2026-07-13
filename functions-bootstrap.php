@@ -218,7 +218,11 @@ function a8csp_template_output_requirements_error( $error ) {
 				$requirements_error .= '</ul>';
 			}
 
-			wp_admin_notice( $requirements_error, array( 'type' => 'error' ) );
+			if ( \function_exists( 'wp_admin_notice' ) ) {
+				wp_admin_notice( $requirements_error, array( 'type' => 'error' ) );
+			} else {
+				echo wp_kses_post( '<div class="notice notice-error"><p>' . $requirements_error . '</p></div>' );
+			}
 		}
 	);
 }

@@ -1,6 +1,6 @@
 # EXAMPLE_REPO_NAME
 
-**Contributors:** wpcomspecialprojects
+**Contributors:** wpspecialprojects
 **Tags:**
 **Requires at least:** 7.0
 **Tested up to:** 7.0

@@ -44,10 +44,9 @@
 // requirements gate below can call them.
 require_once A8CSP_TEMPLATE_DIR_PATH . '/functions-bootstrap.php';
 
-// Translations for the /languages directory declared via the Domain Path header above are
-// resolved just-in-time: WordPress registers this plugin's language directory from its header
-// before the plugin loads, and the first call to a translation function for this text domain
-// triggers loading the matching translation file for the current locale.
+// Core registers header Domain Paths for site-active plugins only, so a network-activated copy
+// registers its own translations path; loading stays just-in-time either way.
+load_plugin_textdomain( 'a8csp-plugin-template', false, dirname( A8CSP_TEMPLATE_BASENAME ) . '/languages' );
 
 // Declare compatibility with WC features.
 add_action(

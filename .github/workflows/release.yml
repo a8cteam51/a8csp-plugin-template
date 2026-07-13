@@ -46,6 +46,13 @@ jobs:
         run: |
           npm ci
           npm run build
+      # The committed POT drifts as source changes between releases; regenerating here ships
+      # current strings in the archive regardless.
+      - name: Generate translation template
+        run: |
+          wp package install wp-cli/i18n-command:2.7.0
+          wp i18n make-pot ./ --slug="${GITHUB_REPOSITORY##*/}"
+          test -f "languages/${GITHUB_REPOSITORY##*/}.pot"
       - name: Install dist-archive command
         run: |
           wp package install wp-cli/dist-archive-command:3.2.2
