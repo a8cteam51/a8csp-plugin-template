@@ -23,7 +23,7 @@ final class Plugin {
 	 *
 	 * @var     array<int, class-string<Component>>
 	 */
-	private const COMPONENTS = array(
+	private const array COMPONENTS = array(
 		Blocks::class,
 		Settings::class,
 		Integrations\WC_Settings_Section::class,

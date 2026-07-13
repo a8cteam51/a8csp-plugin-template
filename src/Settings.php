@@ -28,7 +28,7 @@ final class Settings implements Component {
 	 *
 	 * @var     string
 	 */
-	private const OPTION_KEY = 'a8csp_template_example_option';
+	private const string OPTION_KEY = 'a8csp_template_example_option';
 
 	// endregion
 

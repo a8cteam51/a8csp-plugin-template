@@ -35,7 +35,7 @@ class WC_Settings_Section implements Component {
 	 *
 	 * @var     string
 	 */
-	private const OPTION_KEY = 'a8csp_template_wc_example_option';
+	private const string OPTION_KEY = 'a8csp_template_wc_example_option';
 
 	// endregion
 
