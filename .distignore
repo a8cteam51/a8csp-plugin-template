@@ -38,6 +38,7 @@ package*.json
 composer.json
 composer.lock
 README.scaffold.md
+/docs
 
 # Secret material — never ship, even if a consumer forgets to list it.
 # .pem/.key are root-anchored (leading /) so certs bundled under vendor/

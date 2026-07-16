@@ -27,57 +27,10 @@ example POT.
 
 ## What is in this repository
 
-A plugin is a list of components; a component is a class with a static `should_load()` gate, an
-`initialize()` readiness phase, and a `register_hooks()` attachment phase; the boot is a few
-foreach loops you can read — gate and construct, initialize all, then register all hooks, so
-every surviving component is initialized before any hook can fire.
-
-- `a8csp-template-plugin.php` defines the plugin header and constants, requires
-  `functions-bootstrap.php`, and wires the requirements gate and plugin boot.
-- `functions-bootstrap.php` provides plugin metadata, version-compatibility checks, the requirements
-  gate, and its admin-notice reporter; both root bootstrap files stay parsable below the plugin's PHP
-  floor, and CI lints them against the older PHP versions.
-- `functions.php` provides the construction-only plugin accessor (booting stays tied to the
-  `plugins_loaded` attachment in the entry file) and loads the PHP helper files under `includes/`.
-- `src/` follows one folder per feature, each owning a `Component` that composes it; the `src/`
-  root holds only the bootstrapping mechanism. `src/ComponentInterface.php` is the one contract,
-  and `src/Plugin.php` is the one file to edit when adding components to `COMPONENTS`; they boot
-  in registration order. `src/ComponentCollection.php` is the shared gated collection both the composition
-  root and group roots delegate their gate-construct and phase loops to — has-a, not is-a: the
-  collection does not implement the contract. `src/AbstractComponent.php` is the optional
-  defaults-only base (open gate, no-op readiness) for components that need neither. The plugin is
-  a WooCommerce extension, so `boot()` opens with the plugin-wide host gate: without WooCommerce
-  at the header-declared floor it stages an explanatory notice and stays un-booted.
-- `src/Settings/` is the settings example feature and owns both settings surfaces: it persists
-  `a8csp_template_example_option` through the Settings API on the General options page, registers a
-  section in WooCommerce → Settings → Advanced persisting `a8csp_template_wc_example_option` — the
-  host gate guarantees WooCommerce, so neither surface carries a gate — and demonstrates the
-  uninstall footprint. Teardown recipes live in `README.scaffold.md`.
-- `src/Integrations/` groups the optional integrations behind one nested example:
-  `src/Integrations/Component.php` is the group root that gates, constructs, and initializes its
-  children inside its own phases. Its children model the two child shapes:
-  `src/Integrations/WooPayments.php` is the single-class leaf — gated on WooPayments and hooking
-  one of its payment-metadata filters — and `src/Integrations/WooCommerceSubscriptions/` is the grown
-  sub-feature folder owning its own `Component` plus a plain collaborator, still forwarding-depth
-  one. More nesting than this is the signal a plugin has outgrown manual composition; see the
-  group root's notes.
-- `includes/` contains automatically loaded procedural helpers, including typed option readers; PHP
-  files dropped there load automatically inside WordPress, while underscore-prefixed files are skipped.
-- `languages/` contains translations and an example POT generated from the template's strings;
-  regenerate it with `composer i18n:makepot`.
-- `models/` is an extension point for classmapped data/model classes.
-- `templates/` is an extension point for template partials rendered by components.
-- `footprint.php` is the dependency-free manifest of the complete persisted footprint — every option
-  and user-meta key grouped by owning component — and `uninstall.php` requires it and deletes those
-  keys during WordPress's cold uninstall bootstrap; add an entry with each corresponding write, and
-  cross-reference persisted keys with `@see uninstall.php` in the component class docblock.
-- `blocks/src/example-notice/` contains the example block source, while `blocks/build/` contains tracked build
-  output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`, which
-  `src/Blocks/Component.php` uses to register all built blocks as one metadata collection.
-- `assets/js/src/editor.js` defines the shared editor hook entry point, and `assets/js/build/` contains
-  its tracked output.
-- `tests/` contains the automated test suite; see `tests/README.md` for the local workflow.
-- `.github/workflows/` contains PHP, JavaScript, CSS, syntax, and scaffold-fill workflows.
+The architecture map — the component model, every file's role, the multisite posture, and the
+reshaping recipes (watering down to plain WordPress, growing integrations) — lives in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), which ships with generated plugins so the map
+survives generation. The sections below cover only what is template-specific.
 
 ## Scaffold generation
 
@@ -149,25 +102,6 @@ un-booted when either is unmet. The WooCommerce Subscriptions integration
 (`src/Integrations/WooCommerceSubscriptions/`) gates itself on its companion being active. The main
 bootstrap declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is
 active.
-
-## Multisite
-
-Generated plugins are expected to support multisite networks and to be tested on one when the
-client runs one. Multisite is a design consideration while building, not a porting step at the
-end — when adding a component, decide its scope deliberately:
-
-- Options are per-site; user meta is network-global. `uninstall.php` models the consequence:
-  its options sweep visits every site of a network, while its user-meta pass runs once.
-- The requirements gate reports through `all_admin_notices`, which fires on site and network
-  admin screens alike, so a failed network activation is explained where it happened.
-- The template registers no activation or deactivation hooks. A plugin that adds them must
-  handle the `$network_wide` activation flag and provision sites created after network
-  activation (`wp_initialize_site`).
-- The host gate and the component `should_load()` gates run on every request, so per-site
-  environmental differences — such as WooCommerce or a companion being active on only some
-  sites — resolve correctly site by site.
-- The multisite wp-env fixture (`.wp-env.multisite.json`) converts itself into a network on
-  start, and `composer test:multisite` proves the uninstall sweep against it.
 
 ## Development
 

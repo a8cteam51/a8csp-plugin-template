@@ -35,27 +35,11 @@ This plugin is a WooCommerce extension: it requires WooCommerce at the `WC requi
 
 If the minimum required version of WooCommerce is present, you will find a section present in the `Advanced` tab of the WooCommerce `Settings` page. Aliquam dolor sem, convallis malesuada neque sit amet, dictum mattis velit. Vestibulum at pharetra metus. Suspendisse rhoncus libero nisi, sed rhoncus tortor aliquam pretium.
 
-## Watering down to plain WordPress
+## Development
 
-To convert this plugin from a WooCommerce extension to a plain WordPress plugin, remove the WooCommerce tier:
-
-1. Delete the `HELPERS` region — the host-requirements check and its notice closures — and the one gate line in `boot()` from `src/Plugin.php`.
-2. Strip the WooCommerce surface from `src/Settings/Component.php`: the `add_section()` and `get_settings()` methods and their two filter registrations in `register_hooks()`.
-3. Delete the `src/Integrations/` and `templates/myaccount/` directories — both example children extend the WooCommerce ecosystem — and remove `Integrations\Component::class` from the `COMPONENTS` list in `src/Plugin.php`.
-4. Remove the `a8csp_template_wc_example_option` and `a8csp_template_wcs_example_option` option lines from the `footprint.php` manifest.
-5. Remove the `wp-plugin/woocommerce` development dependency from `composer.json`; run `composer update`.
-6. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
-7. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the `WC requires at least` / `WC tested up to` plugin-header lines.
-8. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`, `tests/Unit/IntegrationsComponentTest.php`, `tests/Unit/WooCommerceSubscriptionsComponentTest.php`, `tests/Unit/WooPaymentsTest.php`, and their `tests/Unit/wcs-stubs.php` / `tests/Unit/wcpay-stubs.php` stand-ins; drop the WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`, `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`).
-9. Remove the WooCommerce-less proof section from `tests/README.md`.
-10. Run `composer quality-check`. What remains — blocks, settings, the component list, the `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
-
-**For a plugin that persists nothing:** delete `src/Settings/`, its `COMPONENTS` entry in `src/Plugin.php`, its option lines in the `footprint.php` manifest, and `includes/settings.php`.
-
-Optional integrations live behind the `src/Integrations/` group root (`src/Integrations/Component.php`),
-which gates, constructs, and initializes its children inside its own phases; add one child component
-per companion plugin — a single-class leaf at first, promoted to its own folder the day it needs a
-second class.
+The architecture map, the component model, and the reshaping recipes (including watering the
+plugin down to plain WordPress) live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the test
+workflow lives in [`tests/README.md`](tests/README.md).
 
 ## Frequently Asked Questions
 
