@@ -9,9 +9,6 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
 /**
  * Returns the plugin instance, booting it on first access.
  *
- * Doubles as the `plugins_loaded` hook target — named, rather than an anonymous closure, so
- * `remove_action()` can unhook the boot and `has_action()` can assert the wiring by name.
- *
  * @since   1.0.0
  * @version 1.0.0
  *
@@ -19,14 +16,9 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
  */
 function a8csp_template_plugin(): Plugin {
 	static $plugin = null;
-
-	if ( null === $plugin ) {
-		$plugin = new Plugin();
-		$plugin->boot();
-	}
-
-	return $plugin;
+	return $plugin ??= new Plugin();
 }
+
 // endregion
 
 // region OTHER
