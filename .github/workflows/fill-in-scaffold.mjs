@@ -1,17 +1,21 @@
 import { createHash } from 'crypto';
 import { statSync } from 'fs';
-import { readdir, readFile } from 'fs/promises';
-import { writeFile } from 'fs/promises';
+import { readdir, readFile, writeFile } from 'fs/promises';
 import { join as joinPath } from 'path';
 import process from 'process';
 
 // Approximates @wordpress/e2e-test-utils-playwright's runtime paramCase() conversion from a plugin Name header to its slug.
-const toKebabCase = ( str ) => str.toLowerCase().replace( /[^a-z0-9]+/g, '-' ).replace( /^-+|-+$/g, '' );
+const toKebabCase = ( str ) =>
+	str
+		.toLowerCase()
+		.replace( /[^a-z0-9]+/g, '-' )
+		.replace( /^-+|-+$/g, '' );
 
-const escapeRegExp = ( string ) => string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
+const escapeRegExp = ( string ) =>
+	string.replace( /[.*+?^${}()|[\]\\]/g, '\\$&' );
 
-const repository = JSON.parse( process.argv[2] );
-const skip_dirs = [ '.github', '.git' ];
+const repository = JSON.parse( process.argv[ 2 ] );
+const skippedDirectories = [ '.github', '.git' ];
 
 // Every generated repository gets its own wp-env port block, derived from the repository name:
 // deterministic across re-generations of the same repo, and collision-reducing (not unique —
@@ -19,15 +23,21 @@ const skip_dirs = [ '.github', '.git' ];
 // side-by-side `wp-env start`s rarely contend for the same host ports.
 // Blocks span 10000-29996, clear of the OS ephemeral port ranges.
 const TEMPLATE_PORT_BASE = 8890;
-const nameHash           = parseInt( createHash( 'sha256' ).update( repository.name ).digest( 'hex' ).slice( 0, 8 ), 16 );
-const portBase           = 10000 + 4 * ( nameHash % 5000 );
+const nameHash = parseInt(
+	createHash( 'sha256' )
+		.update( repository.name )
+		.digest( 'hex' )
+		.slice( 0, 8 ),
+	16
+);
+const portBase = 10000 + 4 * ( nameHash % 5000 );
 
 /**
- * @param {string} dirPath
+ * @param {string}                              dirPath
  * @param {(filePath: string) => Promise<void>} callback
  */
 const traverseDirectory = async ( dirPath, callback ) => {
-	if ( skip_dirs.includes( dirPath ) ) {
+	if ( skippedDirectories.includes( dirPath ) ) {
 		console.log( 'Skipping %s', dirPath );
 		return;
 	}
@@ -54,19 +64,25 @@ const traverseDirectory = async ( dirPath, callback ) => {
 const buildTemplate = async ( filePath ) => {
 	console.log( 'Building %s', filePath );
 
-	const templateFile   = await readFile( filePath, 'utf-8' );
-	let renderedTemplate = templateFile, replacements;
+	const templateFile = await readFile( filePath, 'utf-8' );
+	let renderedTemplate = templateFile,
+		replacements;
 
-	const title = repository.custom_properties['human-title'];
+	const title = repository.custom_properties[ 'human-title' ];
 	if ( 'README.md' === filePath ) {
 		replacements = {
-			'EXAMPLE_REPO_NAME': title,
-			'EXAMPLE_REPO_DESCRIPTION': repository.description ?? '',
+			EXAMPLE_REPO_NAME: title,
+			EXAMPLE_REPO_DESCRIPTION: repository.description ?? '',
 		};
 	} else {
 		replacements = {
+			// The generators lint themselves in the template repo but self-delete at generation,
+			// so they also strip their own paths from the generated repository's lint scope.
+			' .github/workflows/fill-in-scaffold.mjs': '',
+			' .github/workflows/fill-in-scaffold-content.mjs': '',
 			'A8CSP Template Plugin': title,
-			'A template for A8C Special Projects plugins.': repository.description ?? '',
+			'A template for A8C Special Projects plugins.':
+				repository.description ?? '',
 			'a8csp/plugin-template': 'a8csp/' + repository.name,
 			// The entry file's own name (fill-in-scaffold.yml already renamed it to
 			// "$REPO_NAME.php" by this point) must resolve to the repo-name rule, not the
@@ -77,11 +93,21 @@ const buildTemplate = async ( filePath ) => {
 			'a8csp-plugin-template': repository.name,
 			// Matches the JSON-escaped namespace form composer.json's psr-4 autoload keys carry on disk;
 			// the raw namespace value is escaped by the .json rendering path.
-			'A8C\\\\SpecialProjects\\\\PluginTemplate': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'A8C\\SpecialProjects\\PluginTemplate': 'A8C\\SpecialProjects\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'A8C\\SpecialProjects\\\\PluginTemplate': 'A8C\\SpecialProjects\\\\' + title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'a8csp_template': repository.custom_properties['php-globals-short-prefix'],
-			'A8CSP_TEMPLATE': repository.custom_properties['php-globals-short-prefix'].toUpperCase(),
+			'A8C\\\\SpecialProjects\\\\PluginTemplate':
+				'A8C\\SpecialProjects\\' +
+				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			'A8C\\SpecialProjects\\PluginTemplate':
+				'A8C\\SpecialProjects\\' +
+				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			'A8C\\SpecialProjects\\\\PluginTemplate':
+				'A8C\\SpecialProjects\\\\' +
+				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
+			a8csp_template:
+				repository.custom_properties[ 'php-globals-short-prefix' ],
+			A8CSP_TEMPLATE:
+				repository.custom_properties[
+					'php-globals-short-prefix'
+				].toUpperCase(),
 		};
 	}
 
@@ -93,14 +119,19 @@ const buildTemplate = async ( filePath ) => {
 		'g'
 	);
 
-	renderedTemplate = renderedTemplate.replace( replacementPattern, ( match ) => {
-		// Substitution values land inside JSON string literals, so quotes/backslashes in free-text
-		// repository metadata must be escaped to keep the document valid.
-		const value = replacements[ match ];
-		const renderedValue = filePath.endsWith( '.json' ) ? JSON.stringify( value ).slice( 1, -1 ) : value;
-		// A callback inserts each value literally, and the single pass leaves inserted metadata untouched by other keys.
-		return renderedValue;
-	} );
+	renderedTemplate = renderedTemplate.replace(
+		replacementPattern,
+		( match ) => {
+			// Substitution values land inside JSON string literals, so quotes/backslashes in free-text
+			// repository metadata must be escaped to keep the document valid.
+			const value = replacements[ match ];
+			const renderedValue = filePath.endsWith( '.json' )
+				? JSON.stringify( value ).slice( 1, -1 )
+				: value;
+			// A callback inserts each value literally, and the single pass leaves inserted metadata untouched by other keys.
+			return renderedValue;
+		}
+	);
 
 	if ( 'README.md' !== filePath ) {
 		// Port literals are bare numbers, so they replace only inside their known anchors (the
@@ -110,7 +141,8 @@ const buildTemplate = async ( filePath ) => {
 		// landing in .json files, which would corrupt a match spanning structural JSON.
 		renderedTemplate = renderedTemplate.replace(
 			/(?<="port": |localhost:|\| )889[0-3](?=[,'\s|])/g,
-			( match ) => String( portBase + ( Number( match ) - TEMPLATE_PORT_BASE ) )
+			( match ) =>
+				String( portBase + ( Number( match ) - TEMPLATE_PORT_BASE ) )
 		);
 	}
 
