@@ -7,8 +7,9 @@ namespace A8C\SpecialProjects\PluginTemplate;
 /**
  * The plugin's composition root: `COMPONENTS` below is the plugin, and `boot()` runs it through
  * the `ComponentCollection`. This is the one file you edit to wire a top-level component in —
- * should the plugin ever outgrow manual wiring, a PSR-11 container would replace
- * `ComponentCollection::assemble()` and nothing outside the collection changes.
+ * should the plugin ever outgrow manual wiring, the class list here evolves into root-owned
+ * factories and a PSR-11 container takes over `ComponentCollection::assemble()`; the component
+ * classes themselves stay untouched.
  *
  * The layout convention: one folder per feature, each owning a `Component` that composes it; the
  * `src/` root holds only this bootstrapping mechanism. The root itself deliberately does not
