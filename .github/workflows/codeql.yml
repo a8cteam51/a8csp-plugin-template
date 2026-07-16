@@ -24,3 +24,5 @@ jobs:
       # workflow can never escalate beyond what this job grants.
       security-events: write
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-codeql.yml@trunk
+    with:
+      languages: '["actions", "javascript-typescript"]'

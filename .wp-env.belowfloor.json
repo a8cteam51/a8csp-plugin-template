@@ -3,6 +3,7 @@
   "core": "WordPress/WordPress#tags/6.9.4",
   "phpVersion": "8.5",
   "port": 8891,
+  "testsEnvironment": false,
   "mappings": {
     "wp-content/plugins/a8csp-plugin-template": ".",
     "wp-content/plugins/woocommerce": "./vendor/wp-plugin/woocommerce"
