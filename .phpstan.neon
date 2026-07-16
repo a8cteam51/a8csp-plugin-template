@@ -5,12 +5,10 @@ parameters:
     scanDirectories:
         - vendor/wp-plugin/woocommerce
     # The included config autodetects the fixed-name root files (functions-bootstrap.php,
-    # functions.php); the entry file's name is per-repo, so it is pinned here explicitly and
-    # WPCompat.pluginFile below names it for the same reason. uninstall.php ships in the
-    # release zip, so it gets the same analysis as the rest of the production code.
+    # functions.php, uninstall.php); the entry file's name is per-repo, so it is pinned here
+    # explicitly and WPCompat.pluginFile below names it for the same reason.
     paths:
         - %currentWorkingDirectory%/a8csp-template-plugin.php
-        - %currentWorkingDirectory%/uninstall.php
     WPCompat:
         # wp-compat's own fallback guesses "{cwd}/{basename(cwd)}.php", which only holds
         # by coincidence when a repo's directory name matches its entry file; declared
