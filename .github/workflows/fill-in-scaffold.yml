@@ -37,43 +37,93 @@ jobs:
             exit 1
           fi
 
+      # Validate every input before checkout so an invalid repository remains pristine.
       # fill-in-scaffold.mjs derives every PHP global rename from php-globals-short-prefix and
-      # every title/namespace rename from human-title. A missing or malformed property would bake
-      # broken renames — up to unparseable PHP — into commits that are already pushed; failing
-      # before anything runs keeps a misconfigured repository pristine.
-      - name: Require valid php-globals-short-prefix and human-title custom properties.
+      # every title/namespace rename from human-title, and the repository description and name land
+      # in the plugin header and package identity. A malformed value bakes broken renames — up to
+      # unparseable PHP, or valid-but-injected PHP the syntax sweep cannot catch — into commits that
+      # are already pushed and trigger no CI.
+      - name: Validate the scaffold identity inputs.
         env:
-          CUSTOM_PROPERTIES: ${{ toJSON( github.event.repository.custom_properties ) }}
+          REPO_JSON: ${{ toJSON( github.event.repository ) }}
         run: |
-          for property in php-globals-short-prefix human-title; do
-            value=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r --arg property "$property" '.[$property] // empty')
-            if [ -z "$value" ]; then
-              echo "::error::repository custom property '$property' is missing or empty; set it on the repository and re-run this workflow"
-              exit 1
-            fi
-          done
+          read_json_value() {
+            local destination="$1"
+            local filter="$2"
+            local value
 
-          # The prefix lands in function, variable, and constant identifiers: degenerate or
-          # unbounded values (`a`, `site_`, `my__thing`) ship collision-prone or double-underscore
-          # names fleet-wide, and the 15-character cap keeps prefixed registry keys (post types,
-          # options) inside WordPress's length limits.
-          prefix=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["php-globals-short-prefix"]')
-          if ! printf '%s' "$prefix" | grep -Eq '^[a-z][a-z0-9_]{2,13}[a-z0-9]$' || printf '%s' "$prefix" | grep -q '__'; then
-            echo "::error::php-globals-short-prefix '$prefix' must be 4-15 characters of lowercase snake_case, starting with a letter, ending with a letter or digit, with no __ runs (it becomes PHP identifiers)"
-            exit 1
-          fi
+            IFS= read -r -d '' value < <(
+              printf '%s' "$REPO_JSON" | jq -r "$filter"
+              printf '\0'
+            )
+            value=${value%$'\n'}
+            printf -v "$destination" '%s' "$value"
+          }
+
+          report_error() {
+            local field="$1"
+            local value="$2"
+            local requirement="$3"
+            local displayed_value
+
+            printf -v displayed_value '%q' "$value"
+            printf '::error::%s has offending value %s; %s\n' "$field" "$displayed_value" "$requirement"
+            invalid=1
+          }
+
+          read_json_value human_title '.custom_properties["human-title"] // empty'
+          read_json_value php_globals_short_prefix '.custom_properties["php-globals-short-prefix"] // empty'
+          read_json_value repository_description '.description // empty'
+          read_json_value repository_name '.name'
+
+          invalid=0
 
           # The title lands in PHP string literals and, space-stripped, in namespace declarations
-          # and composer.json PSR-4 keys — so it must be alphanumerics and spaces, and its derived
-          # namespace segment must itself be a valid PHP identifier.
-          title=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["human-title"]')
-          if ! printf '%s' "$title" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9 ]*$'; then
-            echo "::error::human-title '$title' must contain only letters, digits, and spaces (it becomes PHP strings and a namespace segment)"
-            exit 1
+          # and composer.json PSR-4 keys, so it must be alphanumerics and spaces.
+          title_grammar='^[A-Za-z0-9][A-Za-z0-9 ]*$'
+          if [ -z "$human_title" ]; then
+            report_error "repository custom property 'human-title'" "$human_title" 'it must be present and non-empty'
+          elif [[ ! "$human_title" =~ $title_grammar ]]; then
+            report_error "repository custom property 'human-title'" "$human_title" 'it must contain only letters, digits, and spaces (it lands in PHP string literals and a namespace segment)'
+          else
+            # This template generates a real PHP namespace from the title (unlike the site template,
+            # whose title-derived value reaches only @package tags), so the space-stripped form must
+            # itself be a valid PHP identifier.
+            namespace_segment=$(printf '%s' "$human_title" | sed 's/ //g; s/A8CSP//')
+            if ! printf '%s' "$namespace_segment" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$'; then
+              report_error "repository custom property 'human-title'" "$human_title" "its space-stripped form '$namespace_segment' must be a valid PHP namespace segment (start with a letter)"
+            fi
           fi
-          namespace_segment=$(printf '%s' "$title" | sed 's/ //g; s/A8CSP//')
-          if ! printf '%s' "$namespace_segment" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$'; then
-            echo "::error::human-title '$title' derives the invalid namespace segment '$namespace_segment'; adjust the title so its space-stripped form starts with a letter"
+
+          # The prefix replaces `a8csp_template` in every minted global identifier; degenerate
+          # values (`a`, `site_`) would ship collision-prone or double-underscore names fleet-wide.
+          # The 15-character cap keeps prefixed registry keys (post types, options) inside
+          # WordPress's length limits.
+          prefix_grammar='^[a-z][a-z0-9_]{2,13}[a-z0-9]$'
+          if [ -z "$php_globals_short_prefix" ]; then
+            report_error "repository custom property 'php-globals-short-prefix'" "$php_globals_short_prefix" 'it must be present and non-empty'
+          elif [[ ! "$php_globals_short_prefix" =~ $prefix_grammar ]] || [[ "$php_globals_short_prefix" == *__* ]]; then
+            report_error "repository custom property 'php-globals-short-prefix'" "$php_globals_short_prefix" 'it must be 4-15 characters of lowercase snake_case, starting with a letter, ending with a letter or digit, with no __ runs'
+          fi
+
+          # The description lands verbatim in the plugin header docblock: a `*/` closes the comment
+          # early (a crafted payload then reopens it and passes `php -l`), and a newline breaks the
+          # single-line header.
+          if [ -n "$repository_description" ]; then
+            if [[ "$repository_description" == *$'\n'* ]]; then
+              report_error 'repository description' "$repository_description" 'it must be a single line when set'
+            fi
+            if [[ "$repository_description" == *'*/'* ]]; then
+              report_error 'repository description' "$repository_description" "it must not contain '*/'"
+            fi
+          fi
+
+          # The repository name becomes the composer package slug and file identities.
+          if [[ ! "$repository_name" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+            report_error 'repository name' "$repository_name" 'it must match ^[a-z0-9]+(-[a-z0-9]+)*$'
+          fi
+
+          if [ "$invalid" -ne 0 ]; then
             exit 1
           fi
 
@@ -86,7 +136,7 @@ jobs:
       - name: Check whether the scaffold was already filled.
         id: scaffold-check
         run: |
-          if [ ! -f .github/workflows/fill-in-scaffold.mjs ] || [ ! -f README.scaffold.md ]; then
+          if [ ! -f .github/workflows/fill-in-scaffold.mjs ] || [ ! -f .github/workflows/fill-in-scaffold-content.mjs ] || [ ! -f README.scaffold.md ]; then
             echo "::notice::a prior fill-in-scaffold run already completed; this duplicate run is a no-op"
             echo "already-filled=true" >> "$GITHUB_OUTPUT"
           else
