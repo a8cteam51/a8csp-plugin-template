@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/a8cteam51/a8csp-configs.git",
-                "reference": "71b5437d7b36cf73c79f9677989d244d32fe1847"
+                "reference": "5a68f9e39276d5fc9ebe34c70c05a1f812e65f4b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/71b5437d7b36cf73c79f9677989d244d32fe1847",
-                "reference": "71b5437d7b36cf73c79f9677989d244d32fe1847",
+                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/5a68f9e39276d5fc9ebe34c70c05a1f812e65f4b",
+                "reference": "5a68f9e39276d5fc9ebe34c70c05a1f812e65f4b",
                 "shasum": ""
             },
             "require": {
@@ -81,7 +81,7 @@
                 "source": "https://github.com/a8cteam51/a8csp-configs/tree/trunk",
                 "issues": "https://github.com/a8cteam51/a8csp-configs/issues"
             },
-            "time": "2026-07-16T14:32:11+00:00"
+            "time": "2026-07-16T14:50:22+00:00"
         },
         {
             "name": "automattic/jetpack-changelogger",
