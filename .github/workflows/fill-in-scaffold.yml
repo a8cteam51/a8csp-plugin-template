@@ -4,6 +4,12 @@ on:
   repository_dispatch:
     types: [ fill_scaffold ]
   workflow_dispatch:
+    inputs:
+      strip-teaching-content:
+        description: 'Rewrite the template teaching prose into production docblocks'
+        type: boolean
+        required: false
+        default: false
 
 # Serialize runs repo-wide; a cancelled half-pushed fill would leave the generated repo inconsistent.
 concurrency:
@@ -134,21 +140,22 @@ jobs:
 
       # Optional second phase: strip the template's teaching prose, rewriting each passage into the
       # contract-level docblock a real plugin would carry, via the exact-match manifest in
-      # fill-in-scaffold-content.mjs. It runs only when the repository custom property
-      # 'strip-teaching-content' is exactly 'true'. The manifest's `from` spans are written in
+      # fill-in-scaffold-content.mjs. It runs only when the dispatch asked for it — the
+      # workflow_dispatch checkbox, or a `strip-teaching-content: true` key in the
+      # repository_dispatch client payload. The manifest's `from` spans are written in
       # post-substitution form, so this MUST run after the identifier substitution above and before
       # the syntax sweep below; a docrot drift (any span no longer matching exactly once) fails the
       # build loudly rather than silently skipping.
       - name: Strip the template's teaching content.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         env:
-          CUSTOM_PROPERTIES: ${{ toJSON( github.event.repository.custom_properties ) }}
+          STRIP_INPUT: ${{ inputs.strip-teaching-content }}
+          STRIP_PAYLOAD: ${{ github.event.client_payload.strip-teaching-content }}
         run: |
-          strip=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["strip-teaching-content"] // empty')
-          if [ "$strip" = 'true' ]; then
+          if [ "$STRIP_INPUT" = 'true' ] || [ "$STRIP_PAYLOAD" = 'true' ]; then
             node ./.github/workflows/fill-in-scaffold-content.mjs
           else
-            echo "::notice::repository custom property 'strip-teaching-content' is not 'true'; keeping the template teaching prose"
+            echo "::notice::the dispatch did not ask for strip-teaching-content; keeping the template teaching prose"
           fi
 
       # Substituted identifiers land inside PHP source, and pushes from this workflow trigger no

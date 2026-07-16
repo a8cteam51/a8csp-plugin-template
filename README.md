@@ -88,14 +88,16 @@ option keys.
 ### Optional teaching-content strip
 
 The template's docblocks and comments carry teaching prose — the architectural
-rationale that makes the scaffold a worked example. Set the repository custom
-property `strip-teaching-content` to exactly `true` and generation runs a second
-phase, `.github/workflows/fill-in-scaffold-content.mjs`, that rewrites each
-teaching passage into the contract-level docblock a production plugin would
-carry and deletes the `includes/_disabled-example.php` teaching stub.
-Load-bearing constraint comments (below-floor parsability, the boot latch, cache
-staging, the uninstall footprint, and the like) are left verbatim. Absent or any
-other value skips the phase with a notice, keeping the teaching prose.
+rationale that makes the scaffold a worked example. Ask for the strip in the
+dispatch that triggers generation — the `strip-teaching-content` checkbox on a
+manual `workflow_dispatch` run, or a `"strip-teaching-content": true` key in the
+`repository_dispatch` client payload — and generation runs a second phase,
+`.github/workflows/fill-in-scaffold-content.mjs`, that rewrites each teaching
+passage into the contract-level docblock a production plugin would carry and
+deletes the `includes/_disabled-example.php` teaching stub. Load-bearing
+constraint comments (below-floor parsability, the boot latch, cache staging, the
+uninstall footprint, and the like) are left verbatim. A dispatch that does not
+ask for the strip keeps the teaching prose, with a notice.
 
 The strip is driven by an exact-match manifest, not markers or regexes: each
 passage is matched by its literal text, which must occur **exactly once** in its
