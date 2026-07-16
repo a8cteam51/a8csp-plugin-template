@@ -6,9 +6,12 @@ parameters:
         - vendor/wp-plugin/woocommerce
     # The included config autodetects the fixed-name root files (functions-bootstrap.php,
     # functions.php, uninstall.php); the entry file's name is per-repo, so it is pinned here
-    # explicitly and WPCompat.pluginFile below names it for the same reason.
+    # explicitly and WPCompat.pluginFile below names it for the same reason. footprint.php is a
+    # root data manifest outside the autodetected set, so it is pinned too — uninstall.php's
+    # delete loops consume its shape.
     paths:
         - %currentWorkingDirectory%/a8csp-template-plugin.php
+        - %currentWorkingDirectory%/footprint.php
     WPCompat:
         # wp-compat's own fallback guesses "{cwd}/{basename(cwd)}.php", which only holds
         # by coincidence when a repo's directory name matches its entry file; declared
