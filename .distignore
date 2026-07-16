@@ -30,7 +30,10 @@ vendor/bin
 infection.json
 playwright.config.js
 postcss.config.js
+eslint.config.mjs
+stylelint.config.js
 .editorconfig
+.DS_Store
 package*.json
 composer.json
 composer.lock

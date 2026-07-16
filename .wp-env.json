@@ -2,7 +2,6 @@
   "$schema": "https://schemas.wp.org/trunk/wp-env.json",
   "phpVersion": "8.5",
   "port": 8893,
-  "testsEnvironment": false,
   "mappings": {
     "wp-content/plugins/a8csp-template-plugin": ".",
     "wp-content/plugins/woocommerce": "./vendor/wp-plugin/woocommerce"
@@ -11,9 +10,7 @@
     "afterStart": "wp-env run cli wp plugin activate woocommerce a8csp-template-plugin"
   },
   "config": {
-    "WP_DEBUG": true,
     "WP_DEBUG_DISPLAY": false,
-    "WP_DEBUG_LOG": true,
-    "SCRIPT_DEBUG": true
+    "WP_DEBUG_LOG": true
   }
 }

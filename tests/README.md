@@ -1,6 +1,6 @@
 # Tests
 
-The test rig has three PHPUnit suites plus a Playwright end-to-end suite, run against wp-env
+The test rig has four PHPUnit suites plus a Playwright end-to-end suite, run against wp-env
 fixtures at three WordPress-version tiers.
 
 ## Suites
@@ -99,8 +99,8 @@ precedence (`.wp-env.override.json`; custom configs pair with e.g.
 ## Why plain `TestCase`, not `WP_UnitTestCase`
 
 WordPress core's own PHPUnit scaffold still caps at PHPUnit <=9, and core's migration plan
-(#62004) only targets PHPUnit 11.1+ over several future releases — there is no core-provided
-`WP_UnitTestCase` path onto a current PHPUnit today. This rig runs PHPUnit 13 directly, against
+(#62004) targets PHPUnit 10/11 with 12-readiness over several future releases — there is no
+core-provided `WP_UnitTestCase` path onto a current PHPUnit today. This rig runs PHPUnit 13 directly, against
 plain `TestCase`, inside wp-env, rather than waiting on that migration or pinning to an old
 PHPUnit.
 

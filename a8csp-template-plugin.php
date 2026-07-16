@@ -43,7 +43,7 @@
 // The gate's helper functions live in functions-bootstrap.php, which shares this file's
 // below-floor parse constraint; they must exist before the compatibility hook and the
 // requirements gate below can call them.
-require_once A8CSP_TEMPLATE_DIR_PATH . '/functions-bootstrap.php';
+require_once A8CSP_TEMPLATE_DIR_PATH . 'functions-bootstrap.php';
 
 add_filter(
 	'update_plugins_github.com',
@@ -125,8 +125,9 @@ add_filter(
 );
 
 // Registration-only since WP 6.7, so include time is safe — and required: core registers the
-// header path only for site-active plugins, so network-activated copies lose their bundled
-// translations without this line. Gettext calls still wait for `init` (JIT).
+// header path only for site-active plugins (wp-settings.php skips it in the network-activated
+// loop), so network-activated copies lose their bundled translations without this line.
+// Gettext calls still wait for `init` (JIT).
 load_plugin_textdomain( 'a8csp-plugin-template', false, dirname( A8CSP_TEMPLATE_BASENAME ) . '/languages' );
 
 // Declare compatibility with WC features.
@@ -140,17 +141,17 @@ add_action(
 );
 
 // Load the autoloader.
-if ( ! \is_file( A8CSP_TEMPLATE_DIR_PATH . '/vendor/autoload.php' ) ) {
+if ( ! \is_file( A8CSP_TEMPLATE_DIR_PATH . 'vendor/autoload.php' ) ) {
 	a8csp_template_output_requirements_error( new WP_Error( 'missing_autoloader' ) );
 	return;
 }
-require_once A8CSP_TEMPLATE_DIR_PATH . '/vendor/autoload.php';
+require_once A8CSP_TEMPLATE_DIR_PATH . 'vendor/autoload.php';
 
 // Bootstrap the plugin (maybe)!
 \define( 'A8CSP_TEMPLATE_REQUIREMENTS', a8csp_template_validate_requirements() );
 if ( is_wp_error( A8CSP_TEMPLATE_REQUIREMENTS ) ) {
 	a8csp_template_output_requirements_error( A8CSP_TEMPLATE_REQUIREMENTS );
 } else {
-	require_once A8CSP_TEMPLATE_DIR_PATH . '/functions.php';
+	require_once A8CSP_TEMPLATE_DIR_PATH . 'functions.php';
 	add_action( 'plugins_loaded', array( a8csp_template_plugin(), 'boot' ) );
 }

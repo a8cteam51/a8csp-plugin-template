@@ -58,6 +58,7 @@ if ( is_multisite() ) {
 }
 
 // User meta is stored network-globally, so one pass covers every site.
+// @phpstan-ignore foreach.emptyArray (The scaffold's user-meta footprint starts empty; the loop is live the day a consumer lists a key.)
 foreach ( $a8csp_template_footprint['user_meta'] as $a8csp_template_uninstall_meta_key ) {
 	delete_metadata( 'user', 0, $a8csp_template_uninstall_meta_key, '', true );
 }

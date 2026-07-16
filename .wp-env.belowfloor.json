@@ -3,15 +3,12 @@
   "core": "WordPress/WordPress#tags/6.9.4",
   "phpVersion": "8.5",
   "port": 8891,
-  "testsEnvironment": false,
   "mappings": {
     "wp-content/plugins/a8csp-template-plugin": ".",
     "wp-content/plugins/woocommerce": "./vendor/wp-plugin/woocommerce"
   },
   "config": {
-    "WP_DEBUG": true,
     "WP_DEBUG_DISPLAY": false,
-    "WP_DEBUG_LOG": true,
-    "SCRIPT_DEBUG": true
+    "WP_DEBUG_LOG": true
   }
 }

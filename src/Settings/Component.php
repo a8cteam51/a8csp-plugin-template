@@ -143,7 +143,7 @@ final class Component extends AbstractComponent {
 			),
 			array(
 				'title' => __( 'Example option', 'a8csp-plugin-template' ),
-				'desc'  => __( 'A persisted example setting owned by the WooCommerce integration.', 'a8csp-plugin-template' ),
+				'desc'  => __( 'A persisted example setting owned by the WooCommerce settings surface.', 'a8csp-plugin-template' ),
 				// Mirrored in the `uninstall.php` footprint; the line there goes with this surface when it is deleted.
 				'id'    => 'a8csp_template_wc_example_option',
 				'type'  => 'text',

@@ -90,8 +90,11 @@ For generated repositories, the workflow:
 
 1. Renames `README.scaffold.md` to `README.md`.
 2. Renames `a8csp-template-plugin.php` to the generated repository name.
-3. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
-4. Commits and pushes the renamed and filled files.
+3. Deletes the template's changelog fragments and example POT.
+4. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
+5. Re-locks Composer against the renamed package name.
+6. Deletes the spent scaffold workflows and the template guard.
+7. Commits and pushes the generated files.
 
 The replacement script uses the GitHub repository name, repository description,
 and these repository custom properties:

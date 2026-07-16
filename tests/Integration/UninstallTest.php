@@ -45,10 +45,9 @@ final class UninstallTest extends TestCase {
 
 	/**
 	 * Seeds a sentinel for every key the real footprint lists plus the canary, runs the real
-	 * `uninstall.php`, then asserts the footprint's keys are gone and the canary survived.
-	 * With today's honestly-empty footprint the seed/assert loops below run zero iterations —
-	 * the proof today is that `uninstall.php` executes cleanly against a live WordPress and the
-	 * canary survives; the loops activate for real the day the first footprint entry lands.
+	 * `uninstall.php`, then asserts the footprint's keys are gone and the canary survived. The
+	 * loops read the footprint straight out of `uninstall.php`, so the proof tracks the footprint
+	 * as it grows with no per-key test edits — an empty footprint section simply loops zero times.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
