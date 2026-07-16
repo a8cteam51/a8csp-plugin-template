@@ -3,9 +3,9 @@
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
 use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
-use A8C\SpecialProjects\PluginTemplate\Components;
+use A8C\SpecialProjects\PluginTemplate\ComponentCollection;
 use A8C\SpecialProjects\PluginTemplate\Integrations\Component;
-use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions;
 use A8C\SpecialProjects\PluginTemplate\Integrations\WooPayments;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -23,28 +23,11 @@ use PHPUnit\Framework\TestCase;
  */
 #[CoversClass( Component::class )]
 #[UsesClass( AbstractComponent::class )]
-#[UsesClass( Components::class )]
-#[UsesClass( WC_Subscriptions\Component::class )]
-#[UsesClass( WC_Subscriptions\Price_Note::class )]
+#[UsesClass( ComponentCollection::class )]
+#[UsesClass( WooCommerceSubscriptions\Component::class )]
+#[UsesClass( WooCommerceSubscriptions\PriceNote::class )]
 #[UsesClass( WooPayments::class )]
 final class IntegrationsComponentTest extends TestCase {
-	/**
-	 * Satisfies the production files' `ABSPATH` boot guard and loads the recording hook stubs
-	 * before the component classes are first autoloaded.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public static function setUpBeforeClass(): void {
-		if ( ! \defined( 'ABSPATH' ) ) {
-			\define( 'ABSPATH', __DIR__ . '/' );
-		}
-
-		require_once __DIR__ . '/wp-hook-stubs.php';
-	}
-
 	/**
 	 * Starts each test with an empty hook-registration ledger.
 	 *
@@ -70,7 +53,7 @@ final class IntegrationsComponentTest extends TestCase {
 	 */
 	#[RunInSeparateProcess]
 	public function test_children_with_absent_companions_stay_unconstructed(): void {
-		self::assertTrue( Component::is_needed() );
+		self::assertTrue( Component::should_load() );
 
 		$component = new Component();
 		$component->initialize();

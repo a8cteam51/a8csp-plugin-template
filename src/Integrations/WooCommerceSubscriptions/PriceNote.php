@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions;
+namespace A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions;
 
 \defined( 'ABSPATH' ) || exit;
 
@@ -14,7 +14,7 @@ namespace A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions;
  * @since   1.0.0
  * @version 1.0.0
  */
-final class Price_Note {
+final class PriceNote {
 	// region HOOKS
 
 	/**

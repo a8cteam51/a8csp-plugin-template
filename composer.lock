@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/a8cteam51/a8csp-configs.git",
-                "reference": "d143bcf7c79a5686ea93ea6473456ecfc75535bc"
+                "reference": "654a00c445ed34c3e9ff27af6b19df1b06c3d057"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/d143bcf7c79a5686ea93ea6473456ecfc75535bc",
-                "reference": "d143bcf7c79a5686ea93ea6473456ecfc75535bc",
+                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/654a00c445ed34c3e9ff27af6b19df1b06c3d057",
+                "reference": "654a00c445ed34c3e9ff27af6b19df1b06c3d057",
                 "shasum": ""
             },
             "require": {
@@ -81,7 +81,7 @@
                 "source": "https://github.com/a8cteam51/a8csp-configs/tree/trunk",
                 "issues": "https://github.com/a8cteam51/a8csp-configs/issues"
             },
-            "time": "2026-07-15T18:52:33+00:00"
+            "time": "2026-07-16T12:22:21+00:00"
         },
         {
             "name": "automattic/jetpack-changelogger",
@@ -7902,7 +7902,7 @@
         "phpcompatibility/phpcompatibility-wp": 15,
         "roave/security-advisories": 20
     },
-    "prefer-stable": true,
+    "prefer-stable": false,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.5",

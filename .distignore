@@ -30,11 +30,15 @@ vendor/bin
 infection.json
 playwright.config.js
 postcss.config.js
+eslint.config.mjs
+stylelint.config.js
 .editorconfig
+.DS_Store
 package*.json
 composer.json
 composer.lock
 README.scaffold.md
+/docs
 
 # Secret material — never ship, even if a consumer forgets to list it.
 # .pem/.key are root-anchored (leading /) so certs bundled under vendor/

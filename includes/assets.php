@@ -3,10 +3,10 @@
 \defined( 'ABSPATH' ) || exit;
 
 /**
- * Returns an array with meta information for a given asset path. It first checks for an
- * `.asset.php` file beside the given asset file and returns that file's contents when it exists.
- * Otherwise, it falls back to an array using the file's last-modified time as the version, with any
- * extra dependencies passed in.
+ * Returns an array with meta information for a given asset path. It starts from a fallback of the
+ * file's last-modified time as the version with no dependencies, overlays the version and
+ * dependencies from an `.asset.php` file beside the asset when one exists, and appends any extra
+ * dependencies passed in.
  *
  * @since   1.0.0
  * @version 1.0.0

@@ -1,6 +1,6 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions;
+namespace A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions;
 
 use A8C\SpecialProjects\PluginTemplate\ComponentInterface;
 
@@ -30,9 +30,9 @@ final class Component implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @var     Price_Note|null
+	 * @var     PriceNote|null
 	 */
-	private ?Price_Note $price_note = null;
+	private ?PriceNote $price_note = null;
 
 	// endregion
 
@@ -47,7 +47,7 @@ final class Component implements ComponentInterface {
 	 *
 	 * @return  bool
 	 */
-	public static function is_needed(): bool {
+	public static function should_load(): bool {
 		return \class_exists( 'WC_Subscriptions' );
 	}
 
@@ -58,7 +58,7 @@ final class Component implements ComponentInterface {
 	 * @version 1.0.0
 	 */
 	public function initialize(): void {
-		$this->price_note = new Price_Note();
+		$this->price_note = new PriceNote();
 	}
 
 	/**

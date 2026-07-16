@@ -85,7 +85,7 @@ final class MultisiteUninstallTest extends TestCase {
 			self::markTestSkipped( 'This proof only runs against a multisite network; this fixture is single-site.' );
 		}
 
-		$footprint           = InlineFootprint::read();
+		$footprint           = require \dirname( __DIR__, 2 ) . '/footprint.php';
 		$this->proof_site_id = self::a_fresh_proof_site_id();
 
 		foreach ( array( get_current_blog_id(), $this->proof_site_id ) as $site_id ) {

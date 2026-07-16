@@ -33,7 +33,7 @@ export default function Edit() {
 	return (
 		<p { ...useBlockProps() }>
 			{ __(
-				'Todo List – hello from the editor!',
+				'An example notice from A8CSP Template Plugin.',
 				'a8csp-plugin-template'
 			) }
 		</p>

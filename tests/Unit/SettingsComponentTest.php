@@ -9,9 +9,9 @@ use PHPUnit\Framework\Attributes\UsesClass;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Exercises the merged settings component outside WordPress: the component carries no gate of its
- * own — the plugin-wide host gate guarantees WooCommerce — and registers both of its surfaces in
- * the hook phase.
+ * Exercises the settings component outside WordPress: the component carries no gate of its own —
+ * the plugin-wide host gate guarantees WooCommerce — and registers both of its surfaces in the
+ * hook phase.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -19,23 +19,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( Settings\Component::class )]
 #[UsesClass( AbstractComponent::class )]
 final class SettingsComponentTest extends TestCase {
-	/**
-	 * Satisfies the production files' `ABSPATH` boot guard before their classes are first
-	 * autoloaded.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public static function setUpBeforeClass(): void {
-		if ( ! \defined( 'ABSPATH' ) ) {
-			\define( 'ABSPATH', __DIR__ . '/' );
-		}
-
-		require_once __DIR__ . '/wp-hook-stubs.php';
-	}
-
 	/**
 	 * Starts each test with an empty hook-registration ledger.
 	 *
@@ -59,8 +42,8 @@ final class SettingsComponentTest extends TestCase {
 	 *
 	 * @return  void
 	 */
-	public function test_is_needed_is_always_true(): void {
-		self::assertTrue( Settings\Component::is_needed() );
+	public function test_should_load_is_always_true(): void {
+		self::assertTrue( Settings\Component::should_load() );
 	}
 
 	/**

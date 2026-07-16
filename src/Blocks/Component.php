@@ -28,7 +28,7 @@ final class Component extends AbstractComponent {
 	 */
 	public function register_hooks(): void {
 		add_action( 'init', array( $this, 'register_blocks' ) );
-		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
+		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_script' ) );
 	}
 
 	// endregion
@@ -52,14 +52,17 @@ final class Component extends AbstractComponent {
 	}
 
 	/**
-	 * Registers a plugin-level script for the block editor.
+	 * Registers and enqueues the plugin-level block-editor script. A registered-but-not-enqueued
+	 * handle never loads, so the editor hook hub in `assets/js/src/editor.js` — the entry point that
+	 * fires `editor.ready` for any editor extensions the plugin ships — only runs once the handle is
+	 * enqueued here.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
 	 * @return  void
 	 */
-	public function enqueue_block_editor_assets(): void {
+	public function enqueue_editor_script(): void {
 		$asset_meta = a8csp_template_get_asset_meta( 'assets/js/build/editor.js' );
 		if ( \is_null( $asset_meta ) ) {
 			return;
@@ -73,6 +76,7 @@ final class Component extends AbstractComponent {
 			$asset_meta['version'],
 			false
 		);
+		wp_enqueue_script( "$plugin_slug-editor" );
 		wp_set_script_translations( "$plugin_slug-editor", 'a8csp-plugin-template' );
 	}
 

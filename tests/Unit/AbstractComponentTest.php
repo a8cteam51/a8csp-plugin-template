@@ -16,23 +16,6 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( AbstractComponent::class )]
 final class AbstractComponentTest extends TestCase {
 	/**
-	 * Satisfies the production files' `ABSPATH` boot guard and loads the recording hook stubs
-	 * before the component classes are first autoloaded.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public static function setUpBeforeClass(): void {
-		if ( ! \defined( 'ABSPATH' ) ) {
-			\define( 'ABSPATH', __DIR__ . '/' );
-		}
-
-		require_once __DIR__ . '/wp-hook-stubs.php';
-	}
-
-	/**
 	 * An extending component inherits the open gate and a readiness phase that registers nothing.
 	 *
 	 * @since   1.0.0
@@ -55,7 +38,7 @@ final class AbstractComponentTest extends TestCase {
 			}
 		};
 
-		self::assertTrue( $component::is_needed() );
+		self::assertTrue( $component::should_load() );
 
 		$component->initialize();
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_hooks'] );

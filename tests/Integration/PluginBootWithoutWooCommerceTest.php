@@ -33,7 +33,7 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 			self::markTestSkipped( 'This proof only runs against a WooCommerce-less runtime; WooCommerce is active in this run.' );
 		}
 
-		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS );
+		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
 		self::assertTrue( \function_exists( 'a8csp_template_plugin' ) );
 
 		self::assertFalse( a8csp_template_plugin()->is_booted() );
@@ -43,7 +43,7 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 
 		$block_metadata = \json_decode(
 			// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Local filesystem read of a tracked build artifact, not a remote resource.
-			(string) \file_get_contents( \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'blocks/build/foobar/block.json' ),
+			(string) \file_get_contents( \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'blocks/build/example-notice/block.json' ),
 			true,
 			512,
 			JSON_THROW_ON_ERROR

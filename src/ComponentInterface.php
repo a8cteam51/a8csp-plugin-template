@@ -34,17 +34,17 @@ interface ComponentInterface {
 	 * own hooks in `register_hooks()`. Capability checks run inside the hook callbacks, after the
 	 * current user exists.
 	 *
-	 * The gate recurs at four altitudes: the whole plugin (the host gate in `Plugin::boot()`), a
-	 * feature subtree (a parent component whose closed gate leaves everything its `initialize()`
-	 * would have constructed unbuilt), a leaf component's own gate, and finally those capability
-	 * checks inside hook callbacks.
+	 * The gate recurs at four rungs of one ladder: the whole plugin (the host gate in
+	 * `Plugin::boot()`), a feature subtree (a parent component whose closed gate leaves everything
+	 * its `initialize()` would have constructed unbuilt), a leaf component's own gate, and finally
+	 * those capability checks inside hook callbacks.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
 	 * @return  bool
 	 */
-	public static function is_needed(): bool;
+	public static function should_load(): bool;
 
 	/**
 	 * Prepares the component's internal state.
