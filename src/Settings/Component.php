@@ -34,9 +34,10 @@ final class Component extends AbstractComponent {
 	public function register_hooks(): void {
 		// The Settings API is only loaded in the admin, so registration stages onto admin_init.
 		add_action( 'admin_init', array( $this, 'register_settings' ) );
+		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_styles' ) );
 
 		add_filter( 'woocommerce_get_sections_advanced', array( $this, 'add_section' ) );
-		add_filter( 'woocommerce_get_settings_advanced', array( $this, 'get_settings' ), 10, 2 );
+		add_filter( 'woocommerce_get_settings_advanced', array( $this, 'provide_settings' ), 10, 2 );
 	}
 
 	// endregion
@@ -101,6 +102,41 @@ final class Component extends AbstractComponent {
 	}
 
 	/**
+	 * Enqueues the admin stylesheet on the General options page — the surface this component's demo
+	 * field lives on. Gating on the hook suffix keeps the stylesheet off every other admin screen,
+	 * the worked example of a scoped admin enqueue. The compiled asset carries its version and
+	 * dependencies through the same `a8csp_template_get_asset_meta()` helper the block script uses,
+	 * and `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left
+	 * locales.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @param   string $hook_suffix The current admin page's hook suffix.
+	 *
+	 * @return  void
+	 */
+	public function enqueue_admin_styles( string $hook_suffix ): void {
+		if ( 'options-general.php' !== $hook_suffix ) {
+			return;
+		}
+
+		$asset_meta = a8csp_template_get_asset_meta( 'assets/css/build/settings.css' );
+		if ( \is_null( $asset_meta ) ) {
+			return;
+		}
+
+		$plugin_slug = a8csp_template_get_plugin_slug();
+		wp_enqueue_style(
+			"$plugin_slug-settings",
+			\constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/css/build/settings.css',
+			$asset_meta['dependencies'],
+			$asset_meta['version']
+		);
+		wp_style_add_data( "$plugin_slug-settings", 'rtl', 'replace' );
+	}
+
+	/**
 	 * Adds the plugin's section to the Advanced settings tab. The section slug carries the prefix
 	 * token so generation rewrites it, and the label doubles as the plugin title.
 	 *
@@ -130,7 +166,7 @@ final class Component extends AbstractComponent {
 	 *
 	 * @return  array<int, array<string, mixed>>
 	 */
-	public function get_settings( array $settings, string $current_section ): array {
+	public function provide_settings( array $settings, string $current_section ): array {
 		if ( 'a8csp_template' !== $current_section ) {
 			return $settings;
 		}

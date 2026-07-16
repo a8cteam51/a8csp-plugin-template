@@ -71,7 +71,7 @@ every surviving component is initialized before any hook can fire.
   bootstrap, with every option and user-meta key grouped by owning component; add an entry with each
   corresponding write, and cross-reference persisted keys with `@see uninstall.php` in the component
   class docblock.
-- `blocks/src/foobar/` contains the example block source, while `blocks/build/` contains tracked build
+- `blocks/src/example-notice/` contains the example block source, while `blocks/build/` contains tracked build
   output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`, which
   `src/Blocks/Component.php` uses to register all built blocks as one metadata collection.
 - `assets/js/src/editor.js` defines the shared editor hook entry point, and `assets/js/build/` contains

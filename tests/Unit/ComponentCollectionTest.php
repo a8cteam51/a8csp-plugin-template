@@ -89,6 +89,6 @@ final class ComponentCollectionTest extends TestCase {
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_hooks'] );
 
 		$components->register_hooks();
-		self::assertSame( array( 'init', 'enqueue_block_editor_assets', 'admin_init', 'woocommerce_get_sections_advanced', 'woocommerce_get_settings_advanced' ), $GLOBALS['a8csp_template_test_hooks'] );
+		self::assertSame( array( 'init', 'enqueue_block_editor_assets', 'admin_init', 'admin_enqueue_scripts', 'woocommerce_get_sections_advanced', 'woocommerce_get_settings_advanced' ), $GLOBALS['a8csp_template_test_hooks'] );
 	}
 }

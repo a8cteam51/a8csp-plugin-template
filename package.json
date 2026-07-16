@@ -56,13 +56,16 @@
     "packages-update": "npm update",
     "packages-update:wp": "wp-scripts packages-update --dist-tag=wp-7.0",
 
-    "build": "npm-run-all --sequential build:**",
+    "build": "NODE_ENV=production npm-run-all --sequential build:**",
     "build:blocks": "wp-scripts build --webpack-src-dir=blocks/src --output-path=blocks/build",
     "build:blocks-manifest": "wp-scripts build-blocks-manifest --input=blocks/build --output=blocks/build/blocks-manifest.php",
     "build:assets:scripts": "wp-scripts build assets/js/src/*.js --output-path=assets/js/build",
+    "build:assets:styles": "postcss assets/css/src/*.scss --dir assets/css/build --ext css",
+    "build:assets:styles-rtl": "rtlcss assets/css/build/settings.css assets/css/build/settings-rtl.css",
     "start": "npm-run-all --parallel start:**",
     "start:blocks": "wp-scripts start --webpack-src-dir=blocks/src --output-path=blocks/build",
     "start:assets:scripts": "wp-scripts start assets/js/src/*.js --output-path=assets/js/build",
+    "start:assets:styles": "postcss assets/css/src/*.scss --dir assets/css/build --ext css --watch",
 
     "format": "npm-run-all --sequential format:**",
     "format:scripts": "wp-scripts format blocks assets/js --no-error-on-unmatched-pattern",
