@@ -141,7 +141,10 @@ jobs:
           test -f "$REPO_NAME.php"
 
           # The engines strip their own paths from the lint scope; a leftover reference is docrot.
-          ! grep -qF '.github/workflows/fill-in-scaffold' package.json
+          if grep -qF '.github/workflows/fill-in-scaffold' package.json; then
+            echo '::error::the rendered package.json still references the self-deleting .mjs engines in lint:scripts'
+            exit 1
+          fi
 
       # .github is excluded because the real run deletes the spent machinery instead of
       # substituting inside it; composer.lock is re-locked by the real run after this point.
