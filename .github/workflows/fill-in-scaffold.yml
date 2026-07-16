@@ -4,6 +4,12 @@ on:
   repository_dispatch:
     types: [ fill_scaffold ]
   workflow_dispatch:
+    inputs:
+      strip-teaching-content:
+        description: 'Rewrite the template teaching prose into production docblocks'
+        type: boolean
+        required: false
+        default: false
 
 # Serialize runs repo-wide; a cancelled half-pushed fill would leave the generated repo inconsistent.
 concurrency:
@@ -32,10 +38,10 @@ jobs:
           fi
 
       # fill-in-scaffold.mjs derives every PHP global rename from php-globals-short-prefix and
-      # every title/namespace rename from human-title. A missing property would bake broken
-      # renames into commits that are already pushed; failing before anything runs keeps a
-      # misconfigured repository pristine.
-      - name: Require the php-globals-short-prefix and human-title custom properties.
+      # every title/namespace rename from human-title. A missing or malformed property would bake
+      # broken renames — up to unparseable PHP — into commits that are already pushed; failing
+      # before anything runs keeps a misconfigured repository pristine.
+      - name: Require valid php-globals-short-prefix and human-title custom properties.
         env:
           CUSTOM_PROPERTIES: ${{ toJSON( github.event.repository.custom_properties ) }}
         run: |
@@ -46,6 +52,28 @@ jobs:
               exit 1
             fi
           done
+
+          # The prefix lands in function, variable, and constant identifiers: lowercase snake_case
+          # starting with a letter, or every PHP file in the generated repository breaks at parse.
+          prefix=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["php-globals-short-prefix"]')
+          if ! printf '%s' "$prefix" | grep -Eq '^[a-z][a-z0-9_]*$'; then
+            echo "::error::php-globals-short-prefix '$prefix' must be lowercase snake_case starting with a letter (it becomes PHP identifiers)"
+            exit 1
+          fi
+
+          # The title lands in PHP string literals and, space-stripped, in namespace declarations
+          # and composer.json PSR-4 keys — so it must be alphanumerics and spaces, and its derived
+          # namespace segment must itself be a valid PHP identifier.
+          title=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["human-title"]')
+          if ! printf '%s' "$title" | grep -Eq '^[A-Za-z0-9][A-Za-z0-9 ]*$'; then
+            echo "::error::human-title '$title' must contain only letters, digits, and spaces (it becomes PHP strings and a namespace segment)"
+            exit 1
+          fi
+          namespace_segment=$(printf '%s' "$title" | sed 's/ //g; s/A8CSP//')
+          if ! printf '%s' "$namespace_segment" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$'; then
+            echo "::error::human-title '$title' derives the invalid namespace segment '$namespace_segment'; adjust the title so its space-stripped form starts with a letter"
+            exit 1
+          fi
 
       # Credentials are persisted on purpose: the final step pushes the
       # scaffolding commits back to the repo via the checkout-provided token.
@@ -96,19 +124,48 @@ jobs:
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: git commit -am "chore -- clear scaffold changelog fragments and the example POT"
 
-      - name: Perform string replacements within the files.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
-        env:
-          REPO_JSON: ${{ toJSON( github.event.repository ) }}
-        run: node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
-
-      - name: Setup PHP for re-locking composer.json.
+      - name: Setup PHP for the syntax sweep and composer re-lock.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.5'
           coverage: none
           tools: composer:v2
+
+      - name: Perform string replacements within the files.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        env:
+          REPO_JSON: ${{ toJSON( github.event.repository ) }}
+        run: node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
+
+      # Optional second phase: strip the template's teaching prose, rewriting each passage into the
+      # contract-level docblock a real plugin would carry, via the exact-match manifest in
+      # fill-in-scaffold-content.mjs. It runs only when the dispatch asked for it — the
+      # workflow_dispatch checkbox, or a `strip-teaching-content: true` key in the
+      # repository_dispatch client payload. The manifest's `from` spans are written in
+      # post-substitution form, so this MUST run after the identifier substitution above and before
+      # the syntax sweep below; a docrot drift (any span no longer matching exactly once) fails the
+      # build loudly rather than silently skipping.
+      - name: Strip the template's teaching content.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        env:
+          STRIP_INPUT: ${{ inputs.strip-teaching-content }}
+          STRIP_PAYLOAD: ${{ github.event.client_payload.strip-teaching-content }}
+        run: |
+          if [ "$STRIP_INPUT" = 'true' ] || [ "$STRIP_PAYLOAD" = 'true' ]; then
+            node ./.github/workflows/fill-in-scaffold-content.mjs
+          else
+            echo "::notice::the dispatch did not ask for strip-teaching-content; keeping the template teaching prose"
+          fi
+
+      # Substituted identifiers land inside PHP source, and pushes from this workflow trigger no
+      # CI — a parse error here would ship a dead-on-arrival repository, so every PHP file is
+      # syntax-checked before anything is committed.
+      - name: Syntax-check every generated PHP file.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        run: |
+          find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
 
       # The name substitution invalidates composer.lock's content-hash, so the lock is refreshed before the commit includes it.
       - name: Re-lock composer.json after the name substitution.
@@ -125,7 +182,7 @@ jobs:
       - name: Remove the spent fill-in-scaffold workflow and the template guard.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
-          rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/template-guard.yml
+          rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs .github/workflows/template-guard.yml
           git add .github/workflows
           git commit -m "chore -- remove the spent fill-in-scaffold workflow and the template guard"
 

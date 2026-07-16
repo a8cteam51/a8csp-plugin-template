@@ -1,9 +1,8 @@
 <?php declare( strict_types=1 );
 /**
  * Uninstall handler. WordPress runs this file directly when the plugin is deleted, in a cold
- * bootstrap where only `WP_UNINSTALL_PLUGIN` is defined — no Composer autoloader, no Plugin class,
- * no Component registry — so the plugin's footprint stays inline below instead of living in a
- * separately-requirable file: nothing here may reference plugin code.
+ * bootstrap without the plugin loaded; the footprint comment below spells out what that means
+ * for this file.
  *
  * @since       1.0.0
  * @version     1.0.0
@@ -13,43 +12,42 @@
 \defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /*
- * The plugin's persisted footprint. Every option and user-meta key any component writes is
- * listed here, in the same change that introduces the write — grouped by owning component
- * so ownership stays reviewable. This file runs in WordPress's cold uninstall bootstrap
- * (no autoloader, no Plugin or Component classes), so the arrays stay inline: nothing here
- * may reference plugin code.
+ * The plugin's persisted footprint, loaded from the standalone manifest. Keeping it in a
+ * dependency-free `footprint.php` lets both this cold uninstall bootstrap and the uninstall proofs
+ * read the same list without either defining `WP_UNINSTALL_PLUGIN` or running the delete loops.
  */
-$a8csp_template_footprint = array(
-	'options'   => array(
-		// Settings owns:
-		'a8csp_template_example_option',
-		// Integrations\WC_Settings_Section owns:
-		'a8csp_template_wc_example_option',
-	),
-	'user_meta' => array(),
-);
+$a8csp_template_footprint = require __DIR__ . '/footprint.php';
 
 /*
  * Options are stored per site, and a multisite uninstall runs only once, network-wide — so the
- * options sweep visits every site of the network. `get_sites()` returns at most 100 sites by
- * default; `number => 0` lifts that cap so no site's options outlive the plugin.
+ * options sweep visits every site of the network. It pages through the sites in batches so memory
+ * stays flat on large networks while the sweep still visits every site.
  */
 if ( is_multisite() ) {
-	$a8csp_template_uninstall_site_ids = get_sites(
-		array(
-			'fields' => 'ids',
-			'number' => 0,
-		)
-	);
-	foreach ( $a8csp_template_uninstall_site_ids as $a8csp_template_uninstall_site_id ) {
-		switch_to_blog( $a8csp_template_uninstall_site_id );
+	$a8csp_template_uninstall_offset = 0;
 
-		foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
-			delete_option( $a8csp_template_uninstall_option );
+	do {
+		$a8csp_template_uninstall_site_ids = get_sites(
+			array(
+				'fields' => 'ids',
+				'number' => 100,
+				'offset' => $a8csp_template_uninstall_offset,
+			)
+		);
+
+		foreach ( $a8csp_template_uninstall_site_ids as $a8csp_template_uninstall_site_id ) {
+			switch_to_blog( $a8csp_template_uninstall_site_id );
+
+			foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
+				delete_option( $a8csp_template_uninstall_option );
+			}
+
+			restore_current_blog();
 		}
 
-		restore_current_blog();
-	}
+		$a8csp_template_uninstall_offset    += 100;
+		$a8csp_template_uninstall_batch_size = \count( $a8csp_template_uninstall_site_ids );
+	} while ( 100 === $a8csp_template_uninstall_batch_size );
 } else {
 	foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
 		delete_option( $a8csp_template_uninstall_option );

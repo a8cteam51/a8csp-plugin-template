@@ -5,7 +5,7 @@
 		 colors="true"
 		 cacheDirectory="tests/.cache/phpunit"
 		 executionOrder="depends,defects"
-		 requireCoverageMetadata="false"
+
 		 beStrictAboutCoverageMetadata="true"
 		 beStrictAboutOutputDuringTests="true"
 		 failOnRisky="true"

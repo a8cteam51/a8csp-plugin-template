@@ -14,8 +14,9 @@ const repository = JSON.parse( process.argv[2] );
 const skip_dirs = [ '.github', '.git' ];
 
 // Every generated repository gets its own wp-env port block, derived from the repository name:
-// deterministic across re-generations of the same repo, and distinct fleet plugins land on
-// distinct blocks, so side-by-side `wp-env start`s don't contend for the same host ports.
+// deterministic across re-generations of the same repo, and collision-reducing (not unique —
+// 5000 blocks, so distinct names can hash together; wp-env override files cover that case) so
+// side-by-side `wp-env start`s rarely contend for the same host ports.
 // Blocks span 10000-29996, clear of the OS ephemeral port ranges.
 const TEMPLATE_PORT_BASE = 8890;
 const nameHash           = parseInt( createHash( 'sha256' ).update( repository.name ).digest( 'hex' ).slice( 0, 8 ), 16 );

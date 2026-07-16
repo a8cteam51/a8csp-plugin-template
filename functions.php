@@ -7,10 +7,11 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
 // region META
 
 /**
- * Returns the plugin instance, booting it on first access.
+ * Returns the plugin's composition root.
  *
- * Doubles as the `plugins_loaded` hook target — named, rather than an anonymous closure, so
- * `remove_action()` can unhook the boot and `has_action()` can assert the wiring by name.
+ * Construction only — never boots: a peer calling this at include time would otherwise run the
+ * component gates before every plugin has loaded. Booting stays tied to the `plugins_loaded`
+ * attachment in the main plugin file.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -18,15 +19,10 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
  * @return  Plugin
  */
 function a8csp_template_plugin(): Plugin {
-	static $plugin = null;
-
-	if ( null === $plugin ) {
-		$plugin = new Plugin();
-		$plugin->boot();
-	}
-
-	return $plugin;
+	static $plugin   = null;
+	return $plugin ??= new Plugin();
 }
+
 // endregion
 
 // region OTHER

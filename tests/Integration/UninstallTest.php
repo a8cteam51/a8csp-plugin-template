@@ -6,8 +6,8 @@ use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
 /**
- * Verifies the real `uninstall.php` end-to-end: every option and user-meta key its inline
- * footprint lists is gone after it runs, and a sentinel key NOT in the footprint survives —
+ * Verifies the real `uninstall.php` end-to-end: every option and user-meta key the `footprint.php`
+ * manifest lists is gone after it runs, and a sentinel key NOT in the footprint survives —
  * proving the file deletes what it owns and nothing else.
  *
  * `uninstall.php` guards on `defined( 'WP_UNINSTALL_PLUGIN' )`, a constant WordPress itself
@@ -45,10 +45,10 @@ final class UninstallTest extends TestCase {
 
 	/**
 	 * Seeds a sentinel for every key the real footprint lists plus the canary, runs the real
-	 * `uninstall.php`, then asserts the footprint's keys are gone and the canary survived.
-	 * With today's honestly-empty footprint the seed/assert loops below run zero iterations —
-	 * the proof today is that `uninstall.php` executes cleanly against a live WordPress and the
-	 * canary survives; the loops activate for real the day the first footprint entry lands.
+	 * `uninstall.php`, then asserts the footprint's keys are gone and the canary survived. The
+	 * loops read the same `footprint.php` manifest `uninstall.php` deletes from, so the proof
+	 * tracks the footprint as it grows with no per-key test edits — an empty footprint section
+	 * simply loops zero times.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -57,7 +57,7 @@ final class UninstallTest extends TestCase {
 	 */
 	#[RunInSeparateProcess]
 	public function test_uninstall_deletes_only_its_own_footprint(): void {
-		$footprint = InlineFootprint::read();
+		$footprint = require \dirname( __DIR__, 2 ) . '/footprint.php';
 		$user_id   = self::an_existing_user_id();
 
 		foreach ( $footprint['options'] as $option ) {

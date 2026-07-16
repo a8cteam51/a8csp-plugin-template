@@ -10,21 +10,35 @@ concurrency:
 
 permissions: {}
 
+# The repository this file ships from — the trunk-only template, pinned by its immutable
+# ID — never releases itself; generated plugins have their own IDs, so the conditions are
+# permanently true for them. It rides along because generation can delete workflow files
+# but never edit them.
 jobs:
-  release:
-    name: Release
-    # The repository this file ships from — the trunk-only template, pinned by its immutable
-    # ID — never releases itself; generated plugins have their own IDs, so the condition is
-    # permanently true for them. It rides along because generation can delete workflow files
-    # but never edit them.
+  build:
+    name: Build the release artifact
     if: github.repository_id != '1297277915'
     runs-on: ubuntu-latest
     permissions:
-      contents: write
+      contents: read
     steps:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+      # A missed version bump would publish an archive whose header identifies itself
+      # differently from its tag, and the self-updater compares against that header.
+      - name: Require the tag to match the plugin header and package versions
+        env:
+          TAG: ${{ github.ref_name }}
+        run: |
+          tag_version="${TAG#v}"
+          entry_file="${GITHUB_REPOSITORY##*/}.php"
+          header_version=$(grep -E '^ \* Version:' "$entry_file" | awk '{print $NF}')
+          package_version=$(jq -r .version package.json)
+          if [ "$tag_version" != "$header_version" ] || [ "$tag_version" != "$package_version" ]; then
+            echo "::error::tag '$tag_version', plugin header '$header_version', and package.json '$package_version' must agree; bump the versions and re-tag"
+            exit 1
+          fi
       - uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.5'
@@ -46,13 +60,60 @@ jobs:
         run: |
           npm ci
           npm run build
+      # The committed POT drifts as source changes between releases; regenerating here ships
+      # current strings in the archive regardless.
+      - name: Generate translation template
+        run: |
+          wp package install wp-cli/i18n-command:2.7.0
+          wp i18n make-pot ./ --slug="${GITHUB_REPOSITORY##*/}"
+          test -f "languages/${GITHUB_REPOSITORY##*/}.pot"
       - name: Install dist-archive command
         run: |
           wp package install wp-cli/dist-archive-command:3.2.2
       - name: Create plugin archive
         run: |
           wp dist-archive . "./${GITHUB_REPOSITORY##*/}.zip" --plugin-dirname="${GITHUB_REPOSITORY##*/}"
+      - name: Upload the archive for the smoke and publish jobs
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: release-zip
+          path: ./*.zip
+          retention-days: 1
+
+  smoke:
+    name: Smoke test the artifact
+    needs: build
+    if: github.repository_id != '1297277915'
+    permissions:
+      actions: read
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-release-smoke.yml@trunk
+    with:
+      zip-artifact: release-zip
+      plugin-slug: ${{ github.event.repository.name }}
+      # The WooCommerce host: without it the plugin activates gated-off, which would pass
+      # trivially; with it the boot pipeline actually runs during the smoke request.
+      extra-plugins: '["https://downloads.wordpress.org/plugin/woocommerce.zip"]'
+
+  publish:
+    name: Publish the release
+    needs: smoke
+    if: github.repository_id != '1297277915'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download the smoke-tested archive
+        uses: actions/download-artifact@37930b1c2abaa49bbe596cd826c3c89aef350131 # v7.0.0
+        with:
+          name: release-zip
       - name: Create GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" ./*.zip --generate-notes
+        run: |
+          # A SemVer prerelease tag must never become the "latest" release: the self-updater
+          # serves stable installations from the latest-release endpoint.
+          if [[ "$GITHUB_REF_NAME" == *-* ]]; then
+            gh release create "$GITHUB_REF_NAME" ./*.zip --generate-notes --prerelease --latest=false
+          else
+            gh release create "$GITHUB_REF_NAME" ./*.zip --generate-notes
+          fi

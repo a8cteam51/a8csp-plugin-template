@@ -27,45 +27,10 @@ example POT.
 
 ## What is in this repository
 
-A plugin is a list of components; a component is a class with `is_needed()` and
-`initialize()`; the boot is a foreach you can read.
-
-- `a8csp-template-plugin.php` defines the plugin header and constants, requires
-  `functions-bootstrap.php`, and wires the requirements gate and plugin boot.
-- `functions-bootstrap.php` provides plugin metadata, version-compatibility checks, the requirements
-  gate, and its admin-notice reporter; both root bootstrap files stay parsable below the plugin's PHP
-  floor, and CI lints them against the older PHP versions.
-- `functions.php` boots the component list and loads the PHP helper files under `includes/`.
-- `src/` contains the PSR-4 classes: `src/Component.php` is the one contract, and `src/Plugin.php` is
-  the one file to edit when adding components to `COMPONENTS`; they boot in registration order.
-- `src/Settings.php` is the base-WordPress example component, persists
-  `a8csp_template_example_option` through the Settings API on the General options page, and
-  demonstrates the uninstall footprint. Teardown recipes live in `README.scaffold.md`.
-- `src/Integrations/` groups the deletable WooCommerce tier;
-  `src/Integrations/WC_Settings_Section.php` gates itself on WooCommerce core, registers a section in
-  WooCommerce → Settings → Advanced, and persists `a8csp_template_wc_example_option`. See "Watering
-  down to plain WordPress" in `README.scaffold.md`.
-
-  When integrations multiply behind one shared gate, give them a parent component whose
-  `initialize()` constructs and gates its children — five lines, written the day they're needed.
-
-- `includes/` contains automatically loaded procedural helpers, including typed option readers; PHP
-  files dropped there load automatically inside WordPress, while underscore-prefixed files are skipped.
-- `languages/` contains translations and an example POT generated from the template's strings;
-  regenerate it with `composer i18n:makepot`.
-- `models/` is an extension point for classmapped data/model classes.
-- `templates/` is an extension point for template partials rendered by components.
-- `uninstall.php` holds and deletes the complete persisted footprint during WordPress's cold uninstall
-  bootstrap, with every option and user-meta key grouped by owning component; add an entry with each
-  corresponding write, and cross-reference persisted keys with `@see uninstall.php` in the component
-  class docblock.
-- `blocks/src/foobar/` contains the example block source, while `blocks/build/` contains tracked build
-  output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`, which
-  `src/Blocks.php` uses to register all built blocks as one metadata collection.
-- `assets/js/src/editor.js` defines the shared editor hook entry point, and `assets/js/build/` contains
-  its tracked output.
-- `tests/` contains the automated test suite; see `tests/README.md` for the local workflow.
-- `.github/workflows/` contains PHP, JavaScript, CSS, syntax, and scaffold-fill workflows.
+The architecture map — the component model, every file's role, the multisite posture, and the
+reshaping recipes (watering down to plain WordPress, growing integrations) — lives in
+[`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md), which ships with generated plugins so the map
+survives generation. The sections below cover only what is template-specific.
 
 ## Scaffold generation
 
@@ -78,8 +43,13 @@ For generated repositories, the workflow:
 
 1. Renames `README.scaffold.md` to `README.md`.
 2. Renames `a8csp-template-plugin.php` to the generated repository name.
-3. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
-4. Commits and pushes the renamed and filled files.
+3. Deletes the template's changelog fragments and example POT.
+4. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
+5. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
+   template's teaching prose (see below).
+6. Re-locks Composer against the renamed package name.
+7. Deletes the spent scaffold workflows and the template guard.
+8. Commits and pushes the generated files.
 
 The replacement script uses the GitHub repository name, repository description,
 and these repository custom properties:
@@ -97,8 +67,9 @@ The script replaces the following tracked template values:
   the generated repository name.
 - `a8csp-template-plugin.php` (the entry file, already renamed to the repository
   name by this point) with the generated repository name.
-- `a8csp-template-plugin` (elsewhere — the wp-env mapping and Playwright slug)
-  with the title-derived slug.
+- `a8csp-template-plugin` (the Playwright slug) with the title-derived slug:
+  WordPress and the E2E utilities derive it from the plugin `Name` header,
+  never from the plugin folder.
 - `a8csp-plugin-template` (the repository slug and text domain, elsewhere) with
   the generated repository name.
 - `A8C\SpecialProjects\PluginTemplate` (including the JSON-escaped form in
@@ -114,6 +85,27 @@ not replace, including the example block copy (block title, description, and
 sample text), the example Settings and WooCommerce-section labels, and the demo
 option keys.
 
+### Optional teaching-content strip
+
+The template's docblocks and comments carry teaching prose — the architectural
+rationale that makes the scaffold a worked example. Ask for the strip in the
+dispatch that triggers generation — the `strip-teaching-content` checkbox on a
+manual `workflow_dispatch` run, or a `"strip-teaching-content": true` key in the
+`repository_dispatch` client payload — and generation runs a second phase,
+`.github/workflows/fill-in-scaffold-content.mjs`, that rewrites each teaching
+passage into the contract-level docblock a production plugin would carry and
+deletes the `includes/_disabled-example.php` teaching stub. Load-bearing
+constraint comments (below-floor parsability, the boot latch, cache staging, the
+uninstall footprint, and the like) are left verbatim. A dispatch that does not
+ask for the strip keeps the teaching prose, with a notice.
+
+The strip is driven by an exact-match manifest, not markers or regexes: each
+passage is matched by its literal text, which must occur **exactly once** in its
+file. A passage that has drifted — zero or multiple matches — fails the
+generation build loudly rather than stripping the wrong span, and the template's
+own `template-guard.yml` runs the manifest in `--check` mode on every change so
+that drift is caught on the template before it can reach a generated repository.
+
 ## Runtime requirements
 
 The tracked template files declare these runtime targets:
@@ -127,28 +119,12 @@ The tracked template files declare these runtime targets:
   tooling.
 - Docker for the `wp-env` local environment.
 
-The plugin boots its component list unconditionally. The WooCommerce-dependent example
-settings-section component (`src/Integrations/WC_Settings_Section.php`) gates itself through `is_needed()`, checking
-that WooCommerce is active and meets the `WC requires at least` header floor. The main bootstrap
-declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is active.
-
-## Multisite
-
-Generated plugins are expected to support multisite networks and to be tested on one when the
-client runs one. Multisite is a design consideration while building, not a porting step at the
-end — when adding a component, decide its scope deliberately:
-
-- Options are per-site; user meta is network-global. `uninstall.php` models the consequence:
-  its options sweep visits every site of a network, while its user-meta pass runs once.
-- The requirements gate reports through `all_admin_notices`, which fires on site and network
-  admin screens alike, so a failed network activation is explained where it happened.
-- The template registers no activation or deactivation hooks. A plugin that adds them must
-  handle the `$network_wide` activation flag and provision sites created after network
-  activation (`wp_initialize_site`).
-- Component `is_needed()` gates run on every request, so per-site environmental differences —
-  such as WooCommerce being active on only some sites — resolve correctly site by site.
-- The multisite wp-env fixture (`.wp-env.multisite.json`) converts itself into a network on
-  start, and `composer test:multisite` proves the uninstall sweep against it.
+The plugin is a WooCommerce extension: `Plugin::boot()` gates plugin-wide on WooCommerce presence
+and the `WC requires at least` header floor, staging an explanatory admin notice and staying
+un-booted when either is unmet. The WooCommerce Subscriptions integration
+(`src/Integrations/WooCommerceSubscriptions/`) gates itself on its companion being active. The main
+bootstrap declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is
+active.
 
 ## Development
 

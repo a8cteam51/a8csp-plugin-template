@@ -1,15 +1,18 @@
 <?php
 // This file is generated. Do not modify it manually.
 return array(
-	'foobar' => array(
+	'example-notice' => array(
 		'$schema' => 'https://schemas.wp.org/trunk/block.json',
 		'apiVersion' => 3,
-		'name' => 'a8csp-plugin-template/foobar',
-		'version' => '0.1.0',
-		'title' => 'FooBar Block',
+		'name' => 'a8csp-plugin-template/example-notice',
+		'version' => '1.0.0',
+		'title' => 'Example Notice',
 		'category' => 'widgets',
-		'icon' => 'smiley',
-		'description' => 'Example block scaffolded with Create Block tool.',
+		'icon' => 'info',
+		'description' => 'Displays a static example notice. Copy this block to build your own.',
+		'example' => array(
+			
+		),
 		'supports' => array(
 			'html' => false
 		),
