@@ -112,8 +112,9 @@ The script replaces the following tracked template values:
   the generated repository name.
 - `a8csp-template-plugin.php` (the entry file, already renamed to the repository
   name by this point) with the generated repository name.
-- `a8csp-template-plugin` (elsewhere — the wp-env mapping and Playwright slug)
-  with the title-derived slug.
+- `a8csp-template-plugin` (the Playwright slug) with the title-derived slug:
+  WordPress and the E2E utilities derive it from the plugin `Name` header,
+  never from the plugin folder.
 - `a8csp-plugin-template` (the repository slug and text domain, elsewhere) with
   the generated repository name.
 - `A8C\SpecialProjects\PluginTemplate` (including the JSON-escaped form in

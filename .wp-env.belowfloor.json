@@ -4,7 +4,7 @@
   "phpVersion": "8.5",
   "port": 8891,
   "mappings": {
-    "wp-content/plugins/a8csp-template-plugin": ".",
+    "wp-content/plugins/a8csp-plugin-template": ".",
     "wp-content/plugins/woocommerce": "./vendor/wp-plugin/woocommerce"
   },
   "config": {

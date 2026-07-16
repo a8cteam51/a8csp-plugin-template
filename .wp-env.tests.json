@@ -3,11 +3,11 @@
   "phpVersion": "8.5",
   "port": 8890,
   "mappings": {
-    "wp-content/plugins/a8csp-template-plugin": ".",
+    "wp-content/plugins/a8csp-plugin-template": ".",
     "wp-content/plugins/woocommerce": "./vendor/wp-plugin/woocommerce"
   },
   "lifecycleScripts": {
-    "afterStart": "wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce a8csp-template-plugin"
+    "afterStart": "wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce a8csp-plugin-template"
   },
   "config": {
     "WP_DEBUG_DISPLAY": false,

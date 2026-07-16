@@ -36,7 +36,7 @@ before continuing with the Integration suite:
 ```sh
 npm run wp-env:tests:start
 wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce
-wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-template-plugin vendor/bin/phpunit --filter=PluginBootWithoutWooCommerceTest
+wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --filter=PluginBootWithoutWooCommerceTest
 wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce
 composer test:integration
 npm run wp-env:tests:stop
