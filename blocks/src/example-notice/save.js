@@ -23,7 +23,7 @@ import { useBlockProps } from '@wordpress/block-editor';
  */
 export default function save() {
 	return (
-		<p {...useBlockProps.save()}>
+		<p { ...useBlockProps.save() }>
 			An example notice from A8CSP Template Plugin.
 		</p>
 	);
