@@ -33,6 +33,7 @@
     "@wordpress/scripts": "^32.4.0",
     "npm-run-all": "^4.1.5",
     "postcss-cli": "^11.0.1",
+    "prettier": "npm:wp-prettier@^3.0.3",
     "rtlcss": "^4.0.0"
   },
   "rtlcssConfig": {
@@ -55,7 +56,6 @@
     "packages-install": "npm install",
     "packages-update": "npm update",
     "packages-update:wp": "wp-scripts packages-update --dist-tag=wp-7.0",
-
     "build": "NODE_ENV=production npm-run-all --sequential build:**",
     "build:blocks": "wp-scripts build --webpack-src-dir=blocks/src --output-path=blocks/build",
     "build:blocks-manifest": "wp-scripts build-blocks-manifest --input=blocks/build --output=blocks/build/blocks-manifest.php",
@@ -66,7 +66,6 @@
     "start:blocks": "wp-scripts start --webpack-src-dir=blocks/src --output-path=blocks/build",
     "start:assets:scripts": "wp-scripts start assets/js/src/*.js --output-path=assets/js/build",
     "start:assets:styles": "postcss assets/css/src/*.scss --dir assets/css/build --ext css --watch",
-
     "format": "npm-run-all --sequential format:**",
     "format:scripts": "wp-scripts format blocks assets/js --no-error-on-unmatched-pattern",
     "format:styles": "npm run lint:styles -- --fix",
@@ -75,7 +74,6 @@
     "lint:styles": "wp-scripts lint-style blocks/**/*.{css,sass,scss} assets/css/**/*.{css,sass,scss} --allow-empty-input --report-descriptionless-disables --report-invalid-scope-disables --report-needless-disables",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:readme-md": "wp-scripts lint-md-docs README.md",
-
     "wp-env": "wp-env",
     "wp-env:start": "wp-env start",
     "wp-env:update": "wp-env start --update",
@@ -86,12 +84,10 @@
     "wp-env:belowfloor:stop": "wp-env --config .wp-env.belowfloor.json stop",
     "wp-env:multisite:start": "wp-env --config .wp-env.multisite.json start",
     "wp-env:multisite:stop": "wp-env --config .wp-env.multisite.json stop",
-
     "audit": "composer audit --abandoned=report && npm audit",
     "audit:fix": "npm audit fix",
     "check:engines": "wp-scripts check-engines",
     "check:licenses": "wp-scripts check-licenses",
-
     "test:integration": "wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Integration",
     "test:requirements": "wp-env --config .wp-env.belowfloor.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Requirements",
     "test:multisite": "wp-env --config .wp-env.multisite.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Multisite",
