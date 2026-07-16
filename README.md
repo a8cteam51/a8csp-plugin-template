@@ -41,15 +41,22 @@ repository itself.
 
 For generated repositories, the workflow:
 
-1. Renames `README.scaffold.md` to `README.md`.
-2. Renames `a8csp-template-plugin.php` to the generated repository name.
-3. Deletes the template's changelog fragments and example POT.
-4. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
-5. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
+1. Requires its ref to be the repository's default branch, and never runs on this template
+   repository itself.
+2. Validates the `human-title` and `php-globals-short-prefix` custom properties, the repository
+   description (single line, no `*/`), and the repository name (lowercase-kebab) before checkout,
+   so a malformed value leaves the repository untouched.
+3. Renames `README.scaffold.md` to `README.md` and `a8csp-template-plugin.php` to the generated
+   repository name.
+4. Deletes the template's changelog fragments and example POT.
+5. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
+6. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
    template's teaching prose (see below).
-6. Re-locks Composer against the renamed package name.
-7. Deletes the spent scaffold workflows and the template guard.
-8. Commits and pushes the generated files.
+7. Syntax-checks every generated PHP file.
+8. Regenerates `package-lock.json`, rebuilds the committed assets, and re-locks Composer against
+   the renamed identity.
+9. Deletes the spent scaffold workflows and the template guard.
+10. Commits and pushes the generated files.
 
 The replacement script uses the GitHub repository name, repository description,
 and these repository custom properties:
@@ -151,6 +158,8 @@ Run watch builds:
 ```sh
 npm start
 ```
+
+`npm start` watches blocks, scripts, and Sass, but for `assets/css` the watcher runs Sass only -- the PostCSS vendor-prefix pass and the RTL stylesheet come from `npm run build`, so that watched CSS differs from a production build.
 
 Run the local WordPress environment:
 
