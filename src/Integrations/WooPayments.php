@@ -27,7 +27,7 @@ final class WooPayments extends AbstractComponent {
 	 *
 	 * @return  bool
 	 */
-	public static function is_needed(): bool {
+	public static function should_load(): bool {
 		return \class_exists( 'WC_Payments' );
 	}
 

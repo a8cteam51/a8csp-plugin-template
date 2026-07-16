@@ -27,7 +27,7 @@ example POT.
 
 ## What is in this repository
 
-A plugin is a list of components; a component is a class with a static `is_needed()` gate, an
+A plugin is a list of components; a component is a class with a static `should_load()` gate, an
 `initialize()` readiness phase, and a `register_hooks()` attachment phase; the boot is a few
 foreach loops you can read — gate and construct, initialize all, then register all hooks, so
 every surviving component is initialized before any hook can fire.
@@ -42,7 +42,7 @@ every surviving component is initialized before any hook can fire.
 - `src/` follows one folder per feature, each owning a `Component` that composes it; the `src/`
   root holds only the bootstrapping mechanism. `src/ComponentInterface.php` is the one contract,
   and `src/Plugin.php` is the one file to edit when adding components to `COMPONENTS`; they boot
-  in registration order. `src/Components.php` is the shared gated collection both the composition
+  in registration order. `src/ComponentCollection.php` is the shared gated collection both the composition
   root and group roots delegate their gate-construct and phase loops to — has-a, not is-a: the
   collection does not implement the contract. `src/AbstractComponent.php` is the optional
   defaults-only base (open gate, no-op readiness) for components that need neither. The plugin is
@@ -57,7 +57,7 @@ every surviving component is initialized before any hook can fire.
   `src/Integrations/Component.php` is the group root that gates, constructs, and initializes its
   children inside its own phases. Its children model the two child shapes:
   `src/Integrations/WooPayments.php` is the single-class leaf — gated on WooPayments and hooking
-  one of its payment-metadata filters — and `src/Integrations/WC_Subscriptions/` is the grown
+  one of its payment-metadata filters — and `src/Integrations/WooCommerceSubscriptions/` is the grown
   sub-feature folder owning its own `Component` plus a plain collaborator, still forwarding-depth
   one. More nesting than this is the signal a plugin has outgrown manual composition; see the
   group root's notes.
@@ -145,7 +145,7 @@ The tracked template files declare these runtime targets:
 The plugin is a WooCommerce extension: `Plugin::boot()` gates plugin-wide on WooCommerce presence
 and the `WC requires at least` header floor, staging an explanatory admin notice and staying
 un-booted when either is unmet. The WooCommerce Subscriptions integration
-(`src/Integrations/WC_Subscriptions/`) gates itself on its companion being active. The main
+(`src/Integrations/WooCommerceSubscriptions/`) gates itself on its companion being active. The main
 bootstrap declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is
 active.
 
@@ -162,7 +162,7 @@ end — when adding a component, decide its scope deliberately:
 - The template registers no activation or deactivation hooks. A plugin that adds them must
   handle the `$network_wide` activation flag and provision sites created after network
   activation (`wp_initialize_site`).
-- The host gate and the component `is_needed()` gates run on every request, so per-site
+- The host gate and the component `should_load()` gates run on every request, so per-site
   environmental differences — such as WooCommerce or a companion being active on only some
   sites — resolve correctly site by site.
 - The multisite wp-env fixture (`.wp-env.multisite.json`) converts itself into a network on

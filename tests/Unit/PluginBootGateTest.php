@@ -4,7 +4,7 @@ namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
 use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
 use A8C\SpecialProjects\PluginTemplate\Blocks;
-use A8C\SpecialProjects\PluginTemplate\Components;
+use A8C\SpecialProjects\PluginTemplate\ComponentCollection;
 use A8C\SpecialProjects\PluginTemplate\Integrations;
 use A8C\SpecialProjects\PluginTemplate\Plugin;
 use A8C\SpecialProjects\PluginTemplate\Settings;
@@ -25,7 +25,7 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( Plugin::class )]
 #[UsesClass( AbstractComponent::class )]
 #[UsesClass( Blocks\Component::class )]
-#[UsesClass( Components::class )]
+#[UsesClass( ComponentCollection::class )]
 #[UsesClass( Settings\Component::class )]
 #[UsesClass( Integrations\Component::class )]
 final class PluginBootGateTest extends TestCase {

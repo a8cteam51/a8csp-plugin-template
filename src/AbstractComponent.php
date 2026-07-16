@@ -24,7 +24,7 @@ abstract class AbstractComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
-	public static function is_needed(): bool {
+	public static function should_load(): bool {
 		return true;
 	}
 

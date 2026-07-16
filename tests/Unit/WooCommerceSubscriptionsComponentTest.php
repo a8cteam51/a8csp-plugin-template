@@ -2,8 +2,8 @@
 
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
-use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions\Component;
-use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions\Price_Note;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions\Component;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions\PriceNote;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -20,8 +20,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 #[CoversClass( Component::class )]
-#[UsesClass( Price_Note::class )]
-final class WCSubscriptionsComponentTest extends TestCase {
+#[UsesClass( PriceNote::class )]
+final class WooCommerceSubscriptionsComponentTest extends TestCase {
 	/**
 	 * Satisfies the production files' `ABSPATH` boot guard and loads the recording hook stubs
 	 * before the component classes are first autoloaded.
@@ -62,8 +62,8 @@ final class WCSubscriptionsComponentTest extends TestCase {
 	 * @return  void
 	 */
 	#[RunInSeparateProcess]
-	public function test_is_needed_is_false_without_the_companion(): void {
-		self::assertFalse( Component::is_needed() );
+	public function test_should_load_is_false_without_the_companion(): void {
+		self::assertFalse( Component::should_load() );
 	}
 
 	/**
@@ -79,7 +79,7 @@ final class WCSubscriptionsComponentTest extends TestCase {
 	public function test_hook_phase_attaches_component_and_collaborator_callbacks(): void {
 		require_once __DIR__ . '/wcs-stubs.php';
 
-		self::assertTrue( Component::is_needed() );
+		self::assertTrue( Component::should_load() );
 
 		$component = new Component();
 

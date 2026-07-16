@@ -42,11 +42,11 @@ To convert this plugin from a WooCommerce extension to a plain WordPress plugin,
 1. Delete the `HELPERS` region — the host-requirements check and its notice closures — and the one gate line in `boot()` from `src/Plugin.php`.
 2. Strip the WooCommerce surface from `src/Settings/Component.php`: the `add_section()` and `get_settings()` methods and their two filter registrations in `register_hooks()`.
 3. Delete the `src/Integrations/` and `templates/myaccount/` directories — both example children extend the WooCommerce ecosystem — and remove `Integrations\Component::class` from the `COMPONENTS` list in `src/Plugin.php`.
-4. Remove the `a8csp_template_wc_example_option` and `Integrations\WC_Subscriptions\Component` option lines from the `uninstall.php` footprint.
+4. Remove the `a8csp_template_wc_example_option` and `a8csp_template_wcs_example_option` option lines from the `uninstall.php` footprint.
 5. Remove the `wp-plugin/woocommerce` development dependency from `composer.json`; run `composer update`.
 6. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
 7. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the `WC requires at least` / `WC tested up to` plugin-header lines.
-8. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`, `tests/Unit/IntegrationsComponentTest.php`, `tests/Unit/WCSubscriptionsComponentTest.php`, `tests/Unit/WooPaymentsTest.php`, and their `tests/Unit/wcs-stubs.php` / `tests/Unit/wcpay-stubs.php` stand-ins; drop the WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`, `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`).
+8. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`, `tests/Unit/IntegrationsComponentTest.php`, `tests/Unit/WooCommerceSubscriptionsComponentTest.php`, `tests/Unit/WooPaymentsTest.php`, and their `tests/Unit/wcs-stubs.php` / `tests/Unit/wcpay-stubs.php` stand-ins; drop the WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`, `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`).
 9. Remove the WooCommerce-less proof section from `tests/README.md`.
 10. Run `composer quality-check`. What remains — blocks, settings, the component list, the `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 

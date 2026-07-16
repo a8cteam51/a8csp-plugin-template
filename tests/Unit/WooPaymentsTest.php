@@ -61,8 +61,8 @@ final class WooPaymentsTest extends TestCase {
 	 * @return  void
 	 */
 	#[RunInSeparateProcess]
-	public function test_is_needed_is_false_without_the_companion(): void {
-		self::assertFalse( WooPayments::is_needed() );
+	public function test_should_load_is_false_without_the_companion(): void {
+		self::assertFalse( WooPayments::should_load() );
 	}
 
 	/**
@@ -78,7 +78,7 @@ final class WooPaymentsTest extends TestCase {
 	public function test_hook_phase_registers_the_metadata_filter(): void {
 		require_once __DIR__ . '/wcpay-stubs.php';
 
-		self::assertTrue( WooPayments::is_needed() );
+		self::assertTrue( WooPayments::should_load() );
 
 		$component = new WooPayments();
 

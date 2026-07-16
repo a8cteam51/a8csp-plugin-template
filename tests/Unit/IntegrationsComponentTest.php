@@ -3,9 +3,9 @@
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
 use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
-use A8C\SpecialProjects\PluginTemplate\Components;
+use A8C\SpecialProjects\PluginTemplate\ComponentCollection;
 use A8C\SpecialProjects\PluginTemplate\Integrations\Component;
-use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions;
 use A8C\SpecialProjects\PluginTemplate\Integrations\WooPayments;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
@@ -23,9 +23,9 @@ use PHPUnit\Framework\TestCase;
  */
 #[CoversClass( Component::class )]
 #[UsesClass( AbstractComponent::class )]
-#[UsesClass( Components::class )]
-#[UsesClass( WC_Subscriptions\Component::class )]
-#[UsesClass( WC_Subscriptions\Price_Note::class )]
+#[UsesClass( ComponentCollection::class )]
+#[UsesClass( WooCommerceSubscriptions\Component::class )]
+#[UsesClass( WooCommerceSubscriptions\PriceNote::class )]
 #[UsesClass( WooPayments::class )]
 final class IntegrationsComponentTest extends TestCase {
 	/**
@@ -70,7 +70,7 @@ final class IntegrationsComponentTest extends TestCase {
 	 */
 	#[RunInSeparateProcess]
 	public function test_children_with_absent_companions_stay_unconstructed(): void {
-		self::assertTrue( Component::is_needed() );
+		self::assertTrue( Component::should_load() );
 
 		$component = new Component();
 		$component->initialize();

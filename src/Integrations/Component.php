@@ -4,7 +4,7 @@ namespace A8C\SpecialProjects\PluginTemplate\Integrations;
 
 use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
 use A8C\SpecialProjects\PluginTemplate\ComponentInterface;
-use A8C\SpecialProjects\PluginTemplate\Components;
+use A8C\SpecialProjects\PluginTemplate\ComponentCollection;
 
 \defined( 'ABSPATH' ) || exit;
 
@@ -13,7 +13,7 @@ use A8C\SpecialProjects\PluginTemplate\Components;
  * peers that extend the plugin when a companion plugin happens to be active.
  *
  * The children are full Components, and this parent forwards the pipeline's phases to them
- * faithfully through the shared `Components` collection: construction and readiness inside
+ * faithfully through the shared `ComponentCollection`: construction and readiness inside
  * `initialize()`, hooks inside `register_hooks()`. Children come in two shapes — a single-class
  * leaf with a descriptive name, and a grown sub-feature folder owning its own `Component`; a leaf
  * is promoted to the folder shape the day it needs a second class. This template nests exactly
@@ -23,7 +23,7 @@ use A8C\SpecialProjects\PluginTemplate\Components;
  *
  * The group's own gate stays at the base's always-open default because the children gate
  * individually; a gate every child shares — one companion they all require — would override
- * `is_needed()` here instead, sparing each child the repetition.
+ * `should_load()` here instead, sparing each child the repetition.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -41,7 +41,7 @@ final class Component extends AbstractComponent {
 	 */
 	private const array COMPONENTS = array(
 		WooPayments::class,
-		WC_Subscriptions\Component::class,
+		WooCommerceSubscriptions\Component::class,
 	);
 
 	/**
@@ -50,9 +50,9 @@ final class Component extends AbstractComponent {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
-	 * @var     Components|null
+	 * @var     ComponentCollection|null
 	 */
-	private ?Components $components = null;
+	private ?ComponentCollection $components = null;
 
 	// endregion
 
@@ -72,7 +72,7 @@ final class Component extends AbstractComponent {
 	 * @return  void
 	 */
 	public function initialize(): void {
-		$this->components = Components::assemble( self::COMPONENTS );
+		$this->components = ComponentCollection::assemble( self::COMPONENTS );
 		$this->components->initialize();
 	}
 

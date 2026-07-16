@@ -29,7 +29,7 @@ final class PluginBootTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_plugin_boots_on_supported_runtime(): void {
-		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS );
+		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
 		self::assertTrue( \function_exists( 'a8csp_template_plugin' ) );
 		self::assertNotFalse( has_action( 'plugins_loaded', array( a8csp_template_plugin(), 'boot' ) ) );
 		self::assertInstanceOf( Plugin::class, a8csp_template_plugin() );

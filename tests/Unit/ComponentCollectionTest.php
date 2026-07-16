@@ -4,8 +4,8 @@ namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
 use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
 use A8C\SpecialProjects\PluginTemplate\Blocks;
-use A8C\SpecialProjects\PluginTemplate\Components;
-use A8C\SpecialProjects\PluginTemplate\Integrations\WC_Subscriptions;
+use A8C\SpecialProjects\PluginTemplate\ComponentCollection;
+use A8C\SpecialProjects\PluginTemplate\Integrations\WooCommerceSubscriptions;
 use A8C\SpecialProjects\PluginTemplate\Settings;
 use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\Attributes\UsesClass;
@@ -19,12 +19,12 @@ use PHPUnit\Framework\TestCase;
  * @since   1.0.0
  * @version 1.0.0
  */
-#[CoversClass( Components::class )]
+#[CoversClass( ComponentCollection::class )]
 #[UsesClass( AbstractComponent::class )]
 #[UsesClass( Blocks\Component::class )]
 #[UsesClass( Settings\Component::class )]
-#[UsesClass( WC_Subscriptions\Component::class )]
-final class ComponentsTest extends TestCase {
+#[UsesClass( WooCommerceSubscriptions\Component::class )]
+final class ComponentCollectionTest extends TestCase {
 	/**
 	 * Satisfies the production files' `ABSPATH` boot guard and loads the recording hook stubs
 	 * before the component classes are first autoloaded.
@@ -66,10 +66,10 @@ final class ComponentsTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_assemble_gates_before_construction(): void {
-		$components = Components::assemble( array( Settings\Component::class, WC_Subscriptions\Component::class ) );
+		$components = ComponentCollection::assemble( array( Settings\Component::class, WooCommerceSubscriptions\Component::class ) );
 
-		self::assertTrue( $components->is_active( Settings\Component::class ) );
-		self::assertFalse( $components->is_active( WC_Subscriptions\Component::class ) );
+		self::assertTrue( $components->has( Settings\Component::class ) );
+		self::assertFalse( $components->has( WooCommerceSubscriptions\Component::class ) );
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_hooks'] );
 	}
 
@@ -83,7 +83,7 @@ final class ComponentsTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_phase_loops_run_in_registration_order(): void {
-		$components = Components::assemble( array( Blocks\Component::class, Settings\Component::class ) );
+		$components = ComponentCollection::assemble( array( Blocks\Component::class, Settings\Component::class ) );
 
 		$components->initialize();
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_hooks'] );

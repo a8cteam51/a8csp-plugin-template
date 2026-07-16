@@ -55,7 +55,7 @@ final class AbstractComponentTest extends TestCase {
 			}
 		};
 
-		self::assertTrue( $component::is_needed() );
+		self::assertTrue( $component::should_load() );
 
 		$component->initialize();
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_hooks'] );

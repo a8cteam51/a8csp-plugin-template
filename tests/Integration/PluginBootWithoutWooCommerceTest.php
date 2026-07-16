@@ -33,7 +33,7 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 			self::markTestSkipped( 'This proof only runs against a WooCommerce-less runtime; WooCommerce is active in this run.' );
 		}
 
-		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS );
+		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
 		self::assertTrue( \function_exists( 'a8csp_template_plugin' ) );
 
 		self::assertFalse( a8csp_template_plugin()->is_booted() );

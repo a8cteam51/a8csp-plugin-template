@@ -6,9 +6,9 @@ namespace A8C\SpecialProjects\PluginTemplate;
 
 /**
  * The plugin's composition root: `COMPONENTS` below is the plugin, and `boot()` runs it through
- * the `Components` collection. This is the one file you edit to wire a top-level component in —
+ * the `ComponentCollection`. This is the one file you edit to wire a top-level component in —
  * should the plugin ever outgrow manual wiring, a PSR-11 container would replace
- * `Components::assemble()` and nothing outside the collection changes.
+ * `ComponentCollection::assemble()` and nothing outside the collection changes.
  *
  * The layout convention: one folder per feature, each owning a `Component` that composes it; the
  * `src/` root holds only this bootstrapping mechanism. The root itself deliberately does not
@@ -92,7 +92,7 @@ final class Plugin {
 			return;
 		}
 
-		$components = Components::assemble( self::COMPONENTS );
+		$components = ComponentCollection::assemble( self::COMPONENTS );
 		$components->initialize();
 
 		// The root seam: every contribution is in, no hook is live yet — cross-component
@@ -112,13 +112,13 @@ final class Plugin {
 	 * header-declared `WC requires at least` floor. On failure, stages the explanatory notice on
 	 * `all_admin_notices` and returns false.
 	 *
-	 * This is the machinery of the plugin-wide rung of the `is_needed()` ladder — the rung itself
-	 * is the one call in `boot()`, gating the whole plugin before any component exists and leaving
-	 * it un-booted and non-retryable for the request — `is_booted()` reports false — mirroring the
-	 * requirements-gate philosophy: the misconfiguration speaks through a notice instead of
-	 * silently gating off. `plugins_loaded` is the earliest the check is reliable; at include time
-	 * the host may simply not have loaded yet. A plugin that is not WooCommerce-dependent deletes
-	 * this region and the one `boot()` line.
+	 * This is the machinery of the plugin-wide rung of the `should_load()` ladder; the rung itself
+	 * is the one call in `boot()`, gating the whole plugin before any component exists. A failed
+	 * gate leaves the plugin un-booted and non-retryable for the request, with `is_booted()`
+	 * reporting false. The misconfiguration speaks through a notice instead of silently gating
+	 * off — the requirements-gate philosophy. `plugins_loaded` is the earliest the check is
+	 * reliable; at include time the host may simply not have loaded yet. A plugin that is not
+	 * WooCommerce-dependent deletes this region and the one `boot()` line.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0

@@ -148,9 +148,9 @@ if ( ! \is_file( A8CSP_TEMPLATE_DIR_PATH . 'vendor/autoload.php' ) ) {
 require_once A8CSP_TEMPLATE_DIR_PATH . 'vendor/autoload.php';
 
 // Bootstrap the plugin (maybe)!
-\define( 'A8CSP_TEMPLATE_REQUIREMENTS', a8csp_template_validate_requirements() );
-if ( is_wp_error( A8CSP_TEMPLATE_REQUIREMENTS ) ) {
-	a8csp_template_output_requirements_error( A8CSP_TEMPLATE_REQUIREMENTS );
+\define( 'A8CSP_TEMPLATE_REQUIREMENTS_RESULT', a8csp_template_validate_requirements() );
+if ( is_wp_error( A8CSP_TEMPLATE_REQUIREMENTS_RESULT ) ) {
+	a8csp_template_output_requirements_error( A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
 } else {
 	require_once A8CSP_TEMPLATE_DIR_PATH . 'functions.php';
 	add_action( 'plugins_loaded', array( a8csp_template_plugin(), 'boot' ) );

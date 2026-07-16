@@ -59,8 +59,8 @@ final class SettingsComponentTest extends TestCase {
 	 *
 	 * @return  void
 	 */
-	public function test_is_needed_is_always_true(): void {
-		self::assertTrue( Settings\Component::is_needed() );
+	public function test_should_load_is_always_true(): void {
+		self::assertTrue( Settings\Component::should_load() );
 	}
 
 	/**

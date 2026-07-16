@@ -24,7 +24,7 @@ $a8csp_template_footprint = array(
 		// Settings owns:
 		'a8csp_template_example_option',
 		'a8csp_template_wc_example_option',
-		// Integrations\WC_Subscriptions\Component owns:
+		// Integrations\WooCommerceSubscriptions\Component owns:
 		'a8csp_template_wcs_example_option',
 	),
 	'user_meta' => array(),

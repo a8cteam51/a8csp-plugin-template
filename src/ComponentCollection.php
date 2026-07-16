@@ -13,11 +13,11 @@ namespace A8C\SpecialProjects\PluginTemplate;
  * @since   1.0.0
  * @version 1.0.0
  */
-final class Components {
+final class ComponentCollection {
 	// region FIELDS AND CONSTANTS
 
 	/**
-	 * The components that survived their gates, keyed by class so activity is answerable by name.
+	 * The components that survived their gates, keyed by class so membership is answerable by name.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -31,8 +31,8 @@ final class Components {
 	// region CONSTRUCTORS
 
 	/**
-	 * Components constructor. Private: `assemble()` is the only way to build the collection, so a
-	 * component can never enter it without passing its gate.
+	 * ComponentCollection constructor. Private: `assemble()` is the only way to build the
+	 * collection, so a component can never enter it without passing its gate.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -60,7 +60,7 @@ final class Components {
 	public static function assemble( array $component_classes ): self {
 		$collection = new self();
 		foreach ( $component_classes as $component_class ) {
-			if ( $component_class::is_needed() ) {
+			if ( $component_class::should_load() ) {
 				$collection->components[ $component_class ] = new $component_class();
 			}
 		}
@@ -113,7 +113,7 @@ final class Components {
 	 *
 	 * @return  bool
 	 */
-	public function is_active( string $component_class ): bool {
+	public function has( string $component_class ): bool {
 		return isset( $this->components[ $component_class ] );
 	}
 
