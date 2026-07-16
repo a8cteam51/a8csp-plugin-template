@@ -220,6 +220,19 @@ jobs:
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
 
+      # --ignore-scripts keeps dependency lifecycle code from executing inside a job that will
+      # push to the repository; the generated repository's own developers install normally. A full
+      # re-resolve (not an in-place name substitution) is what correctly hoists git-dependency edges.
+      - name: Regenerate package-lock.json after the name substitution.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        run: rm -f package-lock.json && npm install --ignore-scripts
+
+      # Substitution rewrote asset sources (slugs, text domains), so the committed build output is
+      # rebuilt to match what this tree itself produces -- the build-integrity gate diffs exactly that.
+      - name: Rebuild the committed assets from the substituted sources.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        run: npm run build
+
       # The name substitution invalidates composer.lock's content-hash, so the lock is refreshed before the commit includes it.
       - name: Re-lock composer.json after the name substitution.
         if: steps.scaffold-check.outputs.already-filled != 'true'
