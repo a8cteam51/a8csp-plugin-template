@@ -31,11 +31,11 @@ import './editor.scss';
  */
 export default function Edit() {
 	return (
-		<p { ...useBlockProps() }>
-			{ __(
+		<p {...useBlockProps()}>
+			{__(
 				'An example notice from A8CSP Template Plugin.',
 				'a8csp-plugin-template'
-			) }
+			)}
 		</p>
 	);
 }
