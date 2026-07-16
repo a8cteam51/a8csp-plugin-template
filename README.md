@@ -45,9 +45,11 @@ For generated repositories, the workflow:
 2. Renames `a8csp-template-plugin.php` to the generated repository name.
 3. Deletes the template's changelog fragments and example POT.
 4. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
-5. Re-locks Composer against the renamed package name.
-6. Deletes the spent scaffold workflows and the template guard.
-7. Commits and pushes the generated files.
+5. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
+   template's teaching prose (see below).
+6. Re-locks Composer against the renamed package name.
+7. Deletes the spent scaffold workflows and the template guard.
+8. Commits and pushes the generated files.
 
 The replacement script uses the GitHub repository name, repository description,
 and these repository custom properties:
@@ -82,6 +84,25 @@ After generation, review the remaining example identifiers that the script does
 not replace, including the example block copy (block title, description, and
 sample text), the example Settings and WooCommerce-section labels, and the demo
 option keys.
+
+### Optional teaching-content strip
+
+The template's docblocks and comments carry teaching prose — the architectural
+rationale that makes the scaffold a worked example. Set the repository custom
+property `strip-teaching-content` to exactly `true` and generation runs a second
+phase, `.github/workflows/fill-in-scaffold-content.mjs`, that rewrites each
+teaching passage into the contract-level docblock a production plugin would
+carry and deletes the `includes/_disabled-example.php` teaching stub.
+Load-bearing constraint comments (below-floor parsability, the boot latch, cache
+staging, the uninstall footprint, and the like) are left verbatim. Absent or any
+other value skips the phase with a notice, keeping the teaching prose.
+
+The strip is driven by an exact-match manifest, not markers or regexes: each
+passage is matched by its literal text, which must occur **exactly once** in its
+file. A passage that has drifted — zero or multiple matches — fails the
+generation build loudly rather than stripping the wrong span, and the template's
+own `template-guard.yml` runs the manifest in `--check` mode on every change so
+that drift is caught on the template before it can reach a generated repository.
 
 ## Runtime requirements
 

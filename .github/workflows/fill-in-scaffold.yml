@@ -132,6 +132,25 @@ jobs:
           REPO_JSON: ${{ toJSON( github.event.repository ) }}
         run: node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
 
+      # Optional second phase: strip the template's teaching prose, rewriting each passage into the
+      # contract-level docblock a real plugin would carry, via the exact-match manifest in
+      # fill-in-scaffold-content.mjs. It runs only when the repository custom property
+      # 'strip-teaching-content' is exactly 'true'. The manifest's `from` spans are written in
+      # post-substitution form, so this MUST run after the identifier substitution above and before
+      # the syntax sweep below; a docrot drift (any span no longer matching exactly once) fails the
+      # build loudly rather than silently skipping.
+      - name: Strip the template's teaching content.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        env:
+          CUSTOM_PROPERTIES: ${{ toJSON( github.event.repository.custom_properties ) }}
+        run: |
+          strip=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["strip-teaching-content"] // empty')
+          if [ "$strip" = 'true' ]; then
+            node ./.github/workflows/fill-in-scaffold-content.mjs
+          else
+            echo "::notice::repository custom property 'strip-teaching-content' is not 'true'; keeping the template teaching prose"
+          fi
+
       # Substituted identifiers land inside PHP source, and pushes from this workflow trigger no
       # CI — a parse error here would ship a dead-on-arrival repository, so every PHP file is
       # syntax-checked before anything is committed.
@@ -156,7 +175,7 @@ jobs:
       - name: Remove the spent fill-in-scaffold workflow and the template guard.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
-          rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/template-guard.yml
+          rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs .github/workflows/template-guard.yml
           git add .github/workflows
           git commit -m "chore -- remove the spent fill-in-scaffold workflow and the template guard"
 
