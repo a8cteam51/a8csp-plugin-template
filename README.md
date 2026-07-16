@@ -67,10 +67,10 @@ every surviving component is initialized before any hook can fire.
   regenerate it with `composer i18n:makepot`.
 - `models/` is an extension point for classmapped data/model classes.
 - `templates/` is an extension point for template partials rendered by components.
-- `uninstall.php` holds and deletes the complete persisted footprint during WordPress's cold uninstall
-  bootstrap, with every option and user-meta key grouped by owning component; add an entry with each
-  corresponding write, and cross-reference persisted keys with `@see uninstall.php` in the component
-  class docblock.
+- `footprint.php` is the dependency-free manifest of the complete persisted footprint — every option
+  and user-meta key grouped by owning component — and `uninstall.php` requires it and deletes those
+  keys during WordPress's cold uninstall bootstrap; add an entry with each corresponding write, and
+  cross-reference persisted keys with `@see uninstall.php` in the component class docblock.
 - `blocks/src/example-notice/` contains the example block source, while `blocks/build/` contains tracked build
   output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`, which
   `src/Blocks/Component.php` uses to register all built blocks as one metadata collection.

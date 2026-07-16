@@ -29,17 +29,23 @@ fixtures at three WordPress-version tiers.
 
 `PluginBootWithoutWooCommerceTest` verifies the plugin-wide host gate: with WooCommerce inactive
 the plugin stays un-booted and stages the "requires WooCommerce" notice instead of registering
-anything. It self-skips whenever WooCommerce is active. To exercise the proof, deactivate
-WooCommerce in the tests wp-env instance, run that test directly, then reactivate WooCommerce
-before continuing with the Integration suite:
+anything. It self-skips whenever WooCommerce is active, so the proof needs WooCommerce deactivated
+just for its run. With the tests wp-env instance started, one command does the whole dance:
 
 ```sh
 npm run wp-env:tests:start
+npm run test:integration:no-wc
+npm run wp-env:tests:stop
+```
+
+`test:integration:no-wc` deactivates WooCommerce in the tests wp-env instance, runs that one test
+directly, then reactivates WooCommerce — carrying the test's exit status through — so the instance
+is left ready for the Integration suite. Its three steps are:
+
+```sh
 wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce
 wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --filter=PluginBootWithoutWooCommerceTest
 wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce
-composer test:integration
-npm run wp-env:tests:stop
 ```
 
 ## Running the suites

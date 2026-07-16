@@ -12,44 +12,42 @@
 \defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 /*
- * The plugin's persisted footprint. Every option and user-meta key any component writes is
- * listed here, in the same change that introduces the write — grouped by owning component
- * so ownership stays reviewable. This file runs in WordPress's cold uninstall bootstrap
- * (no autoloader, no Plugin or Component classes), so the arrays stay inline: nothing here
- * may reference plugin code.
+ * The plugin's persisted footprint, loaded from the standalone manifest. Keeping it in a
+ * dependency-free `footprint.php` lets both this cold uninstall bootstrap and the uninstall proofs
+ * read the same list without either defining `WP_UNINSTALL_PLUGIN` or running the delete loops.
  */
-$a8csp_template_footprint = array(
-	'options'   => array(
-		// Settings owns:
-		'a8csp_template_example_option',
-		'a8csp_template_wc_example_option',
-		// Integrations\WooCommerceSubscriptions\Component owns:
-		'a8csp_template_wcs_example_option',
-	),
-	'user_meta' => array(),
-);
+$a8csp_template_footprint = require __DIR__ . '/footprint.php';
 
 /*
  * Options are stored per site, and a multisite uninstall runs only once, network-wide — so the
- * options sweep visits every site of the network. `get_sites()` returns at most 100 sites by
- * default; `number => 0` lifts that cap so no site's options outlive the plugin.
+ * options sweep visits every site of the network. It pages through the sites in batches so memory
+ * stays flat on large networks while the sweep still visits every site.
  */
 if ( is_multisite() ) {
-	$a8csp_template_uninstall_site_ids = get_sites(
-		array(
-			'fields' => 'ids',
-			'number' => 0,
-		)
-	);
-	foreach ( $a8csp_template_uninstall_site_ids as $a8csp_template_uninstall_site_id ) {
-		switch_to_blog( $a8csp_template_uninstall_site_id );
+	$a8csp_template_uninstall_offset = 0;
 
-		foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
-			delete_option( $a8csp_template_uninstall_option );
+	do {
+		$a8csp_template_uninstall_site_ids = get_sites(
+			array(
+				'fields' => 'ids',
+				'number' => 100,
+				'offset' => $a8csp_template_uninstall_offset,
+			)
+		);
+
+		foreach ( $a8csp_template_uninstall_site_ids as $a8csp_template_uninstall_site_id ) {
+			switch_to_blog( $a8csp_template_uninstall_site_id );
+
+			foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
+				delete_option( $a8csp_template_uninstall_option );
+			}
+
+			restore_current_blog();
 		}
 
-		restore_current_blog();
-	}
+		$a8csp_template_uninstall_offset    += 100;
+		$a8csp_template_uninstall_batch_size = \count( $a8csp_template_uninstall_site_ids );
+	} while ( 100 === $a8csp_template_uninstall_batch_size );
 } else {
 	foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
 		delete_option( $a8csp_template_uninstall_option );
@@ -57,7 +55,6 @@ if ( is_multisite() ) {
 }
 
 // User meta is stored network-globally, so one pass covers every site.
-// @phpstan-ignore foreach.emptyArray (The scaffold's user-meta footprint starts empty; the loop is live the day a consumer lists a key.)
 foreach ( $a8csp_template_footprint['user_meta'] as $a8csp_template_uninstall_meta_key ) {
 	delete_metadata( 'user', 0, $a8csp_template_uninstall_meta_key, '', true );
 }

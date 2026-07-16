@@ -20,23 +20,6 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass( AbstractComponent::class )]
 final class SettingsComponentTest extends TestCase {
 	/**
-	 * Satisfies the production files' `ABSPATH` boot guard before their classes are first
-	 * autoloaded.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public static function setUpBeforeClass(): void {
-		if ( ! \defined( 'ABSPATH' ) ) {
-			\define( 'ABSPATH', __DIR__ . '/' );
-		}
-
-		require_once __DIR__ . '/wp-hook-stubs.php';
-	}
-
-	/**
 	 * Starts each test with an empty hook-registration ledger.
 	 *
 	 * @since   1.0.0

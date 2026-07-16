@@ -42,7 +42,7 @@ To convert this plugin from a WooCommerce extension to a plain WordPress plugin,
 1. Delete the `HELPERS` region — the host-requirements check and its notice closures — and the one gate line in `boot()` from `src/Plugin.php`.
 2. Strip the WooCommerce surface from `src/Settings/Component.php`: the `add_section()` and `get_settings()` methods and their two filter registrations in `register_hooks()`.
 3. Delete the `src/Integrations/` and `templates/myaccount/` directories — both example children extend the WooCommerce ecosystem — and remove `Integrations\Component::class` from the `COMPONENTS` list in `src/Plugin.php`.
-4. Remove the `a8csp_template_wc_example_option` and `a8csp_template_wcs_example_option` option lines from the `uninstall.php` footprint.
+4. Remove the `a8csp_template_wc_example_option` and `a8csp_template_wcs_example_option` option lines from the `footprint.php` manifest.
 5. Remove the `wp-plugin/woocommerce` development dependency from `composer.json`; run `composer update`.
 6. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
 7. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the `WC requires at least` / `WC tested up to` plugin-header lines.
@@ -50,7 +50,7 @@ To convert this plugin from a WooCommerce extension to a plain WordPress plugin,
 9. Remove the WooCommerce-less proof section from `tests/README.md`.
 10. Run `composer quality-check`. What remains — blocks, settings, the component list, the `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 
-**For a plugin that persists nothing:** delete `src/Settings/`, its `COMPONENTS` entry in `src/Plugin.php`, its option lines in the `uninstall.php` footprint, and `includes/settings.php`.
+**For a plugin that persists nothing:** delete `src/Settings/`, its `COMPONENTS` entry in `src/Plugin.php`, its option lines in the `footprint.php` manifest, and `includes/settings.php`.
 
 Optional integrations live behind the `src/Integrations/` group root (`src/Integrations/Component.php`),
 which gates, constructs, and initializes its children inside its own phases; add one child component
