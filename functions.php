@@ -7,7 +7,11 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
 // region META
 
 /**
- * Returns the plugin instance, booting it on first access.
+ * Returns the plugin's composition root.
+ *
+ * Construction only — never boots: a peer calling this at include time would otherwise run the
+ * component gates before every plugin has loaded. Booting stays tied to the `plugins_loaded`
+ * attachment in the main plugin file.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -15,7 +19,7 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
  * @return  Plugin
  */
 function a8csp_template_plugin(): Plugin {
-	static $plugin = null;
+	static $plugin   = null;
 	return $plugin ??= new Plugin();
 }
 

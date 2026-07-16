@@ -124,8 +124,9 @@ add_filter(
 	3
 );
 
-// Core registers header Domain Paths for site-active plugins only, so a network-activated copy
-// registers its own translations path; loading stays just-in-time either way.
+// Registration-only since WP 6.7, so include time is safe — and required: core registers the
+// header path only for site-active plugins, so network-activated copies lose their bundled
+// translations without this line. Gettext calls still wait for `init` (JIT).
 load_plugin_textdomain( 'a8csp-plugin-template', false, dirname( A8CSP_TEMPLATE_BASENAME ) . '/languages' );
 
 // Declare compatibility with WC features.

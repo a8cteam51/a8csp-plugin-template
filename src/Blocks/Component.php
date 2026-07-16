@@ -1,43 +1,32 @@
 <?php declare( strict_types=1 );
 
-namespace A8C\SpecialProjects\PluginTemplate;
+namespace A8C\SpecialProjects\PluginTemplate\Blocks;
+
+use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
 
 \defined( 'ABSPATH' ) || exit;
 
 /**
- * Provides the canonical block component. It registers every built block from the build manifest
- * as one metadata collection and registers a block-editor script.
+ * Composes the Blocks feature: registers every built block from the build manifest as one
+ * metadata collection and registers a block-editor script. Blocks have no environmental
+ * dependency and no state to wire, so the defaults-only base fits.
  *
- * Imitate this manifest registration shape for any block work. Delete this component, its
+ * Imitate this manifest registration shape for any block work. Delete this feature folder, its
  * `COMPONENTS` entry, and the `blocks/` directory if your plugin ships no blocks.
  *
  * @since   1.0.0
  * @version 1.0.0
  */
-final class Blocks implements Component {
+final class Component extends AbstractComponent {
 	// region METHODS
 
 	/**
-	 * Blocks have no environmental dependency, so the component always runs.
+	 * {@inheritDoc}
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
-	 *
-	 * @return  bool
 	 */
-	public function is_needed(): bool {
-		return true;
-	}
-
-	/**
-	 * Initializes the blocks.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public function initialize(): void {
+	public function register_hooks(): void {
 		add_action( 'init', array( $this, 'register_blocks' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_block_editor_assets' ) );
 	}

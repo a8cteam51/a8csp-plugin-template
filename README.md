@@ -27,28 +27,40 @@ example POT.
 
 ## What is in this repository
 
-A plugin is a list of components; a component is a class with `is_needed()` and
-`initialize()`; the boot is a foreach you can read.
+A plugin is a list of components; a component is a class with a static `is_needed()` gate, an
+`initialize()` readiness phase, and a `register_hooks()` attachment phase; the boot is a few
+foreach loops you can read — gate and construct, initialize all, then register all hooks, so
+every surviving component is initialized before any hook can fire.
 
 - `a8csp-template-plugin.php` defines the plugin header and constants, requires
   `functions-bootstrap.php`, and wires the requirements gate and plugin boot.
 - `functions-bootstrap.php` provides plugin metadata, version-compatibility checks, the requirements
   gate, and its admin-notice reporter; both root bootstrap files stay parsable below the plugin's PHP
   floor, and CI lints them against the older PHP versions.
-- `functions.php` boots the component list and loads the PHP helper files under `includes/`.
-- `src/` contains the PSR-4 classes: `src/Component.php` is the one contract, and `src/Plugin.php` is
-  the one file to edit when adding components to `COMPONENTS`; they boot in registration order.
-- `src/Settings.php` is the base-WordPress example component, persists
-  `a8csp_template_example_option` through the Settings API on the General options page, and
-  demonstrates the uninstall footprint. Teardown recipes live in `README.scaffold.md`.
-- `src/Integrations/` groups the deletable WooCommerce tier;
-  `src/Integrations/WC_Settings_Section.php` gates itself on WooCommerce core, registers a section in
-  WooCommerce → Settings → Advanced, and persists `a8csp_template_wc_example_option`. See "Watering
-  down to plain WordPress" in `README.scaffold.md`.
-
-  When integrations multiply behind one shared gate, give them a parent component whose
-  `initialize()` constructs and gates its children — five lines, written the day they're needed.
-
+- `functions.php` provides the construction-only plugin accessor (booting stays tied to the
+  `plugins_loaded` attachment in the entry file) and loads the PHP helper files under `includes/`.
+- `src/` follows one folder per feature, each owning a `Component` that composes it; the `src/`
+  root holds only the bootstrapping mechanism. `src/ComponentInterface.php` is the one contract,
+  and `src/Plugin.php` is the one file to edit when adding components to `COMPONENTS`; they boot
+  in registration order. `src/Components.php` is the shared gated collection both the composition
+  root and group roots delegate their gate-construct and phase loops to — has-a, not is-a: the
+  collection does not implement the contract. `src/AbstractComponent.php` is the optional
+  defaults-only base (open gate, no-op readiness) for components that need neither. The plugin is
+  a WooCommerce extension, so `boot()` opens with the plugin-wide host gate: without WooCommerce
+  at the header-declared floor it stages an explanatory notice and stays un-booted.
+- `src/Settings/` is the settings example feature and owns both settings surfaces: it persists
+  `a8csp_template_example_option` through the Settings API on the General options page, registers a
+  section in WooCommerce → Settings → Advanced persisting `a8csp_template_wc_example_option` — the
+  host gate guarantees WooCommerce, so neither surface carries a gate — and demonstrates the
+  uninstall footprint. Teardown recipes live in `README.scaffold.md`.
+- `src/Integrations/` groups the optional integrations behind one nested example:
+  `src/Integrations/Component.php` is the group root that gates, constructs, and initializes its
+  children inside its own phases. Its children model the two child shapes:
+  `src/Integrations/WooPayments.php` is the single-class leaf — gated on WooPayments and hooking
+  one of its payment-metadata filters — and `src/Integrations/WC_Subscriptions/` is the grown
+  sub-feature folder owning its own `Component` plus a plain collaborator, still forwarding-depth
+  one. More nesting than this is the signal a plugin has outgrown manual composition; see the
+  group root's notes.
 - `includes/` contains automatically loaded procedural helpers, including typed option readers; PHP
   files dropped there load automatically inside WordPress, while underscore-prefixed files are skipped.
 - `languages/` contains translations and an example POT generated from the template's strings;
@@ -61,7 +73,7 @@ A plugin is a list of components; a component is a class with `is_needed()` and
   class docblock.
 - `blocks/src/foobar/` contains the example block source, while `blocks/build/` contains tracked build
   output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`, which
-  `src/Blocks.php` uses to register all built blocks as one metadata collection.
+  `src/Blocks/Component.php` uses to register all built blocks as one metadata collection.
 - `assets/js/src/editor.js` defines the shared editor hook entry point, and `assets/js/build/` contains
   its tracked output.
 - `tests/` contains the automated test suite; see `tests/README.md` for the local workflow.
@@ -127,10 +139,12 @@ The tracked template files declare these runtime targets:
   tooling.
 - Docker for the `wp-env` local environment.
 
-The plugin boots its component list unconditionally. The WooCommerce-dependent example
-settings-section component (`src/Integrations/WC_Settings_Section.php`) gates itself through `is_needed()`, checking
-that WooCommerce is active and meets the `WC requires at least` header floor. The main bootstrap
-declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is active.
+The plugin is a WooCommerce extension: `Plugin::boot()` gates plugin-wide on WooCommerce presence
+and the `WC requires at least` header floor, staging an explanatory admin notice and staying
+un-booted when either is unmet. The WooCommerce Subscriptions integration
+(`src/Integrations/WC_Subscriptions/`) gates itself on its companion being active. The main
+bootstrap declares HPOS (`custom_order_tables`) compatibility whether or not WooCommerce is
+active.
 
 ## Multisite
 
@@ -145,8 +159,9 @@ end — when adding a component, decide its scope deliberately:
 - The template registers no activation or deactivation hooks. A plugin that adds them must
   handle the `$network_wide` activation flag and provision sites created after network
   activation (`wp_initialize_site`).
-- Component `is_needed()` gates run on every request, so per-site environmental differences —
-  such as WooCommerce being active on only some sites — resolve correctly site by site.
+- The host gate and the component `is_needed()` gates run on every request, so per-site
+  environmental differences — such as WooCommerce or a companion being active on only some
+  sites — resolve correctly site by site.
 - The multisite wp-env fixture (`.wp-env.multisite.json`) converts itself into a network on
   start, and `composer test:multisite` proves the uninstall sweep against it.
 

@@ -27,10 +27,11 @@ fixtures at three WordPress-version tiers.
 
 ## WooCommerce-less boot proof
 
-`PluginBootWithoutWooCommerceTest` verifies that the plugin and its WooCommerce-independent
-components (Blocks and Settings) boot when WooCommerce is inactive. It self-skips whenever
-WooCommerce is active. To exercise the proof, deactivate WooCommerce in the tests wp-env instance,
-run that test directly, then reactivate WooCommerce before continuing with the Integration suite:
+`PluginBootWithoutWooCommerceTest` verifies the plugin-wide host gate: with WooCommerce inactive
+the plugin stays un-booted and stages the "requires WooCommerce" notice instead of registering
+anything. It self-skips whenever WooCommerce is active. To exercise the proof, deactivate
+WooCommerce in the tests wp-env instance, run that test directly, then reactivate WooCommerce
+before continuing with the Integration suite:
 
 ```sh
 npm run wp-env:tests:start

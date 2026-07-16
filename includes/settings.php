@@ -5,8 +5,8 @@
 /**
  * Returns the example option's value. Each typed option reader names its option, applies its
  * default, and casts the return so callers never touch raw `get_option()` mixed values. The write
- * side — registration, sanitization, and rendering — lives in the `Settings` component in
- * `src/Settings.php`.
+ * side — registration, sanitization, and rendering — lives in the Settings feature's component
+ * in `src/Settings/Component.php`.
  *
  * @since   1.0.0
  * @version 1.0.0

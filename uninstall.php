@@ -23,8 +23,9 @@ $a8csp_template_footprint = array(
 	'options'   => array(
 		// Settings owns:
 		'a8csp_template_example_option',
-		// Integrations\WC_Settings_Section owns:
 		'a8csp_template_wc_example_option',
+		// Integrations\WC_Subscriptions\Component owns:
+		'a8csp_template_wcs_example_option',
 	),
 	'user_meta' => array(),
 );
