@@ -522,7 +522,8 @@ for ( const [ path, entries ] of entriesByPath ) {
 			errors.push( `replace-exact: ${ path } — span occurs ${ occurrences } times (want exactly 1): "${ entry.from.split( '\n' )[0] }"` );
 			continue;
 		}
-		buffer = buffer.replace( entry.from, entry.to );
+		// A function replacer inserts the text verbatim; a string replacement would interpret $-patterns inside it.
+		buffer = buffer.replace( entry.from, () => entry.to );
 	}
 
 	pendingWrites.push( { absolutePath, buffer } );
