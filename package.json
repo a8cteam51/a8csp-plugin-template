@@ -56,6 +56,7 @@
     "packages-install": "npm install",
     "packages-update": "npm update",
     "packages-update:wp": "wp-scripts packages-update --dist-tag=wp-7.0",
+
     "build": "NODE_ENV=production npm-run-all --sequential build:**",
     "build:blocks": "wp-scripts build --webpack-src-dir=blocks/src --output-path=blocks/build",
     "build:blocks-manifest": "wp-scripts build-blocks-manifest --input=blocks/build --output=blocks/build/blocks-manifest.php",
@@ -66,6 +67,7 @@
     "start:blocks": "wp-scripts start --webpack-src-dir=blocks/src --output-path=blocks/build",
     "start:assets:scripts": "wp-scripts start assets/js/src/*.js --output-path=assets/js/build",
     "start:assets:styles": "postcss assets/css/src/*.scss --dir assets/css/build --ext css --watch",
+
     "format": "npm-run-all --sequential format:**",
     "format:scripts": "wp-scripts format blocks assets/js --no-error-on-unmatched-pattern",
     "format:styles": "npm run lint:styles -- --fix",
@@ -75,6 +77,7 @@
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:readme-md": "wp-scripts lint-md-docs README.md",
     "wp-env": "wp-env",
+
     "wp-env:start": "wp-env start",
     "wp-env:update": "wp-env start --update",
     "wp-env:stop": "wp-env stop",
@@ -92,6 +95,7 @@
     "test:requirements": "wp-env --config .wp-env.belowfloor.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Requirements",
     "test:multisite": "wp-env --config .wp-env.multisite.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Multisite",
     "test:integration:no-wc": "wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce && ( wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --filter=PluginBootWithoutWooCommerceTest; A8CSP_STATUS=$?; wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce; exit $A8CSP_STATUS )",
+
     "test:e2e": "playwright test --config=playwright.config.js"
   }
 }
