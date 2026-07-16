@@ -75,7 +75,6 @@
     "lint:styles": "wp-scripts lint-style blocks/**/*.{css,sass,scss} assets/css/**/*.{css,sass,scss} --allow-empty-input --report-descriptionless-disables --report-invalid-scope-disables --report-needless-disables",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:readme-md": "wp-scripts lint-md-docs README.md",
-    "wp-env": "wp-env",
 
     "wp-env:start": "wp-env start",
     "wp-env:update": "wp-env start --update",
