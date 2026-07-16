@@ -77,6 +77,111 @@ jobs:
             exit 1
           fi
 
+  # Renders the scaffold against representative repository fixtures and asserts the generated
+  # tree is sound: no template literal survives, every PHP file parses, and the derived wp-env
+  # port block matches the engine's hash. The replicated rename/fill sequence mirrors
+  # fill-in-scaffold.yml step for step — change both together; this job exists so that
+  # divergence fails here instead of in a generated repository.
+  generation-contract:
+    name: 'Generation contract: ${{ matrix.fixture }}'
+    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - fixture: aligned
+            strip: false
+            repo_json: '{"name":"my-client-plugin","description":"A client plugin.","custom_properties":{"human-title":"My Client Plugin","php-globals-short-prefix":"myclient"}}'
+          - fixture: diverging-empty
+            strip: false
+            repo_json: '{"name":"acme-tools","description":"","custom_properties":{"human-title":"Acme Corporation Tools","php-globals-short-prefix":"acme_tools"}}'
+          - fixture: hostile-description
+            strip: false
+            repo_json: '{"name":"quote-plugin","description":"He said \"deploy\" \\ fast","custom_properties":{"human-title":"Quote Plugin","php-globals-short-prefix":"quotes"}}'
+          - fixture: stripped
+            strip: true
+            repo_json: '{"name":"my-client-plugin","description":"A client plugin.","custom_properties":{"human-title":"My Client Plugin","php-globals-short-prefix":"myclient"}}'
+    steps:
+      - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Setup PHP for the syntax sweep.
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.5'
+          coverage: none
+
+      - name: Replicate the fill-in sequence.
+        env:
+          REPO_JSON: ${{ matrix.repo_json }}
+          STRIP: ${{ matrix.strip }}
+        run: |
+          set -euo pipefail
+
+          REPO_NAME=$(printf '%s' "$REPO_JSON" | jq -r .name)
+          echo "REPO_NAME=$REPO_NAME" >> "$GITHUB_ENV"
+
+          git mv --force README.scaffold.md README.md
+          git mv a8csp-template-plugin.php "$REPO_NAME.php"
+
+          find changelog -type f ! -name '.gitkeep' -delete
+          rm -f languages/*.pot
+
+          node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
+
+          if [ "$STRIP" = 'true' ]; then
+            node ./.github/workflows/fill-in-scaffold-content.mjs
+          fi
+
+          # A rename that silently failed would let the literal sweep below pass vacuously.
+          test -f "$REPO_NAME.php"
+
+          # The engines strip their own paths from the lint scope; a leftover reference is docrot.
+          if grep -qF '.github/workflows/fill-in-scaffold' package.json; then
+            echo '::error::the rendered package.json still references the self-deleting .mjs engines in lint:scripts'
+            exit 1
+          fi
+
+      # .github is excluded because the real run deletes the spent machinery instead of
+      # substituting inside it; composer.lock is re-locked by the real run after this point.
+      - name: Assert no template literal survives.
+        run: |
+          set -euo pipefail
+
+          fail=0
+          for literal in 'a8csp-plugin-template' 'a8csp-template-plugin' 'A8CSP Template Plugin' 'a8csp_template' 'A8CSP_TEMPLATE' 'A8C\SpecialProjects\PluginTemplate' 'EXAMPLE_REPO_'; do
+            if survivors=$(grep -rIlF --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=.git --exclude-dir=.github --exclude=composer.lock -- "$literal" .); then
+              printf '%s\n' "$survivors"
+              echo "::error::template literal '$literal' survived substitution"
+              fail=1
+            fi
+          done
+          exit "$fail"
+
+      - name: Syntax-check every generated PHP file.
+        run: |
+          find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
+
+      - name: Assert the derived wp-env port block.
+        run: |
+          set -euo pipefail
+
+          hex=$(printf '%s' "$REPO_NAME" | shasum -a 256 | cut -c1-8)
+          expected=$(( 10000 + 4 * ( 16#$hex % 5000 ) ))
+          grep -Fq "\"port\": $expected," .wp-env.tests.json
+          grep -Fq "\"port\": $(( expected + 1 ))," .wp-env.belowfloor.json
+          grep -Fq "\"port\": $(( expected + 2 ))," .wp-env.multisite.json
+          grep -Fq "\"port\": $(( expected + 3 ))," .wp-env.json
+
+      - name: Assert the strip phase removed the sample content.
+        if: matrix.strip == true
+        run: test ! -f includes/_disabled-example.php
+
   # The teaching-content strip manifest identifies each passage by an exact span that must occur
   # exactly once. Editing the template's docblocks or comments can silently break a span (zero or
   # duplicate matches), which would surface only at generation time as a failed fill-in push. This

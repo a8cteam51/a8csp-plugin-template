@@ -53,11 +53,13 @@ jobs:
             fi
           done
 
-          # The prefix lands in function, variable, and constant identifiers: lowercase snake_case
-          # starting with a letter, or every PHP file in the generated repository breaks at parse.
+          # The prefix lands in function, variable, and constant identifiers: degenerate or
+          # unbounded values (`a`, `site_`, `my__thing`) ship collision-prone or double-underscore
+          # names fleet-wide, and the 15-character cap keeps prefixed registry keys (post types,
+          # options) inside WordPress's length limits.
           prefix=$(printf '%s' "$CUSTOM_PROPERTIES" | jq -r '.["php-globals-short-prefix"]')
-          if ! printf '%s' "$prefix" | grep -Eq '^[a-z][a-z0-9_]*$'; then
-            echo "::error::php-globals-short-prefix '$prefix' must be lowercase snake_case starting with a letter (it becomes PHP identifiers)"
+          if ! printf '%s' "$prefix" | grep -Eq '^[a-z][a-z0-9_]{2,13}[a-z0-9]$' || printf '%s' "$prefix" | grep -q '__'; then
+            echo "::error::php-globals-short-prefix '$prefix' must be 4-15 characters of lowercase snake_case, starting with a letter, ending with a letter or digit, with no __ runs (it becomes PHP identifiers)"
             exit 1
           fi
 
@@ -75,10 +77,11 @@ jobs:
             exit 1
           fi
 
-      # Credentials are persisted on purpose: the final step pushes the
-      # scaffolding commits back to the repo via the checkout-provided token.
+      # No credential persists on disk: the composer re-lock executes third-party code
+      # (composer plugins), and the publish step passes the token explicitly.
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
-        # zizmor: ignore[artipacked] git push below needs the persisted token
+        with:
+          persist-credentials: false
 
       - name: Check whether the scaffold was already filled.
         id: scaffold-check
@@ -188,4 +191,7 @@ jobs:
 
       - name: Push all the changed files.
         if: steps.scaffold-check.outputs.already-filled != 'true'
-        run: git push
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          REPOSITORY: ${{ github.repository }}
+        run: git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${REPOSITORY}.git" HEAD

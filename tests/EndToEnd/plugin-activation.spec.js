@@ -5,10 +5,15 @@ test.describe( 'Plugin activation', () => {
 		await requestUtils.activatePlugin( 'a8csp-template-plugin' );
 	} );
 
-	test( 'the scaffold plugin is listed as active', async ( { admin, page } ) => {
+	test( 'the scaffold plugin is listed as active', async ( {
+		admin,
+		page,
+	} ) => {
 		await admin.visitAdminPage( 'plugins.php' );
 
-		const pluginRow = page.locator( 'tr[data-slug="a8csp-template-plugin"]' );
+		const pluginRow = page.locator(
+			'tr[data-slug="a8csp-template-plugin"]'
+		);
 		await expect( pluginRow ).toHaveClass( /\bactive\b/ );
 	} );
 } );
