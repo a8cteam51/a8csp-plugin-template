@@ -140,6 +140,9 @@ jobs:
           # A rename that silently failed would let the literal sweep below pass vacuously.
           test -f "$REPO_NAME.php"
 
+          # The engines strip their own paths from the lint scope; a leftover reference is docrot.
+          ! grep -qF '.github/workflows/fill-in-scaffold' package.json
+
       # .github is excluded because the real run deletes the spent machinery instead of
       # substituting inside it; composer.lock is re-locked by the real run after this point.
       - name: Assert no template literal survives.
