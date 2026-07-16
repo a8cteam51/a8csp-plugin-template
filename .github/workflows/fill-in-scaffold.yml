@@ -239,7 +239,7 @@ jobs:
           git add .github/workflows
           git commit -m "chore -- remove the spent fill-in-scaffold workflow and the template guard"
 
-      - name: Push all the changed files.
+      - name: Publish all the changed commits.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
