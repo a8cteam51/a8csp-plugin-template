@@ -110,7 +110,7 @@ jobs:
           # early (a crafted payload then reopens it and passes `php -l`), and a newline breaks the
           # single-line header.
           if [ -n "$repository_description" ]; then
-            if [[ "$repository_description" == *$'\n'* ]]; then
+            if [[ "$repository_description" == *$'\n'* || "$repository_description" == *$'\r'* ]]; then
               report_error 'repository description' "$repository_description" 'it must be a single line when set'
             fi
             if [[ "$repository_description" == *'*/'* ]]; then
@@ -211,15 +211,6 @@ jobs:
             echo "::notice::the dispatch did not ask for strip-teaching-content; keeping the template teaching prose"
           fi
 
-      # Substituted identifiers land inside PHP source, and pushes from this workflow trigger no
-      # CI — a parse error here would ship a dead-on-arrival repository, so every PHP file is
-      # syntax-checked before anything is committed.
-      - name: Syntax-check every generated PHP file.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
-        run: |
-          find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
-            | xargs -0 -n1 -P4 php -l > /dev/null
-
       # --ignore-scripts keeps dependency lifecycle code from executing inside a job that will
       # push to the repository; the generated repository's own developers install normally. A full
       # re-resolve (not an in-place name substitution) is what correctly hoists git-dependency edges.
@@ -237,6 +228,16 @@ jobs:
       - name: Re-lock composer.json after the name substitution.
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: composer update --lock --no-install
+
+      # Substituted identifiers land inside PHP source, and the rebuild above regenerates PHP build
+      # assets — pushes from this workflow trigger no CI, so a parse error in either would ship a
+      # dead-on-arrival repository. The sweep runs after the build so it covers the committed build
+      # output too, and before anything is committed.
+      - name: Syntax-check every generated PHP file.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        run: |
+          find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
+            | xargs -0 -n1 -P4 php -l > /dev/null
 
       - name: Commit the changed files.
         if: steps.scaffold-check.outputs.already-filled != 'true'

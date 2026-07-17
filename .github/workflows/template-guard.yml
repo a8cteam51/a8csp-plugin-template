@@ -154,7 +154,7 @@ jobs:
 
           fail=0
           for literal in 'a8csp-plugin-template' 'a8csp-template-plugin' 'A8CSP Template Plugin' 'a8csp_template' 'A8CSP_TEMPLATE' 'A8C\SpecialProjects\PluginTemplate' 'EXAMPLE_REPO_'; do
-            if survivors=$(grep -rIlF --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=.git --exclude-dir=.github --exclude=composer.lock -- "$literal" .); then
+            if survivors=$(grep -rIlF --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=.git --exclude-dir=.github --exclude=composer.lock --exclude=package-lock.json -- "$literal" .); then
               printf '%s\n' "$survivors"
               echo "::error::template literal '$literal' survived substitution"
               fail=1

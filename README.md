@@ -224,8 +224,10 @@ npm run test:e2e
 
 - Customize source files under `src/`, `includes/`, `models/`, `templates/`,
   `blocks/src/`, `assets/js/src/`, `assets/css/src/`, and `languages/`.
-- Rebuild generated assets after changing block or editor sources. The tracked
-  generated outputs live in `blocks/build/` and `assets/js/build/`.
+- Rebuild generated assets after changing block, editor, or `assets/css/src/` Sass
+  sources. The tracked generated outputs live in `blocks/build/`, `assets/js/build/`,
+  and `assets/css/build/` (compiled CSS, its RTL variant, and sourcemaps); the
+  build-integrity gate fails if they drift from a fresh build.
 - Composer autoloading uses PSR-4 for `src/` plus a classmap for `models/`. Files
   loaded from `includes/` and classes loaded through either Composer mapping may
   carry an `ABSPATH` guard, but any file added to Composer's
