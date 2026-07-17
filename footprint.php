@@ -1,8 +1,8 @@
 <?php declare( strict_types=1 );
 /**
- * The plugin's persisted-footprint manifest: every option and user-meta key any component writes,
- * grouped by owning component so ownership stays reviewable. Add a key here in the same change that
- * introduces the write.
+ * The plugin's persisted-footprint manifest: every durable option and user-meta key any component
+ * writes, grouped by owning component so ownership stays reviewable; transient cache entries are deleted
+ * directly by `uninstall.php`. Add a durable key here in the same change that introduces the write.
  *
  * WordPress's cold uninstall bootstrap loads this file (no autoloader, no Plugin or Component
  * classes), and the uninstall proofs load it too — so nothing here may reference plugin code. It is

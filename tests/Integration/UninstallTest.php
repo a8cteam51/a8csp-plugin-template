@@ -70,11 +70,19 @@ final class UninstallTest extends TestCase {
 
 		update_option( self::CANARY_OPTION, 'sentinel' );
 
+		foreach ( array( 'stable', 'prerelease' ) as $channel ) {
+			set_transient( 'a8csp_template_github_latest_release_' . $channel, 'sentinel', HOUR_IN_SECONDS );
+		}
+
 		\define( 'WP_UNINSTALL_PLUGIN', true );
 		require \dirname( __DIR__, 2 ) . '/uninstall.php';
 
 		foreach ( $footprint['options'] as $option ) {
 			self::assertFalse( get_option( $option ), "uninstall.php must delete the '{$option}' option" );
+		}
+
+		foreach ( array( 'stable', 'prerelease' ) as $channel ) {
+			self::assertFalse( get_transient( 'a8csp_template_github_latest_release_' . $channel ), "uninstall.php must delete the '{$channel}' update-check transient" );
 		}
 
 		foreach ( $footprint['user_meta'] as $meta_key ) {

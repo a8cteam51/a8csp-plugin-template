@@ -41,6 +41,8 @@ if ( is_multisite() ) {
 			foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
 				delete_option( $a8csp_template_uninstall_option );
 			}
+			delete_transient( 'a8csp_template_github_latest_release_stable' );
+			delete_transient( 'a8csp_template_github_latest_release_prerelease' );
 
 			restore_current_blog();
 		}
@@ -52,6 +54,8 @@ if ( is_multisite() ) {
 	foreach ( $a8csp_template_footprint['options'] as $a8csp_template_uninstall_option ) {
 		delete_option( $a8csp_template_uninstall_option );
 	}
+	delete_transient( 'a8csp_template_github_latest_release_stable' );
+	delete_transient( 'a8csp_template_github_latest_release_prerelease' );
 }
 
 // User meta is stored network-globally, so one pass covers every site.

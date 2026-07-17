@@ -96,6 +96,10 @@ final class MultisiteUninstallTest extends TestCase {
 			}
 			update_option( self::CANARY_OPTION, 'sentinel' );
 
+			foreach ( array( 'stable', 'prerelease' ) as $channel ) {
+				set_transient( 'a8csp_template_github_latest_release_' . $channel, 'sentinel', HOUR_IN_SECONDS );
+			}
+
 			restore_current_blog();
 		}
 
@@ -107,6 +111,9 @@ final class MultisiteUninstallTest extends TestCase {
 
 			foreach ( $footprint['options'] as $option ) {
 				self::assertFalse( get_option( $option ), "uninstall.php must delete the '{$option}' option on site {$site_id}" );
+			}
+			foreach ( array( 'stable', 'prerelease' ) as $channel ) {
+				self::assertFalse( get_transient( 'a8csp_template_github_latest_release_' . $channel ), "uninstall.php must delete the '{$channel}' update-check transient on site {$site_id}" );
 			}
 			self::assertSame( 'sentinel', get_option( self::CANARY_OPTION ), "uninstall.php must not delete keys outside its footprint on site {$site_id}" );
 
