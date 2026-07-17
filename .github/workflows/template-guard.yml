@@ -30,6 +30,7 @@ jobs:
     name: Refuse to release the template
     if: github.repository_id == '1297277915' && startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Fail loudly
         run: |
@@ -42,6 +43,7 @@ jobs:
     name: Enforce the trunk-only template state
     if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -86,6 +88,7 @@ jobs:
     name: 'Generation contract: ${{ matrix.fixture }}'
     if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     strategy:
@@ -190,6 +193,7 @@ jobs:
     name: Enforce the teaching-content strip manifest
     if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
