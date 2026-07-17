@@ -112,9 +112,9 @@ function a8csp_template_get_plugin_version() {
  * @since   1.0.0
  * @version 1.0.0
  *
- * @param   array<string, mixed>|false $update      The pending update data, or false when none is known yet.
- * @param   array<string, mixed>       $plugin_data The plugin's header data.
- * @param   string                     $plugin_file The plugin file being checked.
+ * @param   array<string, mixed>|false                 $update      The pending update data, or false when none is known yet.
+ * @param   array{Version: string, TextDomain: string} $plugin_data The plugin's header data.
+ * @param   string                                     $plugin_file The plugin file being checked.
  *
  * @return  array<string, mixed>|false
  */
@@ -123,9 +123,12 @@ function a8csp_template_check_github_release_update( $update, $plugin_data, $plu
 		return $update;
 	}
 
-	$latest_release_info = get_transient( 'a8csp_template_github_latest_release' );
+	$prerelease_channel = \str_contains( (string) ( $plugin_data['Version'] ?? '' ), '-' );
+	$transient_key      = 'a8csp_template_github_latest_release_' . ( $prerelease_channel ? 'prerelease' : 'stable' );
+
+	$latest_release_info = get_transient( $transient_key );
 	if ( false === $latest_release_info ) {
-		$release_url_path    = \str_contains( (string) ( $plugin_data['Version'] ?? '' ), '-' ) ? 'releases?per_page=10' : 'releases/latest';
+		$release_url_path    = $prerelease_channel ? 'releases?per_page=10' : 'releases/latest';
 		$response            = wp_remote_get( 'https://api.github.com/repos/a8cteam51/a8csp-plugin-template/' . $release_url_path );
 		$latest_release_info = is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ? array() : \json_decode( wp_remote_retrieve_body( $response ), true );
 	}
@@ -168,7 +171,7 @@ function a8csp_template_check_github_release_update( $update, $plugin_data, $plu
 
 	$release_is_usable = \is_string( $release_tag ) && \is_string( $release_url ) && \is_string( $release_asset );
 	if ( isset( $response ) ) {
-		set_transient( 'a8csp_template_github_latest_release', $release_is_usable ? $latest_release_info : array(), $release_is_usable ? HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS );
+		set_transient( $transient_key, $release_is_usable ? $latest_release_info : array(), $release_is_usable ? HOUR_IN_SECONDS : 5 * MINUTE_IN_SECONDS );
 	}
 
 	if ( ! $release_is_usable ) {

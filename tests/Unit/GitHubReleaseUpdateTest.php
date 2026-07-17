@@ -9,9 +9,10 @@ use PHPUnit\Framework\TestCase;
 /**
  * Proves the GitHub release updater's channel and packaging decisions: a stable installation
  * follows only the latest-release endpoint while a prerelease installation scans the full
- * release list for the first non-draft entry, the update package is the release asset matched
- * by name, an up-to-date installation is offered nothing, and a failed fetch is negative-cached
- * briefly so update checks don't hammer a failing API.
+ * release list for the first non-draft entry, each channel caches under its own transient key
+ * so a channel switch never serves the other channel's releases, the update package is the
+ * release asset matched by name, an up-to-date installation is offered nothing, and a failed
+ * fetch is negative-cached briefly so update checks don't hammer a failing API.
  *
  * Loading the real `functions-bootstrap.php` would shadow the canned metadata stubs other
  * tests in the shared process rely on, so every test runs `#[RunInSeparateProcess]`.
@@ -122,6 +123,8 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		self::assertStringContainsString( 'releases?per_page=10', $GLOBALS['a8csp_template_test_http_requests'][0] );
 		self::assertIsArray( $update );
 		self::assertSame( '1.2.0-beta.1', $update['version'], 'The draft entry must be skipped for the first published release' );
+		self::assertArrayHasKey( 'a8csp_template_github_latest_release_prerelease', $GLOBALS['a8csp_template_test_transients'], 'The prerelease channel caches under its own key' );
+		self::assertArrayNotHasKey( 'a8csp_template_github_latest_release_stable', $GLOBALS['a8csp_template_test_transients'], 'The prerelease channel must not touch the stable cache' );
 	}
 
 	/**
@@ -151,7 +154,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '2.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
 
 		self::assertFalse( $update );
-		self::assertSame( \constant( 'HOUR_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release'], 'A usable release caches for the full hour even when no update is offered' );
+		self::assertSame( \constant( 'HOUR_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release_stable'], 'A usable release caches for the full hour even when no update is offered' );
 	}
 
 	/**
@@ -173,8 +176,8 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
 
 		self::assertFalse( $update );
-		self::assertSame( array(), $GLOBALS['a8csp_template_test_transients']['a8csp_template_github_latest_release'] );
-		self::assertSame( 5 * \constant( 'MINUTE_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release'] );
+		self::assertSame( array(), $GLOBALS['a8csp_template_test_transients']['a8csp_template_github_latest_release_stable'] );
+		self::assertSame( 5 * \constant( 'MINUTE_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release_stable'] );
 	}
 
 	/**
@@ -195,6 +198,110 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		self::assertSame( array( 'version' => '9.9.9' ), $settled );
 
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_http_requests'], 'Pass-through paths must not touch the network' );
+	}
+
+	/**
+	 * Each channel caches under its own transient key, so a machine that switches between the
+	 * stable and prerelease channels never serves the other channel's releases: after a
+	 * prerelease check caches its list, a stable check on the same machine fetches the stable
+	 * endpoint fresh instead of reusing the cached prerelease.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_channels_cache_separately_so_a_switch_never_serves_the_other_channel(): void {
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				array(
+					'draft'    => false,
+					'tag_name' => 'v3.0.0-beta.1',
+					'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v3.0.0-beta.1',
+					'assets'   => array(
+						array(
+							'name'                 => 'a8csp-plugin-template.zip',
+							'browser_download_url' => 'https://example.com/beta.zip',
+						),
+					),
+				),
+			)
+		);
+		a8csp_template_check_github_release_update( false, self::plugin_data( '2.0.0-beta.1' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		// The machine is switched to a stable build; the network now answers with the stable latest.
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				'tag_name' => 'v2.0.0',
+				'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v2.0.0',
+				'assets'   => array(
+					array(
+						'name'                 => 'a8csp-plugin-template.zip',
+						'browser_download_url' => 'https://example.com/stable.zip',
+					),
+				),
+			)
+		);
+
+		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		self::assertCount( 2, $GLOBALS['a8csp_template_test_http_requests'], 'The stable check must fetch fresh rather than reuse the prerelease cache' );
+		self::assertStringEndsWith( '/releases/latest', $GLOBALS['a8csp_template_test_http_requests'][1] );
+		self::assertSame( '2.0.0', $update['version'], 'The stable install follows the stable release, never the cached prerelease' );
+		self::assertSame( 'https://example.com/stable.zip', $update['package'] );
+	}
+
+	/**
+	 * The mirror of the switch above: a stable check that caches its release must not satisfy a
+	 * later prerelease check on the same machine. Reading the stable key for a prerelease install
+	 * would suppress a newer prerelease behind stale stable data, so the prerelease check must
+	 * fetch its own endpoint fresh and follow the prerelease.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_channels_cache_separately_stable_then_prerelease(): void {
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				'tag_name' => 'v2.0.0',
+				'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v2.0.0',
+				'assets'   => array(
+					array(
+						'name'                 => 'a8csp-plugin-template.zip',
+						'browser_download_url' => 'https://example.com/stable.zip',
+					),
+				),
+			)
+		);
+		a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		// The machine is switched to a prerelease build; the network now answers with the release list.
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				array(
+					'draft'    => false,
+					'tag_name' => 'v3.0.0-beta.1',
+					'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v3.0.0-beta.1',
+					'assets'   => array(
+						array(
+							'name'                 => 'a8csp-plugin-template.zip',
+							'browser_download_url' => 'https://example.com/beta.zip',
+						),
+					),
+				),
+			)
+		);
+
+		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '2.0.0-beta.1' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		self::assertCount( 2, $GLOBALS['a8csp_template_test_http_requests'], 'The prerelease check must fetch fresh rather than reuse the stable cache' );
+		self::assertStringEndsWith( 'releases?per_page=10', $GLOBALS['a8csp_template_test_http_requests'][1] );
+		self::assertSame( '3.0.0-beta.1', $update['version'], 'The prerelease install follows the prerelease, never the cached stable release' );
+		self::assertSame( 'https://example.com/beta.zip', $update['package'] );
 	}
 
 	// endregion.
