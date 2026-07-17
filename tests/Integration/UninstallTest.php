@@ -26,7 +26,7 @@ final class UninstallTest extends TestCase {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
-	private const CANARY_OPTION = 'a8csp_template_test_uninstall_canary';
+	private const string CANARY_OPTION = 'a8csp_template_test_uninstall_canary';
 
 	/**
 	 * Removes the canary regardless of how the test finished, since this suite runs against

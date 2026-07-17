@@ -28,7 +28,7 @@ final class MultisiteUninstallTest extends TestCase {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
-	private const CANARY_OPTION = 'a8csp_template_test_uninstall_canary';
+	private const string CANARY_OPTION = 'a8csp_template_test_uninstall_canary';
 
 	/**
 	 * The path of the second site this test creates. Leftovers under this path from an aborted
@@ -38,7 +38,7 @@ final class MultisiteUninstallTest extends TestCase {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
-	private const PROOF_SITE_PATH = '/uninstall-sweep-proof/';
+	private const string PROOF_SITE_PATH = '/uninstall-sweep-proof/';
 
 	/**
 	 * The ID of the second site created for the sweep proof, for tearDown to delete.
