@@ -62,6 +62,13 @@ const traverseDirectory = async ( dirPath, callback ) => {
  * @param {string} filePath
  */
 const buildTemplate = async ( filePath ) => {
+	if ( [ 'composer.lock', 'package-lock.json' ].includes( filePath ) ) {
+		// Both locks are regenerated from the substituted manifests after this pass, so
+		// substituting names into them in place would only risk corrupting integrity hashes.
+		console.log( 'Skipping %s', filePath );
+		return;
+	}
+
 	console.log( 'Building %s', filePath );
 
 	const templateFile = await readFile( filePath, 'utf-8' );

@@ -19,6 +19,7 @@ jobs:
     name: Build the release artifact
     if: github.repository_id != '1297277915'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: read
     steps:
@@ -99,6 +100,7 @@ jobs:
     needs: smoke
     if: github.repository_id != '1297277915'
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     permissions:
       contents: write
     steps:

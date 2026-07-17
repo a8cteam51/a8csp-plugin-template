@@ -1,6 +1,8 @@
 // Match `port` in .wp-env.json. Set BEFORE requires so @wordpress/scripts
 // picks it up (it derives use.baseURL + webServer.port + globalSetup from this).
-process.env.WP_BASE_URL = 'http://localhost:8893';
+// `??=` keeps an exported WP_BASE_URL authoritative, so a `.wp-env.override.json`
+// port move carries into Playwright instead of it reusing whatever sits on 8893.
+process.env.WP_BASE_URL ??= 'http://localhost:8893';
 
 // Keep Playwright outputs (storage states, test-results) out of the repo root.
 const path = require( 'path' );
