@@ -52,6 +52,16 @@ The architecture map, the component model, and the reshaping recipes (including 
 plugin down to plain WordPress) live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the test
 workflow lives in [`tests/README.md`](tests/README.md).
 
+### Releasing
+
+Releases are cut by pushing a version tag; the release workflow fails closed unless the plugin header, `package.json`, and the newest `CHANGELOG.md` entry all agree with the tag. `CHANGELOG.md` is generated from the fragments in `changelog/` by `composer changelog:write`, which derives the next version from the newest existing changelog entry and the fragments' significance. The first release starts from the scaffold's empty changelog, so it must pass its version explicitly:
+
+```sh
+composer changelog:write -- --use-version=1.0.0
+```
+
+Prerelease entries also take an explicit version (`--use-version`, or the `--prerelease` suffix option); from the first stable entry onward, a bare `composer changelog:write` suffices.
+
 ## Frequently Asked Questions
 
 ### How can I get help if I'm stuck?

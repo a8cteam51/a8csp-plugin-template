@@ -23,7 +23,11 @@ changelogger and its `changelog/` fragments directory, `CHANGELOG.md`, and
 any of it is the generated plugin author's choice. The one tracked fragment,
 `changelog/initial-template-population`, is the machinery's fixture: it keeps
 `changelog:validate` non-vacuous here, and generation deletes it along with the
-example POT.
+example POT. A generated plugin's first release starts from the header-only
+`CHANGELOG.md`, where `changelogger write` has no entry to derive a version
+from, so that one write passes its version explicitly
+(`composer changelog:write -- --use-version=1.0.0`); the scaffold README
+documents this in its Releasing section.
 
 ## What is in this repository
 
