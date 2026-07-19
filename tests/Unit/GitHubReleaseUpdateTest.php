@@ -88,8 +88,8 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	}
 
 	/**
-	 * A prerelease installation queries the full release list and follows the first non-draft
-	 * entry — the every-release channel — skipping drafts.
+	 * A prerelease installation queries the full release list — the every-release channel — and
+	 * skips draft entries.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -97,7 +97,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	 * @return  void
 	 */
 	#[RunInSeparateProcess]
-	public function test_prerelease_install_follows_the_first_nondraft_of_the_release_list(): void {
+	public function test_prerelease_install_skips_draft_entries_on_the_release_list(): void {
 		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
 			array(
 				array(
@@ -122,9 +122,54 @@ final class GitHubReleaseUpdateTest extends TestCase {
 
 		self::assertStringContainsString( 'releases?per_page=10', $GLOBALS['a8csp_template_test_http_requests'][0] );
 		self::assertIsArray( $update );
-		self::assertSame( '1.2.0-beta.1', $update['version'], 'The draft entry must be skipped for the first published release' );
+		self::assertSame( '1.2.0-beta.1', $update['version'], 'The draft entry must be skipped' );
 		self::assertArrayHasKey( 'a8csp_template_github_latest_release_prerelease', $GLOBALS['a8csp_template_test_transients'], 'The prerelease channel caches under its own key' );
 		self::assertArrayNotHasKey( 'a8csp_template_github_latest_release_stable', $GLOBALS['a8csp_template_test_transients'], 'The prerelease channel must not touch the stable cache' );
+	}
+
+	/**
+	 * The release list is ordered by publish time, not version, so a newer prerelease listed after
+	 * an older one is still offered — the updater scans for the highest version, not the first entry.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_prerelease_install_follows_the_highest_version_not_the_first_listed(): void {
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				array(
+					'draft'    => false,
+					'tag_name' => 'v1.2.0-beta.1',
+					'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v1.2.0-beta.1',
+					'assets'   => array(
+						array(
+							'name'                 => 'a8csp-plugin-template.zip',
+							'browser_download_url' => 'https://example.com/beta1.zip',
+						),
+					),
+				),
+				array(
+					'draft'    => false,
+					'tag_name' => 'v1.2.0-beta.2',
+					'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v1.2.0-beta.2',
+					'assets'   => array(
+						array(
+							'name'                 => 'a8csp-plugin-template.zip',
+							'browser_download_url' => 'https://example.com/beta2.zip',
+						),
+					),
+				),
+			)
+		);
+
+		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.2.0-beta.1' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		self::assertIsArray( $update );
+		self::assertSame( '1.2.0-beta.2', $update['version'], 'The highest-versioned prerelease is offered even when a lower version is listed first' );
+		self::assertSame( 'https://example.com/beta2.zip', $update['package'] );
 	}
 
 	/**
