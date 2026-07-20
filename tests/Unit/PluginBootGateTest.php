@@ -28,6 +28,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass( ComponentCollection::class )]
 #[UsesClass( Settings\Component::class )]
 #[UsesClass( Integrations\Component::class )]
+#[UsesClass( Integrations\WooCommerceSubscriptions\Component::class )]
+#[UsesClass( Integrations\WooPayments::class )]
 final class PluginBootGateTest extends TestCase {
 	/**
 	 * Loads the canned plugin metadata and the notice-rendering stand-ins the notice proofs invoke.
