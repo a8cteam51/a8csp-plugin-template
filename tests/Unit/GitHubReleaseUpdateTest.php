@@ -2,7 +2,6 @@
 
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -20,7 +19,6 @@ use PHPUnit\Framework\TestCase;
  * @since   1.0.0
  * @version 1.0.0
  */
-#[CoversFunction( 'a8csp_template_check_github_release_update' )]
 final class GitHubReleaseUpdateTest extends TestCase {
 	// region LIFECYCLE.
 

@@ -2,7 +2,6 @@
 
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Unit;
 
-use PHPUnit\Framework\Attributes\CoversFunction;
 use PHPUnit\Framework\Attributes\RunInSeparateProcess;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +17,6 @@ use PHPUnit\Framework\TestCase;
  * @since   1.0.0
  * @version 1.0.0
  */
-#[CoversFunction( 'a8csp_template_get_plugin_metadata' )]
 final class PluginMetadataCacheTest extends TestCase {
 	/**
 	 * Satisfies the bootstrap file's `ABSPATH` guard and constants, stages the WordPress stubs,
