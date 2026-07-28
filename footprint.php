@@ -6,13 +6,16 @@
  *
  * WordPress's cold uninstall bootstrap loads this file (no autoloader, no Plugin or Component
  * classes), and the uninstall proofs load it too — so nothing here may reference plugin code. It is
- * pure data: a bare `return` of the manifest, with no `ABSPATH` guard, so it is loadable both from
- * `uninstall.php` and directly from a test.
+ * pure data: a bare `return` of the manifest behind the same guard `uninstall.php` carries, so the
+ * manifest is reachable only where it has a purpose. A proof that reads it to build its
+ * expectations declares the uninstall constant first.
  *
  * @since       1.0.0
  * @version     1.0.0
  * @package     A8C\SpecialProjects\PluginTemplate
  */
+
+\defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
 return array(
 	'options'   => array(

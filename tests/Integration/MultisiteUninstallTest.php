@@ -14,8 +14,9 @@ use PHPUnit\Framework\TestCase;
  *
  * The proof is meaningful only on a converted network, so it self-skips in the standard
  * `composer test:integration` run (that fixture is single-site); `composer test:multisite` runs
- * it against the multisite fixture. It defines `WP_UNINSTALL_PLUGIN` by hand, so the test method
- * runs `#[RunInSeparateProcess]` for the same containment reason as `UninstallTest`.
+ * it against the multisite fixture. It defines `WP_UNINSTALL_PLUGIN` by hand ahead of the guarded
+ * manifest it reads, so the test method runs `#[RunInSeparateProcess]` for the same containment
+ * reason as `UninstallTest`.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -85,6 +86,8 @@ final class MultisiteUninstallTest extends TestCase {
 			self::markTestSkipped( 'This proof only runs against a multisite network; this fixture is single-site.' );
 		}
 
+		\define( 'WP_UNINSTALL_PLUGIN', true );
+
 		$footprint           = require \dirname( __DIR__, 2 ) . '/footprint.php';
 		$this->proof_site_id = self::a_fresh_proof_site_id();
 
@@ -103,7 +106,6 @@ final class MultisiteUninstallTest extends TestCase {
 			restore_current_blog();
 		}
 
-		\define( 'WP_UNINSTALL_PLUGIN', true );
 		require \dirname( __DIR__, 2 ) . '/uninstall.php';
 
 		foreach ( array( get_current_blog_id(), $this->proof_site_id ) as $site_id ) {

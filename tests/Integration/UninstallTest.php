@@ -10,10 +10,11 @@ use PHPUnit\Framework\TestCase;
  * manifest lists is gone after it runs, and a sentinel key NOT in the footprint survives —
  * proving the file deletes what it owns and nothing else.
  *
- * `uninstall.php` guards on `defined( 'WP_UNINSTALL_PLUGIN' )`, a constant WordPress itself
- * only defines during a real plugin-delete request. This test defines it by hand, so the one
- * test method runs `#[RunInSeparateProcess]` — the constant must not leak into the rest of
- * the suite, where its presence would be indistinguishable from an actual uninstall.
+ * `uninstall.php` and `footprint.php` both guard on `defined( 'WP_UNINSTALL_PLUGIN' )`, a constant
+ * WordPress itself only defines during a real plugin-delete request. This test defines it by hand
+ * ahead of the manifest it reads to build its expectations, so the one test method runs
+ * `#[RunInSeparateProcess]` — the constant must not leak into the rest of the suite, where its
+ * presence would be indistinguishable from an actual uninstall.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -57,6 +58,8 @@ final class UninstallTest extends TestCase {
 	 */
 	#[RunInSeparateProcess]
 	public function test_uninstall_deletes_only_its_own_footprint(): void {
+		\define( 'WP_UNINSTALL_PLUGIN', true );
+
 		$footprint = require \dirname( __DIR__, 2 ) . '/footprint.php';
 		$user_id   = self::an_existing_user_id();
 
@@ -74,7 +77,6 @@ final class UninstallTest extends TestCase {
 			set_transient( 'a8csp_template_github_latest_release_' . $channel, 'sentinel', HOUR_IN_SECONDS );
 		}
 
-		\define( 'WP_UNINSTALL_PLUGIN', true );
 		require \dirname( __DIR__, 2 ) . '/uninstall.php';
 
 		foreach ( $footprint['options'] as $option ) {
