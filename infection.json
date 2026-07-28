@@ -7,6 +7,8 @@
     "text": "build/infection/infection.log",
     "html": "build/infection/infection.html"
   },
+  "minMsi": 70,
+  "minCoveredMsi": 70,
   "bootstrap": "tests/infection-bootstrap.php",
   "testFramework": "phpunit",
   "testFrameworkExtraArgs": "--testsuite=Unit"
