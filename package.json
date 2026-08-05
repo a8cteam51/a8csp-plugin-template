@@ -62,6 +62,7 @@
     "build:assets:scripts": "wp-scripts build assets/js/src/*.js --output-path=assets/js/build",
     "build:assets:styles": "sass assets/css/src:assets/css/build && postcss assets/css/build/*.css --replace",
     "build:assets:styles-rtl": "rtlcss assets/css/build/settings.css assets/css/build/settings-rtl.css",
+
     "start": "npm-run-all --parallel start:**",
     "start:blocks": "wp-scripts start --webpack-src-dir=blocks/src --output-path=blocks/build",
     "start:assets:scripts": "wp-scripts start assets/js/src/*.js --output-path=assets/js/build",
@@ -70,6 +71,7 @@
     "format": "npm-run-all --sequential format:**",
     "format:scripts": "wp-scripts format blocks assets/js --no-error-on-unmatched-pattern",
     "format:styles": "npm run lint:styles -- --fix",
+
     "lint": "npm-run-all --sequential lint:**",
     "lint:scripts": "wp-scripts lint-js blocks assets/js eslint.config.mjs postcss.config.js stylelint.config.js .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs playwright.config.js tests/EndToEnd --no-error-on-unmatched-pattern",
     "lint:styles": "wp-scripts lint-style blocks/**/*.{css,sass,scss} assets/css/**/*.{css,sass,scss} --allow-empty-input --report-descriptionless-disables --report-invalid-scope-disables --report-needless-disables",
@@ -94,6 +96,7 @@
     "audit:fix": "npm audit fix",
     "check:engines": "wp-scripts check-engines",
     "check:licenses": "wp-scripts check-licenses",
+
     "test:integration": "wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Integration",
     "test:requirements": "wp-env --config .wp-env.belowfloor.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Requirements",
     "test:multisite": "wp-env --config .wp-env.multisite.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Multisite",
