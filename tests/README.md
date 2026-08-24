@@ -50,33 +50,36 @@ wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce
 
 ## Running the suites
 
+Each `composer test:*` verb starts its own wp-env environment first: a container already running
+serves the mount set it was created with, and `start` is what replaces it when the resolved config
+moved. The `[ -n "$CI" ]` guard in front of that start is load-bearing — CI starts wp-env in its own
+step, where `WP_ENV_CORE` overrides the WordPress version and does not reach the composer step, so a
+second start would fall back to the config's own `core` and the nightly leg would test the pinned
+version and pass.
+
 Unit (no wp-env required):
 
 ```sh
 composer test:unit
 ```
 
-Integration (start the tests wp-env instance first):
+Integration:
 
 ```sh
-npm run wp-env:tests:start
 composer test:integration
 npm run wp-env:tests:stop
 ```
 
-Requirements (start the below-floor wp-env instance first):
+Requirements:
 
 ```sh
-npm run wp-env:belowfloor:start
 composer test:requirements
 npm run wp-env:belowfloor:stop
 ```
 
-Multisite (start the multisite wp-env instance first; its `afterStart` converts the fresh
-install into a subdirectory network):
+Multisite (its `afterStart` converts the fresh install into a subdirectory network):
 
 ```sh
-npm run wp-env:multisite:start
 composer test:multisite
 npm run wp-env:multisite:stop
 ```

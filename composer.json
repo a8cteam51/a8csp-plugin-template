@@ -92,9 +92,18 @@
     "test": "@php vendor/bin/phpunit",
     "test:unit": "@php vendor/bin/phpunit --testsuite=Unit",
     "test:unit:mutation": "@php vendor/bin/infection --threads=max",
-    "test:integration": "npm --prefix=. run test:integration",
-    "test:requirements": "npm --prefix=. run test:requirements",
-    "test:multisite": "npm --prefix=. run test:multisite",
+    "test:integration": [
+      "[ -n \"$CI\" ] || ./node_modules/.bin/wp-env --config .wp-env.tests.json start",
+      "npm --prefix=. run test:integration"
+    ],
+    "test:requirements": [
+      "[ -n \"$CI\" ] || ./node_modules/.bin/wp-env --config .wp-env.belowfloor.json start",
+      "npm --prefix=. run test:requirements"
+    ],
+    "test:multisite": [
+      "[ -n \"$CI\" ] || ./node_modules/.bin/wp-env --config .wp-env.multisite.json start",
+      "npm --prefix=. run test:multisite"
+    ],
 
     "quality-check": [
       "@lint:php",
@@ -108,6 +117,9 @@
     "changelog:add": "@php vendor/bin/changelogger add",
     "changelog:validate": "@php vendor/bin/changelogger validate",
     "changelog:write": "@php vendor/bin/changelogger write"
+  },
+  "scripts-descriptions": {
+    "test:integration": "Integration suite on .wp-env.tests.json. The $CI guard shared by the three suite verbs is load-bearing: CI starts wp-env in its own step, where WP_ENV_CORE overrides the WordPress version and does not reach this one, so a second start would fall back to the config's own core and the nightly leg would test the pinned version and pass."
   },
   "config": {
     "allow-plugins": {
