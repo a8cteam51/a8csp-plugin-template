@@ -52,10 +52,15 @@ wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce
 
 Each `composer test:*` verb starts its own wp-env environment first: a container already running
 serves the mount set it was created with, and `start` is what replaces it when the resolved config
-moved. The `[ -n "$GITHUB_ACTIONS" ]` guard in front of that start keeps it out of CI, which owns the
-container's lifecycle in its own step. On the Integration leg it is also load-bearing: that is the
-only matrix passing `wp-env-core`, so a second start would fall back to the config's own `core` and
-the nightly leg would test the pinned version and pass.
+moved. `test:integration:no-wc` is the exception — an npm script, not a composer verb — and is why
+its recipe above still starts the environment by hand.
+
+The `[ -n "$GITHUB_ACTIONS" ]` guard in front of that start keeps it out of CI, which owns the
+container's lifecycle in its own step, and says so rather than skipping in silence. On the
+Integration leg the guard is also load-bearing: that is the only matrix passing `wp-env-core`, so a
+second start would fall back to whatever `core` the config names — and `.wp-env.tests.json` names
+none, which makes it wp-env's default of latest stable — and the nightly leg would pass on a
+WordPress it never meant to test.
 
 Unit (no wp-env required):
 
