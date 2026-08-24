@@ -52,10 +52,10 @@ wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce
 
 Each `composer test:*` verb starts its own wp-env environment first: a container already running
 serves the mount set it was created with, and `start` is what replaces it when the resolved config
-moved. The `[ -n "$CI" ]` guard in front of that start is load-bearing — CI starts wp-env in its own
-step, where `WP_ENV_CORE` overrides the WordPress version and does not reach the composer step, so a
-second start would fall back to the config's own `core` and the nightly leg would test the pinned
-version and pass.
+moved. The `[ -n "$GITHUB_ACTIONS" ]` guard in front of that start keeps it out of CI, which owns the
+container's lifecycle in its own step. On the Integration leg it is also load-bearing: that is the
+only matrix passing `wp-env-core`, so a second start would fall back to the config's own `core` and
+the nightly leg would test the pinned version and pass.
 
 Unit (no wp-env required):
 
