@@ -218,9 +218,9 @@ why the rig runs PHPUnit 13 against plain `TestCase` instead of `WP_UnitTestCase
 
 ```sh
 composer test:unit
-npm run wp-env:tests:start && composer test:integration
+composer test:integration
 composer test:requirements
-npm run wp-env:multisite:start && composer test:multisite
+composer test:multisite
 npm run test:e2e
 ```
 

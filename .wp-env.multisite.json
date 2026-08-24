@@ -8,7 +8,7 @@
 		"wp-content/plugins/woocommerce": "./vendor/wp-plugin/woocommerce"
 	},
 	"lifecycleScripts": {
-		"afterStart": "wp-env --config .wp-env.multisite.json run cli bash -c 'wp core is-installed --network || wp core multisite-convert --title=\"A8CSP Template Network\"' && wp-env --config .wp-env.multisite.json run cli wp plugin activate woocommerce a8csp-plugin-template"
+		"afterStart": "./node_modules/.bin/wp-env --config .wp-env.multisite.json run cli bash -c 'wp core is-installed --network || wp core multisite-convert --title=\"A8CSP Template Network\"' && ./node_modules/.bin/wp-env --config .wp-env.multisite.json run cli wp plugin activate woocommerce a8csp-plugin-template"
 	},
 	"config": {
 		"WP_DEBUG_DISPLAY": false,
