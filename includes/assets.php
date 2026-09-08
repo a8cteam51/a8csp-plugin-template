@@ -11,10 +11,10 @@
  * @since   1.0.0
  * @version 1.0.0
  *
- * @param   string        $asset_path         The path to the asset file.
- * @param   string[]|null $extra_dependencies Any extra dependencies to include in the returned meta.
+ * @param   string                  $asset_path         The path to the asset file.
+ * @param   non-empty-string[]|null $extra_dependencies Any extra dependencies to include in the returned meta.
  *
- * @return  array{ version: string, dependencies: array<string> }|null
+ * @return  array{ version: string, dependencies: array<non-empty-string> }|null
  */
 function a8csp_template_get_asset_meta( string $asset_path, ?array $extra_dependencies = null ): ?array {
 	$asset_path = \str_starts_with( $asset_path, \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) ) ? $asset_path : \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . $asset_path;
