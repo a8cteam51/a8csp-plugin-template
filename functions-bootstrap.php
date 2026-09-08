@@ -254,7 +254,7 @@ function a8csp_template_validate_requirements() {
 		$plugin_metadata['RequiresPHP'] = '8.5';
 	}
 	if ( ! isset( $plugin_metadata['RequiresWP'] ) || '' === $plugin_metadata['RequiresWP'] ) {
-		$plugin_metadata['RequiresWP'] = '7.0';
+		$plugin_metadata['RequiresWP'] = '7.1';
 	}
 
 	$is_php_compatible = a8csp_template_is_php_version_compatible( $plugin_metadata['RequiresPHP'] );

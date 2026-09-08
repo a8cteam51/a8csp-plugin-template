@@ -121,10 +121,10 @@ that drift is caught on the template before it can reach a generated repository.
 
 The tracked template files declare these runtime targets:
 
-- WordPress `7.0` in the plugin header.
+- WordPress `7.1` in the plugin header.
 - PHP `>=8.5` in `composer.json` and `8.5` in `.wp-env.json`.
 - WooCommerce `10.0` in the plugin header and `wp-plugin/woocommerce`
-  `10.9.*` as a development dependency.
+  `11.1.*` as a development dependency.
 - Composer for PHP dependency installation and autoload generation.
 - Node.js `>=26` and npm `>=11` for JavaScript, CSS, block, and markdown
   tooling.
