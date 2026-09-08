@@ -20,8 +20,8 @@
  * Update URI:              https://github.com/a8cteam51/a8csp-plugin-template
  * Description:             A template for A8C Special Projects plugins.
  * Version:                 1.0.0
- * Requires at least:       7.0
- * Tested up to:            7.0
+ * Requires at least:       7.1
+ * Tested up to:            7.1
  * Requires PHP:            8.5
  * Author:                  A8C Special Projects
  * Author URI:              https://specialprojects.automattic.com
@@ -30,7 +30,7 @@
  * Text Domain:             a8csp-plugin-template
  * Domain Path:             /languages
  * WC requires at least:    10.0
- * WC tested up to:         10.9
+ * WC tested up to:         11.1
  */
 
 \defined( 'ABSPATH' ) || exit;

@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 /**
  * Verifies the requirements gate degrades gracefully on a below-floor runtime.
  *
- * Runs in both matrix entries: at-floor it must pass, below-floor (WP 6.9.4)
- * it must yield a WP_Error without loading the plugin proper.
+ * Runs in both tiers: at or above the floor it must pass, below-floor it must yield
+ * a WP_Error without loading the plugin proper.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -25,7 +25,7 @@ final class RequirementsCheckTest extends TestCase {
 	public function test_requirements_gate_matches_runtime(): void {
 		self::assertTrue( \defined( 'A8CSP_TEMPLATE_REQUIREMENTS_RESULT' ) );
 
-		if ( \version_compare( $GLOBALS['wp_version'], '7.0', '<' ) ) {
+		if ( \version_compare( $GLOBALS['wp_version'], '7.1', '<' ) ) {
 			self::assertInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
 			self::assertFalse( \function_exists( 'a8csp_template_plugin' ) );
 		} else {
