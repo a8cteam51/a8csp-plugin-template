@@ -98,6 +98,10 @@
       "if [ -n \"$GITHUB_ACTIONS\" ]; then echo 'CI owns the wp-env lifecycle — skipping start.'; else ./node_modules/.bin/wp-env --config .wp-env.tests.json start; fi",
       "npm --prefix=. run test:integration"
     ],
+    "test:integration:no-wc": [
+      "if [ -n \"$GITHUB_ACTIONS\" ]; then echo 'CI owns the wp-env lifecycle — skipping start.'; else ./node_modules/.bin/wp-env --config .wp-env.tests.json start; fi",
+      "npm --prefix=. run test:integration:no-wc"
+    ],
     "test:requirements": [
       "if [ -n \"$GITHUB_ACTIONS\" ]; then echo 'CI owns the wp-env lifecycle — skipping start.'; else ./node_modules/.bin/wp-env --config .wp-env.belowfloor.json start; fi",
       "npm --prefix=. run test:requirements"

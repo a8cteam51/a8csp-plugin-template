@@ -119,8 +119,9 @@ WooCommerce tier:
    WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`,
    `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including
    `tests/Unit/wc-host-stubs.php`).
-9. Remove the WooCommerce-less proof section from `tests/README.md` and the
-   `test:integration:no-wc` script from `package.json`.
+9. Remove the WooCommerce-less proof section from `tests/README.md`, the
+   `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
+   `integration-no-wc` job from `.github/workflows/tests.yml`.
 10. Rewrite the WooCommerce-flavored prose: the Installation and After Activation sections of
     `README.md`, and the WooCommerce references in this document.
 11. Run `composer quality-check`. What remains — blocks, settings, the component list, the
