@@ -70,8 +70,9 @@ and these repository custom properties:
 
 The script replaces the following tracked template values:
 
-- `EXAMPLE_REPO_NAME` and `EXAMPLE_REPO_DESCRIPTION` in the generated
-  `README.md`.
+- `EXAMPLE_REPO_NAME`, `EXAMPLE_REPO_SLUG`, and `EXAMPLE_REPO_DESCRIPTION` in
+  the generated `README.md`, with the title, the repository name, and the
+  description.
 - `A8CSP Template Plugin` and `A template for A8C Special Projects plugins.`
   outside the generated README, with the repository's title and description.
 - `a8csp/plugin-template` (the Composer package name) with `a8csp/` followed by

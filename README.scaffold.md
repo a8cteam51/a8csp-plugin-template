@@ -1,39 +1,22 @@
 # EXAMPLE_REPO_NAME
 
-**Contributors:** wpspecialprojects
-**Tags:**
-**Requires at least:** 7.1
-**Tested up to:** 7.1
-**Requires PHP:** 8.5
-**Stable tag:** 1.0.0
-**License:** GPL v2 or later
-**License URI:** <https://www.gnu.org/licenses/gpl-2.0.html>
-
 EXAMPLE_REPO_DESCRIPTION
 
-## Description
+## Requirements
 
-Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed leo ligula, aliquam et sem luctus, placerat facilisis orci. Cras faucibus, odio ac aliquet scelerisque, nisi ligula dignissim nisi, sed tincidunt magna libero vitae dui. Sed varius lectus turpis, fringilla maximus libero posuere nec. Aenean volutpat pharetra sem, et cursus leo sodales quis.
+This plugin is a WooCommerce extension. It needs the WordPress, PHP, and WooCommerce versions its plugin header declares (`Requires at least`, `Requires PHP`, `WC requires at least`); below the WooCommerce floor it stays off and shows an admin notice naming the version it needs.
 
 ## Installation
 
-This plugin is a WooCommerce extension: it requires WooCommerce at the `WC requires at least` version declared in the plugin header, and stays off with an explanatory notice otherwise. Install `EXAMPLE_REPO_NAME` either manually or through your site's plugins page.
+1. Download `EXAMPLE_REPO_SLUG.zip` from the latest release of this repository.
+1. Upload it through **Plugins → Add New Plugin → Upload Plugin**, or unzip it into `/wp-content/plugins/`; it unpacks to an `EXAMPLE_REPO_SLUG` folder.
+1. Activate the plugin from the **Plugins** screen.
 
-### INSTALL FROM WITHIN WORDPRESS
+With WooCommerce active at the required version, the plugin's settings appear in two places: a field on the **Settings → General** page, and a section of the **Advanced** tab on the WooCommerce **Settings** page.
 
-1. Visit the plugins page withing your dashboard and select `Add New`.
-1. Search for `EXAMPLE_REPO_NAME` and click the `Install Now` button.
-1. Activate the plugin from within your `Plugins` page.
+## Updates
 
-### INSTALL MANUALLY
-
-1. Download the plugin from <https://wordpress.org/plugins/> and unzip the archive.
-1. Upload the `EXAMPLE_REPO_NAME` folder to the `/wp-content/plugins/` directory.
-1. Activate the plugin through the `Plugins` menu in WordPress.
-
-### AFTER ACTIVATION
-
-If the minimum required version of WooCommerce is present, you will find a section present in the `Advanced` tab of the WooCommerce `Settings` page. Aliquam dolor sem, convallis malesuada neque sit amet, dictum mattis velit. Vestibulum at pharetra metus. Suspendisse rhoncus libero nisi, sed rhoncus tortor aliquam pretium.
+The plugin updates itself from this repository's GitHub releases through its `Update URI` header, so WordPress offers a new release like any other plugin update. The check calls the GitHub API without authentication, which works only while the repository is public. An installed prerelease (a version containing `-`) follows every release; a stable installation follows stable releases only.
 
 ## Development
 
@@ -52,6 +35,8 @@ The architecture map, the component model, and the reshaping recipes (including 
 plugin down to plain WordPress) live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the test
 workflow lives in [`tests/README.md`](tests/README.md).
 
+`composer packages-update` and `npm run packages-update` update every dependency within the range its manifest declares. `npm run packages-update:wp` moves the `@wordpress/*` packages, across major versions, to the npm dist-tag named in the script; keep that tag at the plugin's WordPress floor.
+
 ### Releasing
 
 Releases are cut by pushing a version tag; the release workflow fails closed unless the plugin header, `package.json`, and the newest `CHANGELOG.md` entry all agree with the tag, and unless green trunk-push Quality and Tests runs exist at the exact tagged commit — so tag trunk `HEAD` only after those runs finish. `CHANGELOG.md` is generated from the fragments in `changelog/` by `composer changelog:write`, which derives the next version from the newest existing changelog entry and the fragments' significance. The first release starts from the scaffold's empty changelog, so it must pass its version explicitly:
@@ -62,24 +47,13 @@ composer changelog:write -- --use-version=1.0.0
 
 Prerelease entries also take an explicit version (`--use-version`, or the `--prerelease` suffix option); from the first stable entry onward, a bare `composer changelog:write` suffices.
 
-## Frequently Asked Questions
+The release history is [`CHANGELOG.md`](CHANGELOG.md).
 
-### How can I get help if I'm stuck?
+## Publishing on wordpress.org
 
-Quisque volutpat tortor id varius pulvinar. Vivamus porttitor, mi non auctor pellentesque, leo purus interdum libero, at aliquam justo lectus sed ligula.
+This plugin releases as a GitHub zip. Publishing it in the wordpress.org plugin directory is a per-plugin decision, and it takes at least:
 
-### I have a question that is not listed here
-
-Duis efficitur, sapien ac scelerisque placerat, elit justo tempor nisl, ut feugiat magna orci quis odio.
-
-## Screenshots
-
-### 1. Example screenshot
-
-[missing image]
-
-## Changelog
-
-### 1.0.0 (FIRST RELEASE DATE)
-
-* First official release.
+- a `readme.txt` in the directory's readme format;
+- the slug wordpress.org assigns from the plugin name, which can differ from this repository's name, with the `Text Domain` changed to match it so language packs apply;
+- removing the GitHub self-updater (the `Update URI` header and its `update_plugins_github.com` filter), because directory plugins may only update through wordpress.org;
+- a release step that deploys each tagged release to the plugin's wordpress.org SVN repository.
