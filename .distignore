@@ -1,6 +1,6 @@
 # Baseline wp dist-archive exclusions, adapted for a8csp-plugin-template.
-# wp dist-archive walks the disk (not git), so vendor/ and freshly built
-# block/asset output are included automatically; this file removes
+# wp dist-archive walks the disk (not git), so vendor/ and the committed
+# block/asset build output are included automatically; this file removes
 # everything else that must not ship in the release zip.
 #
 # Patterns follow gitignore semantics: a bare name (no slash) matches at
