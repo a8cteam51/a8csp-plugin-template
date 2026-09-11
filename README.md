@@ -56,9 +56,9 @@ For generated repositories, the workflow:
 5. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
 6. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
    template's teaching prose (see below).
-7. Syntax-checks every generated PHP file.
-8. Regenerates `package-lock.json`, rebuilds the committed assets, and re-locks Composer against
+7. Regenerates `package-lock.json`, rebuilds the committed assets, and re-locks Composer against
    the renamed identity.
+8. Syntax-checks every generated PHP file.
 9. Deletes the spent scaffold workflows and the template guard.
 10. Commits and pushes the generated files.
 
