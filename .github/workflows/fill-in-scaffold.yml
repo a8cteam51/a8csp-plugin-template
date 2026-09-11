@@ -19,7 +19,8 @@ concurrency:
 jobs:
   fill-scaffold:
     name: Fill in the placeholders
-    if: github.repository != 'a8cteam51/a8csp-plugin-template'
+    # The template's immutable repository ID survives renames and transfers; every generated repository has its own.
+    if: github.repository_id != '1297277915'
 
     runs-on: ubuntu-latest
     timeout-minutes: 45
