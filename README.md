@@ -186,8 +186,8 @@ composer run-script internationalize
 
 The tracked `languages/*.pot` file is an example of that output, generated from the template's own
 strings; regenerate it after changing translatable strings with `composer i18n:makepot` (the full
-`internationalize` script additionally refreshes `.po`/`.mo`/`.l10n.php` files when translations
-exist).
+`internationalize` script additionally refreshes `.po`/`.mo`/`.l10n.php` files and the
+JavaScript translation `.json` files when translations exist).
 
 ## Quality checks
 

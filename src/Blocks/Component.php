@@ -57,6 +57,12 @@ final class Component extends AbstractComponent {
 	 * fires `editor.ready` for any editor extensions the plugin ships — only runs once the handle is
 	 * enqueued here.
 	 *
+	 * Blocks receive their script translations automatically from the `textdomain` in `block.json`;
+	 * a script registered by hand, like this one, loads them only through
+	 * `wp_set_script_translations()`, which reads the JSON files `composer internationalize`
+	 * generates with `wp i18n make-json`. The hub has no strings of its own, so this call is what
+	 * translates any string an editor extension adds to the bundle.
+	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *
