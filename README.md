@@ -123,7 +123,7 @@ The tracked template files declare these runtime targets:
 
 - WordPress `7.1` in the plugin header.
 - PHP `>=8.5` in `composer.json` and `8.5` in `.wp-env.json`.
-- WooCommerce `10.0` in the plugin header and `wp-plugin/woocommerce`
+- WooCommerce `11.1` in the plugin header and `wp-plugin/woocommerce`
   `11.1.*` as a development dependency.
 - Composer for PHP dependency installation and autoload generation.
 - Node.js `>=26` and npm `>=11` for JavaScript, CSS, block, and markdown

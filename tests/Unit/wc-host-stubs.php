@@ -22,5 +22,5 @@ if ( ! \class_exists( 'WooCommerce' ) ) {
 }
 
 if ( ! \defined( 'WC_VERSION' ) ) {
-	\define( 'WC_VERSION', '10.0.0' );
+	\define( 'WC_VERSION', '11.1.0' );
 }
