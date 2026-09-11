@@ -122,8 +122,8 @@ WooCommerce tier:
 9. Remove the WooCommerce-less proof section from `tests/README.md`, the
    `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
    `integration-no-wc` job from `.github/workflows/tests.yml`.
-10. Rewrite the WooCommerce-flavored prose: the Installation and After Activation sections of
-    `README.md`, and the WooCommerce references in this document.
+10. Rewrite the WooCommerce-flavored prose: the Requirements section and the settings sentence
+    under Installation in `README.md`, and the WooCommerce references in this document.
 11. Run `composer quality-check`. What remains — blocks, settings, the component list, the
     `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 
