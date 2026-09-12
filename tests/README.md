@@ -30,31 +30,30 @@ fixtures at three WordPress-version tiers.
 `PluginBootWithoutWooCommerceTest` verifies the plugin-wide host gate: with WooCommerce inactive
 the plugin stays un-booted and stages the "requires WooCommerce" notice instead of registering
 anything. It self-skips whenever WooCommerce is active, so the proof needs WooCommerce deactivated
-just for its run. With the tests wp-env instance started, one command does the whole dance:
+just for its run. One command does the whole dance, starting the tests wp-env instance first:
 
 ```sh
-npm run wp-env:tests:start
-npm run test:integration:no-wc
-npm run wp-env:tests:stop
+composer test:integration:no-wc
 ```
 
-`test:integration:no-wc` deactivates WooCommerce in the tests wp-env instance, runs that one test
-directly, then reactivates WooCommerce — carrying the test's exit status through — so the instance
-is left ready for the Integration suite. Its three steps are:
+CI runs it as its own Tests job. `test:integration:no-wc` deactivates WooCommerce in the tests
+wp-env instance, runs that one test directly with `--fail-on-skipped`, then reactivates
+WooCommerce — carrying the test's exit status through — so the instance is left ready for the
+Integration suite, and a run in which WooCommerce stayed active fails instead of skipping. Its
+three steps are:
 
 ```sh
 wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce
-wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --filter=PluginBootWithoutWooCommerceTest
+wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Integration --filter=PluginBootWithoutWooCommerceTest --fail-on-skipped
 wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce
 ```
 
 ## Running the suites
 
-Each of the three wp-env-backed verbs — `test:integration`, `test:requirements` and `test:multisite`
-— starts its own environment first: a container already running serves the mount set it was created
-with, and `start` is what replaces it when the resolved config moved. `test:unit` needs no container
-and starts none, and `test:integration:no-wc` is an npm script rather than a composer verb, which is
-why its recipe above still starts the environment by hand.
+Each of the wp-env-backed verbs — `test:integration`, `test:integration:no-wc`, `test:requirements`
+and `test:multisite` — starts its own environment first: a container already running serves the
+mount set it was created with, and `start` is what replaces it when the resolved config moved.
+`test:unit` needs no container and starts none.
 
 The `[ -n "$GITHUB_ACTIONS" ]` guard in front of that start keeps it out of CI, which owns the
 container's lifecycle in its own step, and says so rather than skipping in silence. On the

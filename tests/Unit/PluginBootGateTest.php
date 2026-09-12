@@ -105,7 +105,7 @@ final class PluginBootGateTest extends TestCase {
 	 */
 	#[RunInSeparateProcess]
 	public function test_boot_below_the_host_floor_stays_unbooted(): void {
-		\define( 'WC_VERSION', '9.0.0' );
+		\define( 'WC_VERSION', '11.0.0' );
 		require_once __DIR__ . '/wc-host-stubs.php';
 
 		$plugin = new Plugin();
@@ -117,6 +117,7 @@ final class PluginBootGateTest extends TestCase {
 		$notice   = $this->staged_notice();
 		$rendered = $this->render_notice( $notice );
 		self::assertStringContainsString( 'or newer', $rendered );
+		self::assertStringContainsString( (string) a8csp_template_get_plugin_metadata( 'WC requires at least' ), $rendered );
 		self::assertStringContainsString( \constant( 'WC_VERSION' ), $rendered );
 
 		$GLOBALS['a8csp_template_test_user_can'] = false;

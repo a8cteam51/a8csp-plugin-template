@@ -57,11 +57,11 @@ final class PluginMetadataCacheTest extends TestCase {
 		$GLOBALS['a8csp_template_test_actions']     = array( 'plugins_loaded' => 1 );
 		$GLOBALS['a8csp_template_test_plugin_data'] = array(
 			'Name'                 => 'A8CSP Template Plugin',
-			'WC requires at least' => '10.0',
+			'WC requires at least' => '11.1',
 		);
-		self::assertSame( '10.0', a8csp_template_get_plugin_metadata( 'WC requires at least' ), 'The host gate read at plugins_loaded must see the header WooCommerce registered after this plugin was included' );
+		self::assertSame( '11.1', a8csp_template_get_plugin_metadata( 'WC requires at least' ), 'The host gate read at plugins_loaded must see the header WooCommerce registered after this plugin was included' );
 
 		$GLOBALS['a8csp_template_test_plugin_data'] = array( 'Name' => 'mutated' );
-		self::assertSame( '10.0', a8csp_template_get_plugin_metadata( 'WC requires at least' ), 'A read taken once every plugin has loaded is stable and memoized for the request' );
+		self::assertSame( '11.1', a8csp_template_get_plugin_metadata( 'WC requires at least' ), 'A read taken once every plugin has loaded is stable and memoized for the request' );
 	}
 }
