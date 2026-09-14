@@ -38,8 +38,9 @@ composer test:integration:no-wc
 
 CI runs it as its own Tests job. `test:integration:no-wc` deactivates WooCommerce in the tests
 wp-env instance, runs that one test directly with `--fail-on-skipped`, then reactivates
-WooCommerce — carrying the test's exit status through — so the instance is left ready for the
-Integration suite, and a run in which WooCommerce stayed active fails instead of skipping. Its
+WooCommerce — failing when either the test or the reactivation fails — so the instance is left
+ready for the Integration suite, and a run in which WooCommerce stayed active fails instead of
+skipping. Its
 three steps are:
 
 ```sh
