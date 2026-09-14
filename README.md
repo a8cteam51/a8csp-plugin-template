@@ -56,9 +56,9 @@ For generated repositories, the workflow:
 5. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
 6. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
    template's teaching prose (see below).
-7. Syntax-checks every generated PHP file.
-8. Regenerates `package-lock.json`, rebuilds the committed assets, and re-locks Composer against
+7. Regenerates `package-lock.json`, rebuilds the committed assets, and re-locks Composer against
    the renamed identity.
+8. Syntax-checks every generated PHP file.
 9. Deletes the spent scaffold workflows and the template guard.
 10. Commits and pushes the generated files.
 
@@ -70,8 +70,9 @@ and these repository custom properties:
 
 The script replaces the following tracked template values:
 
-- `EXAMPLE_REPO_NAME` and `EXAMPLE_REPO_DESCRIPTION` in the generated
-  `README.md`.
+- `EXAMPLE_REPO_NAME`, `EXAMPLE_REPO_SLUG`, and `EXAMPLE_REPO_DESCRIPTION` in
+  the generated `README.md`, with the title, the repository name, and the
+  description.
 - `A8CSP Template Plugin` and `A template for A8C Special Projects plugins.`
   outside the generated README, with the repository's title and description.
 - `a8csp/plugin-template` (the Composer package name) with `a8csp/` followed by
@@ -123,7 +124,7 @@ The tracked template files declare these runtime targets:
 
 - WordPress `7.1` in the plugin header.
 - PHP `>=8.5` in `composer.json` and `8.5` in `.wp-env.json`.
-- WooCommerce `10.0` in the plugin header and `wp-plugin/woocommerce`
+- WooCommerce `11.1` in the plugin header and `wp-plugin/woocommerce`
   `11.1.*` as a development dependency.
 - Composer for PHP dependency installation and autoload generation.
 - Node.js `>=26` and npm `>=11` for JavaScript, CSS, block, and markdown
@@ -185,8 +186,8 @@ composer run-script internationalize
 
 The tracked `languages/*.pot` file is an example of that output, generated from the template's own
 strings; regenerate it after changing translatable strings with `composer i18n:makepot` (the full
-`internationalize` script additionally refreshes `.po`/`.mo`/`.l10n.php` files when translations
-exist).
+`internationalize` script additionally refreshes `.po`/`.mo`/`.l10n.php` files and the
+JavaScript translation `.json` files when translations exist).
 
 ## Quality checks
 

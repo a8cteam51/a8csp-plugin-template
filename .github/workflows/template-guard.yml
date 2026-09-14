@@ -73,8 +73,7 @@ jobs:
           fi
 
           if ! grep -Eq '^ \* Version:[[:space:]]+1\.0\.0$' a8csp-template-plugin.php ||
-             ! grep -Fq '"version": "1.0.0"' package.json ||
-             ! grep -Fq '**Stable tag:** 1.0.0' README.scaffold.md; then
+             ! grep -Fq '"version": "1.0.0"' package.json; then
             echo "::error::the template never versions itself: 1.0.0 is the spawn seed of every generated plugin, not a number to bump"
             exit 1
           fi

@@ -79,6 +79,7 @@ const buildTemplate = async ( filePath ) => {
 	if ( 'README.md' === filePath ) {
 		replacements = {
 			EXAMPLE_REPO_NAME: title,
+			EXAMPLE_REPO_SLUG: repository.name,
 			EXAMPLE_REPO_DESCRIPTION: repository.description ?? '',
 		};
 	} else {

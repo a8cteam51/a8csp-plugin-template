@@ -239,10 +239,16 @@ const MANIFEST = [
 			'\t * Registers and enqueues the plugin-level block-editor script. A registered-but-not-enqueued',
 			'\t * handle never loads, so the editor hook hub in `assets/js/src/editor.js` — the entry point that',
 			'\t * fires `editor.ready` for any editor extensions the plugin ships — only runs once the handle is',
-			'\t * enqueued here.'
+			'\t * enqueued here.',
+			'\t *',
+			'\t * Blocks receive their script translations automatically from the `textdomain` in `block.json`;',
+			'\t * a script registered by hand, like this one, loads them only through',
+			'\t * `wp_set_script_translations()`, which reads the JSON files `composer internationalize`',
+			'\t * generates with `wp i18n make-json`. The hub has no strings of its own, so this call is what',
+			'\t * translates any string an editor extension adds to the bundle.'
 		),
 		to: block(
-			"\t * Registers and enqueues the plugin's block-editor script."
+			"\t * Registers and enqueues the plugin's block-editor script and its translations."
 		),
 	},
 
