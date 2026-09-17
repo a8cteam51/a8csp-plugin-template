@@ -31,8 +31,7 @@ final class PluginMetadataCacheTest extends TestCase {
 		parent::setUp();
 
 		\defined( 'ABSPATH' ) || \define( 'ABSPATH', '/tmp/' );
-		\defined( 'WP_PLUGIN_DIR' ) || \define( 'WP_PLUGIN_DIR', '/tmp/plugins' );
-		\defined( 'A8CSP_TEMPLATE_BASENAME' ) || \define( 'A8CSP_TEMPLATE_BASENAME', 'a8csp-template-plugin/a8csp-template-plugin.php' );
+		\defined( 'A8CSP_TEMPLATE_FILE' ) || \define( 'A8CSP_TEMPLATE_FILE', '/tmp/plugins/a8csp-template-plugin/a8csp-template-plugin.php' );
 
 		require_once __DIR__ . '/wp-bootstrap-stubs.php';
 		require_once \dirname( __DIR__, 2 ) . '/functions-bootstrap.php';

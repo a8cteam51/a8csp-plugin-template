@@ -43,7 +43,7 @@ function a8csp_template_get_plugin_metadata( $property = null ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_file = trailingslashit( WP_PLUGIN_DIR ) . \constant( 'A8CSP_TEMPLATE_BASENAME' );
+		$plugin_file = \constant( 'A8CSP_TEMPLATE_FILE' );
 		$metadata    = get_plugin_data( $plugin_file, false, $can_translate );
 
 		// Extra plugin headers — WooCommerce's `WC requires at least` — exist only once the
