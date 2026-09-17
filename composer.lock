@@ -13,20 +13,20 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/a8cteam51/a8csp-configs.git",
-                "reference": "2e1e743cd84de1b9c5417a65406088e4e235819a"
+                "reference": "20728a3ab37ef444e3a84019e9f3c306d621cad6"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/2e1e743cd84de1b9c5417a65406088e4e235819a",
-                "reference": "2e1e743cd84de1b9c5417a65406088e4e235819a",
+                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/20728a3ab37ef444e3a84019e9f3c306d621cad6",
+                "reference": "20728a3ab37ef444e3a84019e9f3c306d621cad6",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
                 "johnbillion/wp-compat": "^2",
                 "php": ">=8.5",
-                "php-stubs/wordpress-stubs": "*",
-                "phpcompatibility/phpcompatibility-wp": "*",
+                "php-stubs/wordpress-stubs": "^7",
+                "phpcompatibility/phpcompatibility-wp": "^2 || ^3",
                 "phpstan/extension-installer": "^1",
                 "phpstan/phpstan": "^2",
                 "phpstan/phpstan-deprecation-rules": "^2",
@@ -38,6 +38,9 @@
             },
             "require-dev": {
                 "composer/composer": "^2",
+                "phpcompatibility/php-compatibility": "^10@alpha",
+                "phpcompatibility/phpcompatibility-paragonie": "^2@alpha",
+                "phpcompatibility/phpcompatibility-wp": "^3@alpha",
                 "phpunit/phpunit": "^13"
             },
             "default-branch": true,
@@ -76,7 +79,7 @@
                 "source": "https://github.com/a8cteam51/a8csp-configs/tree/trunk",
                 "issues": "https://github.com/a8cteam51/a8csp-configs/issues"
             },
-            "time": "2026-09-14T10:34:04+00:00"
+            "time": "2026-09-17T14:43:42+00:00"
         },
         {
             "name": "automattic/jetpack-changelogger",
