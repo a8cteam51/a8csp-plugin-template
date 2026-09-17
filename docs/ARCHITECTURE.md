@@ -131,3 +131,11 @@ WooCommerce tier:
 `src/Plugin.php`, its option lines in the `footprint.php` manifest, `includes/settings.php`, and
 the example admin stylesheet (`assets/css/src/settings.scss` plus its `assets/css/build/`
 output).
+
+## Version tags on transplant
+
+Every PHP file here carries `@since` and `@version` in its docblocks, because this plugin ships
+from tagged releases and a reader can place any member against a published version. A component
+with no release channel — a continuously deployed mu-plugin, a single site's own theme — has
+nothing for the pair to name, so it omits them repo-wide rather than running two conventions side
+by side. Moving a file into such a repository drops the pair; moving one back out restores it.
