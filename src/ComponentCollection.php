@@ -10,6 +10,8 @@ namespace A8C\SpecialProjects\PluginTemplate;
  * hand-rolling them — has-a, not is-a: the collection runs components, so it does not implement
  * `ComponentInterface` itself.
  *
+ * @internal
+ *
  * @since   1.0.0
  * @version 1.0.0
  */

@@ -39,13 +39,45 @@ workflow lives in [`tests/README.md`](tests/README.md).
 
 ### Releasing
 
-Releases are cut by pushing a version tag; the release workflow fails closed unless the plugin header, `package.json`, and the newest `CHANGELOG.md` entry all agree with the tag, and unless green trunk-push Quality and Tests runs exist at the exact tagged commit — so tag trunk `HEAD` only after those runs finish. `CHANGELOG.md` is generated from the fragments in `changelog/` by `composer changelog:write`, which derives the next version from the newest existing changelog entry and the fragments' significance. The first release starts from the scaffold's empty changelog, so it must pass its version explicitly:
+Every pull request that changes behaviour carries a changelog fragment:
 
 ```sh
-composer changelog:write -- --use-version=1.0.0
+composer changelog:add
 ```
 
-Prerelease entries also take an explicit version (`--use-version`, or the `--prerelease` suffix option); from the first stable entry onward, a bare `composer changelog:write` suffices.
+The command asks for a significance (`patch`, `minor`, `major`), a type, and the entry text, then writes one file under `changelog/`; `-s`, `-t` and `-e` supply the same answers non-interactively. `composer changelog:validate` only checks the fragments that exist and passes on an empty directory, so a forgotten fragment surfaces as a missing release note rather than as a red check.
+
+Releases are cut from trunk, in four steps.
+
+1. **Materialize the changelog.** `composer changelog:write` derives the next version from the newest `CHANGELOG.md` entry and the pending fragments' significance, writes that section, and deletes the fragments it consumed. There is nothing to derive from while the changelog is empty, so the first release names its version explicitly, as does any prerelease:
+
+   ```sh
+   composer changelog:write -- --use-version=1.0.0
+   composer changelog:write -- --prerelease=beta.1
+   ```
+
+2. **Bump the other two versions to the same string.** The release refuses to run unless the plugin header's `Version:` in `EXAMPLE_REPO_SLUG.php`, `"version"` in `package.json`, and the newest `CHANGELOG.md` heading all state one version. The self-updater compares an installed copy against the header rather than against the tag, so the header bump belongs in the commit that gets tagged. Commit the three together and land them on trunk.
+
+3. **Let trunk go green, then rehearse.** The release reuses the trunk-push Quality and Tests runs from the exact commit it tags, so tag only once those have finished. With them green, run the **Release** workflow from the Actions tab leaving **Create the GitHub release** off: that exercises the version check, the provenance check, the build and the smoke install without creating anything.
+
+4. **Tag the green commit and publish the tag.**
+
+   ```sh
+   git tag -s "v1.0.0" -m "v1.0.0"
+   git push origin "v1.0.0"
+   ```
+
+   Tagging is the maintainer's step and the tag is signed, so expect the signing key's own confirmation prompt and GitHub reporting the tag as verified. The workflow triggers on `v*` tags only, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
+
+Both paths — the tag and the rehearsal — run the same jobs, and only the last one is conditional:
+
+| Job | What it proves |
+| --- | --- |
+| Verify release version | The plugin header, `package.json` and the newest `CHANGELOG.md` entry state one version. On a tag the tag states it too; on a dispatch there is no tag, so only the three declared versions are held against each other. Turning the release on from a non-tag ref fails here by design, which is why a dispatch cannot publish by accident. |
+| Verify release provenance | Trunk-push runs of `quality.yml` and `tests.yml` succeeded at this exact commit. A missing or red run fails the job; fix it, land the fix, and re-tag. |
+| Build the release artifact | Validates the changelog, installs production dependencies only, regenerates the committed POT — failing loudly if `make-pot` does not recognise the plugin — and packs `EXAMPLE_REPO_SLUG.zip`. |
+| Smoke test the artifact | Installs and activates that zip in a throwaway wp-env and checks the site serves. The artifact differs from the tested tree (production dependencies, a regenerated POT, `.distignore` filtering), so it is proven on its own. |
+| Publish the release | Runs only when the release is turned on. Takes the `CHANGELOG.md` section matching the tag as the release notes and creates the GitHub release with the zip attached. A hyphenated version such as `1.1.0-beta.1` publishes as a prerelease and stays off the latest-release endpoint, so stable installations are not offered it. |
 
 The release history is [`CHANGELOG.md`](CHANGELOG.md).
 

@@ -71,6 +71,7 @@ final class Component extends AbstractComponent {
 	 *
 	 * @return  void
 	 */
+	#[\Override]
 	public function initialize(): void {
 		$this->components = ComponentCollection::assemble( self::COMPONENTS );
 		$this->components->initialize();
@@ -84,6 +85,7 @@ final class Component extends AbstractComponent {
 	 *
 	 * @throws  \LogicException If the hook phase runs before initialization.
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		$components = $this->components ?? throw new \LogicException( 'Integrations group hooked before initialization.' );
 

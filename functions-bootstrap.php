@@ -43,7 +43,7 @@ function a8csp_template_get_plugin_metadata( $property = null ) {
 			require_once ABSPATH . 'wp-admin/includes/plugin.php';
 		}
 
-		$plugin_file = trailingslashit( WP_PLUGIN_DIR ) . \constant( 'A8CSP_TEMPLATE_BASENAME' );
+		$plugin_file = \constant( 'A8CSP_TEMPLATE_FILE' );
 		$metadata    = get_plugin_data( $plugin_file, false, $can_translate );
 
 		// Extra plugin headers — WooCommerce's `WC requires at least` — exist only once the
@@ -296,8 +296,8 @@ function a8csp_template_output_requirements_error( $error ) {
 			$requirements_error = wp_sprintf(
 				/* translators: 1: Plugin name, 2: Plugin version */
 				__( '<strong>%1$s (version %2$s)</strong> could not be initialized.', 'a8csp-plugin-template' ),
-				a8csp_template_get_plugin_metadata( 'Name' ),
-				a8csp_template_get_plugin_metadata( 'Version' )
+				a8csp_template_get_plugin_name(),
+				a8csp_template_get_plugin_version()
 			);
 
 			if ( $error->has_errors() ) {

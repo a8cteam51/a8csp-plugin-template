@@ -4,10 +4,11 @@
 		 bootstrap="tests/bootstrap.php"
 		 colors="true"
 		 cacheDirectory="tests/.cache/phpunit"
-		 executionOrder="depends,defects"
+		 executionOrder="depends,defects,random"
 
 		 beStrictAboutCoverageMetadata="true"
 		 beStrictAboutOutputDuringTests="true"
+		 failOnNotice="true"
 		 failOnRisky="true"
 		 failOnWarning="true"
 		 defaultTestSuite="Unit">
@@ -33,7 +34,9 @@
 	<source>
 		<include>
 			<directory>src</directory>
+			<directory>models</directory>
 			<directory>includes</directory>
+			<file>functions-bootstrap.php</file>
 		</include>
 	</source>
 </phpunit>

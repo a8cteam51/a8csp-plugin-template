@@ -112,6 +112,7 @@
     ],
 
     "quality-check": [
+      "@composer validate --strict",
       "@lint:php",
       "@test:unit"
     ],

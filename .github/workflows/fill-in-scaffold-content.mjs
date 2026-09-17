@@ -460,6 +460,33 @@ const MANIFEST = [
 			'\t * Adds a demonstration entry to the payment metadata WooPayments generates from an order.'
 		),
 	},
+	// The @api/@internal split is carried by the tags themselves; the prose teaching it is
+	// template-only.
+	{
+		action: 'replace-exact',
+		path: 'functions.php',
+		from: block(
+			"// This accessor is the plugin's whole supported surface for a peer plugin; the kernel classes",
+			'// behind it carry `@internal` and may change shape without notice.',
+			'',
+			''
+		),
+		to: '',
+	},
+
+	// `#[\\Override]` stays on every implementation; the passage explaining why is template-only.
+	{
+		action: 'replace-exact',
+		path: 'src/AbstractComponent.php',
+		from: block(
+			' * Every method fulfilling the contract — here and in every component — carries `#[\\Override]`.',
+			' * Without it, renaming a contract method that has a concrete default leaves the implementation',
+			' * silently orphaned rather than failing at compile time.',
+			' *',
+			''
+		),
+		to: '',
+	},
 ];
 
 const checkOnly = process.argv.includes( '--check' );

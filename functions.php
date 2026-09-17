@@ -6,12 +6,17 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
 
 // region META
 
+// This accessor is the plugin's whole supported surface for a peer plugin; the kernel classes
+// behind it carry `@internal` and may change shape without notice.
+
 /**
  * Returns the plugin's composition root.
  *
  * Construction only — never boots: a peer calling this at include time would otherwise run the
  * component gates before every plugin has loaded. Booting stays tied to the `plugins_loaded`
  * attachment in the main plugin file.
+ *
+ * @api
  *
  * @since   1.0.0
  * @version 1.0.0

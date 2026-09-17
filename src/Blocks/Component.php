@@ -26,6 +26,7 @@ final class Component extends AbstractComponent {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		add_action( 'init', array( $this, 'register_blocks' ) );
 		add_action( 'enqueue_block_editor_assets', array( $this, 'enqueue_editor_script' ) );

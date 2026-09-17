@@ -27,6 +27,7 @@ final class WooPayments extends AbstractComponent {
 	 *
 	 * @return  bool
 	 */
+	#[\Override]
 	public static function should_load(): bool {
 		return \class_exists( 'WC_Payments' );
 	}
@@ -37,6 +38,7 @@ final class WooPayments extends AbstractComponent {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		add_filter( 'wcpay_metadata_from_order', array( $this, 'add_order_metadata' ) );
 	}

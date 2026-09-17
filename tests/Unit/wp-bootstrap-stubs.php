@@ -28,22 +28,6 @@ if ( ! \function_exists( 'did_action' ) ) {
 	}
 }
 
-if ( ! \function_exists( 'trailingslashit' ) ) {
-	/**
-	 * Appends a single trailing slash, like the WordPress original.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @param   string $value The value to slash.
-	 *
-	 * @return  string
-	 */
-	function trailingslashit( $value ) {
-		return \rtrim( $value, '/' ) . '/';
-	}
-}
-
 if ( ! \function_exists( 'get_plugin_data' ) ) {
 	/**
 	 * Returns the staged plugin metadata, ignoring the file path like a canned parse would.

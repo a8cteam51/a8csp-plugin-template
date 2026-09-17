@@ -18,6 +18,8 @@ namespace A8C\SpecialProjects\PluginTemplate;
  * convention (`ContainerInterface`, `LoggerInterface`) and frees the `Component` name for the
  * implementations that folder convention creates.
  *
+ * @internal
+ *
  * @since   1.0.0
  * @version 1.0.0
  */
