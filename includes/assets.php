@@ -6,7 +6,8 @@
  * Returns an array with meta information for a given asset path. It starts from a fallback of the
  * file's last-modified time as the version with no dependencies, overlays the version and
  * dependencies from an `.asset.php` file beside the asset when one exists, and appends any extra
- * dependencies passed in.
+ * dependencies passed in. A malformed generated payload is ignored entry by entry, so a stale or
+ * hand-edited `.asset.php` degrades to the fallback rather than enqueuing a broken handle.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -36,12 +37,16 @@ function a8csp_template_get_asset_meta( string $asset_path, ?array $extra_depend
 	$asset_meta_file = "{$asset_pathinfo['dirname']}/{$asset_pathinfo['filename']}.asset.php";
 	if ( \file_exists( $asset_meta_file ) ) {
 		$asset_meta_generated = require $asset_meta_file;
+		if ( \is_array( $asset_meta_generated ) ) {
+			if ( \is_string( $asset_meta_generated['version'] ?? null ) ) {
+				$asset_meta['version'] = $asset_meta_generated['version'];
+			}
 
-		if ( isset( $asset_meta_generated['version'] ) ) {
-			$asset_meta['version'] = $asset_meta_generated['version'];
-		}
-		if ( isset( $asset_meta_generated['dependencies'] ) ) {
-			$asset_meta['dependencies'] = $asset_meta_generated['dependencies'];
+			if ( \is_array( $asset_meta_generated['dependencies'] ?? null ) ) {
+				$asset_meta['dependencies'] = \array_values(
+					\array_filter( $asset_meta_generated['dependencies'], static fn ( mixed $dependency ): bool => \is_string( $dependency ) && '' !== $dependency )
+				);
+			}
 		}
 	}
 
