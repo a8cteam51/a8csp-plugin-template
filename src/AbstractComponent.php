@@ -16,6 +16,8 @@ namespace A8C\SpecialProjects\PluginTemplate;
  * Without it, renaming a contract method that has a concrete default leaves the implementation
  * silently orphaned rather than failing at compile time.
  *
+ * @internal
+ *
  * @since   1.0.0
  * @version 1.0.0
  */

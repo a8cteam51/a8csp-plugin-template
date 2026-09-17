@@ -15,6 +15,8 @@ namespace A8C\SpecialProjects\PluginTemplate;
  * `src/` root holds only this bootstrapping mechanism. The root itself deliberately does not
  * implement `ComponentInterface`: it runs the contract, so it cannot also be subject to it.
  *
+ * @internal
+ *
  * @since   1.0.0
  * @version 1.0.0
  */
