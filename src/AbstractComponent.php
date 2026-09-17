@@ -12,6 +12,10 @@ namespace A8C\SpecialProjects\PluginTemplate;
  * extending is optional — implement the interface directly whenever any default doesn't fit or
  * the explicit methods teach better.
  *
+ * Every method fulfilling the contract — here and in every component — carries `#[\Override]`.
+ * Without it, renaming a contract method that has a concrete default leaves the implementation
+ * silently orphaned rather than failing at compile time.
+ *
  * @since   1.0.0
  * @version 1.0.0
  */
@@ -24,6 +28,7 @@ abstract class AbstractComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public static function should_load(): bool {
 		return true;
 	}
@@ -34,6 +39,7 @@ abstract class AbstractComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function initialize(): void {}
 
 	// endregion

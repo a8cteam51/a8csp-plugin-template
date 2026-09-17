@@ -31,6 +31,7 @@ final class Component extends AbstractComponent {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		// The Settings API is only loaded in the admin, so registration stages onto admin_init.
 		add_action( 'admin_init', array( $this, 'register_settings' ) );

@@ -47,6 +47,7 @@ final class Component implements ComponentInterface {
 	 *
 	 * @return  bool
 	 */
+	#[\Override]
 	public static function should_load(): bool {
 		return \class_exists( 'WC_Subscriptions' );
 	}
@@ -57,6 +58,7 @@ final class Component implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function initialize(): void {
 		$this->price_note = new PriceNote();
 	}
@@ -69,6 +71,7 @@ final class Component implements ComponentInterface {
 	 *
 	 * @throws  \LogicException If the hook phase runs before initialization.
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		$price_note = $this->price_note ?? throw new \LogicException( 'WooCommerce Subscriptions integration hooked before initialization.' );
 
