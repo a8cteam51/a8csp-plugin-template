@@ -27,6 +27,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass( Settings\Component::class )]
 #[UsesClass( WooCommerceSubscriptions\Component::class )]
 final class ComponentCollectionTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Starts each test with empty hook and phase-event ledgers.
 	 *
@@ -41,6 +43,10 @@ final class ComponentCollectionTest extends TestCase {
 		$GLOBALS['a8csp_template_test_hooks']        = array();
 		$GLOBALS['a8csp_template_test_phase_events'] = array();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * A closed gate keeps its component out of the collection — no construction, no activity —
@@ -108,6 +114,10 @@ final class ComponentCollectionTest extends TestCase {
 		self::assertLessThan( $first_hook, $last_readiness, 'every readiness event must precede every hook event' );
 	}
 
+	// endregion.
+
+	// region HELPERS.
+
 	/**
 	 * Returns the highest index in the event log whose entry begins with the given prefix.
 	 *
@@ -152,6 +162,8 @@ final class ComponentCollectionTest extends TestCase {
 
 		self::fail( "no event with the '{$prefix}' prefix was recorded" );
 	}
+
+	// endregion.
 }
 
 /**
@@ -163,12 +175,15 @@ final class ComponentCollectionTest extends TestCase {
  * @version 1.0.0
  */
 final class FirstPhaseRecordingComponent implements ComponentInterface {
+	// region METHODS.
+
 	/**
 	 * {@inheritDoc}
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public static function should_load(): bool {
 		return true;
 	}
@@ -179,6 +194,7 @@ final class FirstPhaseRecordingComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function initialize(): void {
 		$GLOBALS['a8csp_template_test_phase_events'][] = 'init:first';
 	}
@@ -189,9 +205,12 @@ final class FirstPhaseRecordingComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		$GLOBALS['a8csp_template_test_phase_events'][] = 'hooks:first';
 	}
+
+	// endregion.
 }
 
 /**
@@ -202,12 +221,15 @@ final class FirstPhaseRecordingComponent implements ComponentInterface {
  * @version 1.0.0
  */
 final class SecondPhaseRecordingComponent implements ComponentInterface {
+	// region METHODS.
+
 	/**
 	 * {@inheritDoc}
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public static function should_load(): bool {
 		return true;
 	}
@@ -218,6 +240,7 @@ final class SecondPhaseRecordingComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function initialize(): void {
 		$GLOBALS['a8csp_template_test_phase_events'][] = 'init:second';
 	}
@@ -228,7 +251,10 @@ final class SecondPhaseRecordingComponent implements ComponentInterface {
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 */
+	#[\Override]
 	public function register_hooks(): void {
 		$GLOBALS['a8csp_template_test_phase_events'][] = 'hooks:second';
 	}
+
+	// endregion.
 }

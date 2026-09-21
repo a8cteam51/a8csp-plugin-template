@@ -21,6 +21,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( WooPayments::class )]
 #[UsesClass( AbstractComponent::class )]
 final class WooPaymentsTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Starts each test with an empty hook-registration ledger.
 	 *
@@ -34,6 +36,10 @@ final class WooPaymentsTest extends TestCase {
 
 		$GLOBALS['a8csp_template_test_hooks'] = array();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Without the WooPayments companion, the gate reports the integration as not needed.
@@ -86,4 +92,6 @@ final class WooPaymentsTest extends TestCase {
 		self::assertSame( 'entry', $metadata['existing'] );
 		self::assertSame( 'demonstration-value', $metadata['a8csp_template_example'] );
 	}
+
+	// endregion.
 }

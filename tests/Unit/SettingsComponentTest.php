@@ -19,6 +19,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( Settings\Component::class )]
 #[UsesClass( AbstractComponent::class )]
 final class SettingsComponentTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Starts each test with an empty hook-registration ledger.
 	 *
@@ -32,6 +34,10 @@ final class SettingsComponentTest extends TestCase {
 
 		$GLOBALS['a8csp_template_test_hooks'] = array();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * The component is core functionality behind the plugin-wide host gate, so its own gate is
@@ -64,4 +70,6 @@ final class SettingsComponentTest extends TestCase {
 		self::assertContains( 'woocommerce_get_sections_advanced', $GLOBALS['a8csp_template_test_hooks'] );
 		self::assertContains( 'woocommerce_get_settings_advanced', $GLOBALS['a8csp_template_test_hooks'] );
 	}
+
+	// endregion.
 }

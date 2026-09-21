@@ -20,6 +20,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class UninstallTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Removes the canary regardless of how the test finished, since this suite runs against
 	 * a persistent wp-env database with no per-test transaction rollback (see tests/README.md).
@@ -34,6 +36,10 @@ final class UninstallTest extends TestCase {
 
 		parent::tearDown();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Seeds a sentinel for every key the real footprint lists plus the canary, runs the real
@@ -85,6 +91,10 @@ final class UninstallTest extends TestCase {
 		self::assertSame( 'sentinel', get_option( 'a8csp_template_test_uninstall_canary' ), 'uninstall.php must not delete keys outside its footprint' );
 	}
 
+	// endregion.
+
+	// region HELPERS.
+
 	/**
 	 * Returns an existing user's ID to seed and verify user-meta deletion against. wp-env's
 	 * fixture always provisions the default admin (ID 1); querying for one keeps the test
@@ -107,4 +117,6 @@ final class UninstallTest extends TestCase {
 
 		return (int) $users[0];
 	}
+
+	// endregion.
 }

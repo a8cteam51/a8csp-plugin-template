@@ -28,6 +28,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass( WooCommerceSubscriptions\PriceNote::class )]
 #[UsesClass( WooPayments::class )]
 final class IntegrationsComponentTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Starts each test with an empty hook-registration ledger.
 	 *
@@ -41,6 +43,10 @@ final class IntegrationsComponentTest extends TestCase {
 
 		$GLOBALS['a8csp_template_test_hooks'] = array();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * With every companion absent, the group runs both phases without constructing a child or
@@ -85,4 +91,6 @@ final class IntegrationsComponentTest extends TestCase {
 		self::assertContains( 'woocommerce_get_settings_advanced', $GLOBALS['a8csp_template_test_hooks'] );
 		self::assertContains( 'woocommerce_subscriptions_product_price_string', $GLOBALS['a8csp_template_test_hooks'] );
 	}
+
+	// endregion.
 }

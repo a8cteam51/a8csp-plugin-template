@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class PluginBootTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Removes the example option the persistence round-trip seeds, regardless of how the test
 	 * finished, since this suite runs against a persistent wp-env database with no per-test
@@ -30,6 +32,10 @@ final class PluginBootTest extends TestCase {
 
 		parent::tearDown();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * On an at-floor runtime the requirements gate passes, `plugins_loaded` is wired to the
@@ -116,4 +122,6 @@ final class PluginBootTest extends TestCase {
 
 		self::assertStringContainsString( 'value="' . esc_attr( 'audit-sentinel' ) . '"', $field );
 	}
+
+	// endregion.
 }

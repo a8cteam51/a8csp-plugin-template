@@ -31,6 +31,8 @@ use PHPUnit\Framework\TestCase;
 #[UsesClass( Integrations\WooCommerceSubscriptions\Component::class )]
 #[UsesClass( Integrations\WooPayments::class )]
 final class PluginBootGateTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Loads the canned plugin metadata and the notice-rendering stand-ins the notice proofs invoke.
 	 * Both load here rather than globally: the metadata stub would collide with the real reader
@@ -62,6 +64,10 @@ final class PluginBootGateTest extends TestCase {
 		$GLOBALS['a8csp_template_test_hook_callbacks'] = array();
 		$GLOBALS['a8csp_template_test_user_can']       = true;
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Without the WooCommerce host, the boot latches un-booted behind the explanatory notice and
@@ -175,6 +181,10 @@ final class PluginBootGateTest extends TestCase {
 		self::assertCount( $hook_count, $GLOBALS['a8csp_template_test_hooks'] );
 	}
 
+	// endregion.
+
+	// region HELPERS.
+
 	/**
 	 * Fetches the single admin-notice callback the failed gate staged on `all_admin_notices`.
 	 *
@@ -206,4 +216,6 @@ final class PluginBootGateTest extends TestCase {
 
 		return (string) \ob_get_clean();
 	}
+
+	// endregion.
 }

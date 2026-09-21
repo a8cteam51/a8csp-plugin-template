@@ -16,6 +16,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class PluginBootWithoutWooCommerceTest extends TestCase {
+	// region TESTS.
+
 	/**
 	 * With WooCommerce inactive, the requirements gate still passes and the boot hook still runs,
 	 * but the host gate latches the plugin un-booted: the block is not registered, Settings wires
@@ -57,4 +59,6 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 		do_action( 'admin_init' );
 		self::assertArrayNotHasKey( 'a8csp_template_example_option', get_registered_settings() );
 	}
+
+	// endregion.
 }

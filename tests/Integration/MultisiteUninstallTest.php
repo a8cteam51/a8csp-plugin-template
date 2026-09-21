@@ -22,6 +22,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class MultisiteUninstallTest extends TestCase {
+	// region FIELDS AND CONSTANTS.
+
 	/**
 	 * The path of the second site this test creates. Leftovers under this path from an aborted
 	 * earlier run are swept before creating it again, since this suite runs against a persistent
@@ -42,6 +44,10 @@ final class MultisiteUninstallTest extends TestCase {
 	 */
 	private ?int $proof_site_id = null;
 
+	// endregion.
+
+	// region LIFECYCLE.
+
 	/**
 	 * Removes the canary and the proof site regardless of how the test finished, for the same
 	 * persistent-database reason the proof-site path is swept on entry.
@@ -60,6 +66,10 @@ final class MultisiteUninstallTest extends TestCase {
 
 		parent::tearDown();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Seeds a sentinel for every option the real footprint lists — plus the canary — on both the
@@ -114,6 +124,10 @@ final class MultisiteUninstallTest extends TestCase {
 		}
 	}
 
+	// endregion.
+
+	// region HELPERS.
+
 	/**
 	 * Creates the second site the sweep proof runs against and returns its ID, deleting any
 	 * leftover site under the proof path first so the creation cannot collide with the remains
@@ -146,4 +160,6 @@ final class MultisiteUninstallTest extends TestCase {
 
 		return $proof_site_id;
 	}
+
+	// endregion.
 }
