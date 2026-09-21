@@ -1,7 +1,7 @@
 <?php declare( strict_types=1 );
 /**
  * Uninstall handler. WordPress runs this file directly when the plugin is deleted, in a cold
- * bootstrap without the plugin loaded, so everything it deletes comes from a dependency-free
+ * bootstrap without the plugin loaded, so the durable keys it deletes come from a dependency-free
  * manifest.
  *
  * @since       1.0.0
