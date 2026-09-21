@@ -1,20 +1,9 @@
-# Baseline wp dist-archive exclusions, adapted for a8csp-plugin-template.
-# wp dist-archive walks the disk (not git), so vendor/ and the committed
-# block/asset build output are included automatically; this file removes
-# everything else that must not ship in the release zip.
-#
-# Patterns follow gitignore semantics: a bare name (no slash) matches at
-# any depth, a leading `/` anchors to the repo root. `/build` is root-
-# anchored on purpose — it excludes only the top-level build/ directory
-# (Infection mutation-testing logs), while blocks/build and the
-# assets/*/build directories (compiled block and script output) are left
-# alone and ship in the archive.
+# wp dist-archive walks the disk, not git, so this file lists everything the release zip must not
+# carry. `/build` holds Infection's logs; blocks/build and the assets/*/build directories ship.
 
 .git*
 .idea
 .vscode
-.gitattributes
-.gitignore
 .distignore
 node_modules
 tests
@@ -37,8 +26,10 @@ stylelint.config.js
 package*.json
 composer.json
 composer.lock
-README.scaffold.md
 /docs
+AGENTS.md
+CLAUDE.md
+.agents
 
 # Secret material — never ship, even if a consumer forgets to list it.
 # .pem/.key are root-anchored (leading /) so certs bundled under vendor/

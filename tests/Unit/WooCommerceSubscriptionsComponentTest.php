@@ -23,6 +23,8 @@ use PHPUnit\Framework\TestCase;
 #[CoversClass( Component::class )]
 #[UsesClass( PriceNote::class )]
 final class WooCommerceSubscriptionsComponentTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Loads the i18n and formatting stand-ins the price-note and settings-row proofs render through.
 	 *
@@ -48,6 +50,10 @@ final class WooCommerceSubscriptionsComponentTest extends TestCase {
 
 		$GLOBALS['a8csp_template_test_hooks'] = array();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Without the Subscriptions companion, the gate reports the integration as not needed.
@@ -165,4 +171,6 @@ final class WooCommerceSubscriptionsComponentTest extends TestCase {
 
 		self::assertSame( $rows, ( new Component() )->add_settings( $rows, 'some_other_section' ) );
 	}
+
+	// endregion.
 }

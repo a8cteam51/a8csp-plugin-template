@@ -17,11 +17,8 @@ const escapeRegExp = ( string ) =>
 const repository = JSON.parse( process.argv[ 2 ] );
 const skippedDirectories = [ '.github', '.git' ];
 
-// Every generated repository gets its own wp-env port block, derived from the repository name:
-// deterministic across re-generations of the same repo, and collision-reducing (not unique —
-// 5000 blocks, so distinct names can hash together; wp-env override files cover that case) so
-// side-by-side `wp-env start`s rarely contend for the same host ports.
-// Blocks span 10000-29996, clear of the OS ephemeral port ranges.
+// A four-port wp-env block hashed from the repository name, in 10000-29996, clear of the OS ephemeral
+// ranges; distinct names can share a block, which wp-env override files resolve.
 const TEMPLATE_PORT_BASE = 8890;
 const nameHash = parseInt(
 	createHash( 'sha256' )
@@ -38,10 +35,8 @@ const portBase = 10000 + 4 * ( nameHash % 5000 );
  */
 const traverseDirectory = async ( dirPath, callback ) => {
 	if ( skippedDirectories.includes( dirPath ) ) {
-		console.log( 'Skipping %s', dirPath );
 		return;
 	}
-	console.log( 'Traversing %s', dirPath );
 
 	const files = await readdir( dirPath );
 	for ( const file of files ) {
@@ -65,11 +60,8 @@ const buildTemplate = async ( filePath ) => {
 	if ( [ 'composer.lock', 'package-lock.json' ].includes( filePath ) ) {
 		// Both locks are regenerated from the substituted manifests after this pass, so
 		// substituting names into them in place would only risk corrupting integrity hashes.
-		console.log( 'Skipping %s', filePath );
 		return;
 	}
-
-	console.log( 'Building %s', filePath );
 
 	const templateFile = await readFile( filePath, 'utf-8' );
 	let renderedTemplate = templateFile,
@@ -107,9 +99,6 @@ const buildTemplate = async ( filePath ) => {
 			'A8C\\SpecialProjects\\PluginTemplate':
 				'A8C\\SpecialProjects\\' +
 				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'A8C\\SpecialProjects\\\\PluginTemplate':
-				'A8C\\SpecialProjects\\\\' +
-				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			a8csp_template:
 				repository.custom_properties[ 'php-globals-short-prefix' ],
 			A8CSP_TEMPLATE:
@@ -136,19 +125,19 @@ const buildTemplate = async ( filePath ) => {
 			const renderedValue = filePath.endsWith( '.json' )
 				? JSON.stringify( value ).slice( 1, -1 )
 				: value;
-			// A callback inserts each value literally, and the single pass leaves inserted metadata untouched by other keys.
+			// A callback keeps `$` sequences in the metadata literal, and one combined pass never re-substitutes inserted text.
 			return renderedValue;
 		}
 	);
 
 	if ( 'README.md' !== filePath ) {
 		// Port literals are bare numbers, so they replace only inside their known anchors (the
-		// wp-env `"port":` keys, playwright's `localhost:` base URL, and the tests/README ports
-		// table) -- a tree-wide bare `8890` would also match inside package-lock.json integrity
-		// hashes. They also bypass the replacement map above: its values are JSON-escaped when
-		// landing in .json files, which would corrupt a match spanning structural JSON.
+		// wp-env `"port":` keys and the tests/README ports table) — a tree-wide bare `8890` would
+		// also match inside package-lock.json integrity hashes. They also bypass the replacement
+		// map above: its values are JSON-escaped when landing in .json files, which would corrupt
+		// a match spanning structural JSON.
 		renderedTemplate = renderedTemplate.replace(
-			/(?<="port": |localhost:|\| )889[0-3](?=[,'\s|])/g,
+			/(?<="port": |\| )889[0-3](?=[,\s|])/g,
 			( match ) =>
 				String( portBase + ( Number( match ) - TEMPLATE_PORT_BASE ) )
 		);
@@ -160,7 +149,6 @@ const buildTemplate = async ( filePath ) => {
 	}
 
 	if ( renderedTemplate !== templateFile ) {
-		console.log( 'Changes were made. Overwriting file.' );
 		await writeFile( filePath, renderedTemplate );
 	}
 };

@@ -1,8 +1,7 @@
 # Architecture
 
 This is the map of the plugin: what each file owns, how the pieces boot, and the recipes for
-reshaping them. It ships with the plugin repository so the map survives for every future
-maintainer, not just the person who generated it.
+reshaping them.
 
 ## The component model
 
@@ -43,19 +42,19 @@ every surviving component is initialized before any hook can fire.
   one of its payment-metadata filters — and `src/Integrations/WooCommerceSubscriptions/` is the
   grown sub-feature folder owning its own `Component` plus a plain collaborator, still
   forwarding-depth one. More nesting than this is the signal a plugin has outgrown manual
-  composition; see the group root's notes.
+  composition.
 - `includes/` contains automatically loaded procedural helpers, including typed option readers;
   PHP files dropped there load automatically inside WordPress, while underscore-prefixed files
   are skipped.
-- `languages/` contains translations and the POT generated from the plugin's strings; regenerate
-  it with `composer i18n:makepot`.
+- `languages/` holds the plugin's translations; `composer i18n:makepot` generates the POT from the
+  plugin's strings, and every release regenerates it.
 - `models/` is the extension point for namespace-less classmapped classes that are part of a
   public contract — the `WC_Order` shape.
 - `templates/` is an extension point for template partials rendered by components.
 - `footprint.php` is the dependency-free manifest of the complete persisted footprint — every
   option and user-meta key grouped by owning component — and `uninstall.php` requires it and
   deletes those keys during WordPress's cold uninstall bootstrap; add an entry with each
-  corresponding write, and cross-reference persisted keys with `@see uninstall.php` in the
+  corresponding write, and cross-reference persisted keys with `@see footprint.php` in the
   component class docblock.
 - `blocks/src/example-notice/` contains the example block source, while `blocks/build/` contains
   tracked build output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`,
@@ -64,7 +63,7 @@ every surviving component is initialized before any hook can fire.
   `assets/css/src/settings.scss` the compiled admin stylesheet example; `npm run build` is the
   single build contract and produces every tracked `build/` output, RTL variants included.
 - `tests/` contains the automated test suite; see `tests/README.md` for the local workflow.
-- `.github/workflows/` contains the quality, test, audit, and release workflows.
+- `.github/workflows/` contains the CI workflows.
 
 ## Multisite
 
@@ -99,7 +98,7 @@ To convert this plugin from a WooCommerce extension to a plain WordPress plugin,
 WooCommerce tier:
 
 1. Delete the `HELPERS` region — the host-requirements check and its notice closures — and the
-   one gate line in `boot()` from `src/Plugin.php`.
+   host gate in `boot()` from `src/Plugin.php`.
 2. Strip the WooCommerce surface from `src/Settings/Component.php`: the `add_section()` and
    `provide_settings()` methods and their two filter registrations in `register_hooks()`.
 3. Delete the `src/Integrations/` and `templates/myaccount/` directories — both example children
@@ -107,30 +106,63 @@ WooCommerce tier:
    `COMPONENTS` list in `src/Plugin.php`.
 4. Remove the `a8csp_template_wc_example_option` and `a8csp_template_wcs_example_option` option
    lines from the `footprint.php` manifest.
-5. Remove the `wp-plugin/woocommerce` development dependency from `composer.json`; run
-   `composer update`.
-6. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
-7. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the
+5. Remove the WooCommerce development dependency: `composer remove --dev wp-plugin/woocommerce`.
+6. Remove the `wp-content/plugins/woocommerce` mapping from all four `.wp-env*.json` files, drop
+   `woocommerce` from the `afterStart` plugin activations in `.wp-env.json`, `.wp-env.tests.json`
+   and `.wp-env.multisite.json`, and remove the `extra-plugins` input (and its comment) from
+   `.github/workflows/release.yml`.
+7. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
+8. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the
    `WC requires at least` / `WC tested up to` plugin-header lines.
-8. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`,
+9. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`,
    `tests/Unit/IntegrationsComponentTest.php`,
    `tests/Unit/WooCommerceSubscriptionsComponentTest.php`, `tests/Unit/WooPaymentsTest.php`, and
    their `tests/Unit/wcs-stubs.php` / `tests/Unit/wcpay-stubs.php` stand-ins; drop the
    WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`,
-   `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including
-   `tests/Unit/wc-host-stubs.php`).
-9. Remove the WooCommerce-less proof section from `tests/README.md`, the
-   `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
-   `integration-no-wc` job from `.github/workflows/tests.yml`.
-10. Rewrite the WooCommerce-flavored prose: the Requirements section and the settings sentence
-    under Installation in `README.md`, and the WooCommerce references in this document.
-11. Run `composer quality-check`. What remains — blocks, settings, the component list, the
+   `tests/Unit/ComponentCollectionTest.php`, `tests/Unit/PluginBootGateTest.php`, and
+   `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`). That takes
+   `PluginBootGateTest`'s two host-gate tests with their notice helpers, `PluginBootTest`'s
+   section-output test, and the closed-gate case of `ComponentCollectionTest`'s gate test.
+10. Remove the WooCommerce-less proof section and the other `test:integration:no-wc` mentions
+    from `tests/README.md`, the
+    `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
+    `integration-no-wc` job from `.github/workflows/tests.yml`.
+11. Rewrite the WooCommerce-flavored prose: the Requirements section and the settings sentence
+    under Installation in `README.md`, the WooCommerce references in this document, and whatever
+    else `git grep -i woocommerce` still finds, such as the bug-report issue template.
+12. Run `composer quality-check`. What remains — blocks, settings, the component list, the
     `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 
-**For a plugin that persists nothing:** delete `src/Settings/`, its `COMPONENTS` entry in
-`src/Plugin.php`, its option lines in the `footprint.php` manifest, `includes/settings.php`, and
-the example admin stylesheet (`assets/css/src/settings.scss` plus its `assets/css/build/`
-output).
+**For a plugin that persists nothing:**
+
+1. Delete `src/Settings/` and `includes/settings.php`, and remove `Settings\Component::class` from
+   the `COMPONENTS` list in `src/Plugin.php`.
+2. Remove the Subscriptions example setting, which lives in the Settings section: the
+   `add_settings()` method and its `woocommerce_get_settings_advanced` filter in
+   `src/Integrations/WooCommerceSubscriptions/Component.php`.
+3. Empty the `options` list in the `footprint.php` manifest (`'options' => array(),`).
+   `uninstall.php` still clears the update-check transients; the uninstall proofs then cover only
+   those transients and their canary, until the first persisted key returns.
+4. Delete the example admin stylesheet (`assets/css/src/settings.scss` and its `assets/css/build/`
+   output), the `build:assets:styles`, `build:assets:styles-rtl` and `start:assets:styles`
+   scripts in `package.json`, and the `sass`, `postcss-cli` and `rtlcss` dev dependencies and
+   `rtlcssConfig` key that serve only those scripts; run `npm install`.
+5. Delete `tests/Unit/SettingsComponentTest.php`. Drop `Settings\Component` and the assertions on
+   its hooks (`admin_init`, `admin_enqueue_scripts`, `woocommerce_get_sections_advanced` and
+   `woocommerce_get_settings_advanced`) from `tests/Unit/ComponentCollectionTest.php`, whose gate
+   test takes `Blocks\Component` as its open-gate case instead, and from
+   `tests/Unit/PluginBootGateTest.php`; the `add_settings()` tests and filter assertions from
+   `tests/Unit/WooCommerceSubscriptionsComponentTest.php` and
+   `tests/Unit/IntegrationsComponentTest.php`; and, from `tests/Integration/PluginBootTest.php`
+   and `tests/Integration/PluginBootWithoutWooCommerceTest.php`, the settings and section
+   assertions, the section-output and round-trip tests, and the `tearDown()` cleanup.
+6. Rewrite the prose the removals leave false, which
+   `git grep -n -i -E 'settings|example_option|option reader|footprint'` finds: the settings
+   sentence under Installation in `README.md`, the settings steps and examples in
+   `.github/ISSUE_TEMPLATE/bug_report.yml`, the settings, stylesheet and option-reader entries in
+   this document, the uninstall-proof descriptions in `tests/README.md` and the test docblocks,
+   and the docblocks of the Subscriptions component and `PluginBootTest`.
+7. Run `composer quality-check`.
 
 ## Version tags on transplant
 

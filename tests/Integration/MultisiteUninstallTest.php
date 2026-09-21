@@ -22,14 +22,7 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class MultisiteUninstallTest extends TestCase {
-	/**
-	 * A canary option the footprint never lists, seeded on every site the sweep visits. Its
-	 * survival is what proves the sweep deletes only what it owns on each site.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 */
-	private const string CANARY_OPTION = 'a8csp_template_test_uninstall_canary';
+	// region FIELDS AND CONSTANTS.
 
 	/**
 	 * The path of the second site this test creates. Leftovers under this path from an aborted
@@ -51,6 +44,10 @@ final class MultisiteUninstallTest extends TestCase {
 	 */
 	private ?int $proof_site_id = null;
 
+	// endregion.
+
+	// region LIFECYCLE.
+
 	/**
 	 * Removes the canary and the proof site regardless of how the test finished, for the same
 	 * persistent-database reason the proof-site path is swept on entry.
@@ -61,7 +58,7 @@ final class MultisiteUninstallTest extends TestCase {
 	 * @return  void
 	 */
 	protected function tearDown(): void {
-		delete_option( self::CANARY_OPTION );
+		delete_option( 'a8csp_template_test_uninstall_canary' );
 
 		if ( null !== $this->proof_site_id ) {
 			wp_delete_site( $this->proof_site_id );
@@ -69,6 +66,10 @@ final class MultisiteUninstallTest extends TestCase {
 
 		parent::tearDown();
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Seeds a sentinel for every option the real footprint lists — plus the canary — on both the
@@ -97,7 +98,7 @@ final class MultisiteUninstallTest extends TestCase {
 			foreach ( $footprint['options'] as $option ) {
 				update_option( $option, 'sentinel' );
 			}
-			update_option( self::CANARY_OPTION, 'sentinel' );
+			update_option( 'a8csp_template_test_uninstall_canary', 'sentinel' );
 
 			foreach ( array( 'stable', 'prerelease' ) as $channel ) {
 				set_transient( 'a8csp_template_github_latest_release_' . $channel, 'sentinel', HOUR_IN_SECONDS );
@@ -117,11 +118,15 @@ final class MultisiteUninstallTest extends TestCase {
 			foreach ( array( 'stable', 'prerelease' ) as $channel ) {
 				self::assertFalse( get_transient( 'a8csp_template_github_latest_release_' . $channel ), "uninstall.php must delete the '{$channel}' update-check transient on site {$site_id}" );
 			}
-			self::assertSame( 'sentinel', get_option( self::CANARY_OPTION ), "uninstall.php must not delete keys outside its footprint on site {$site_id}" );
+			self::assertSame( 'sentinel', get_option( 'a8csp_template_test_uninstall_canary' ), "uninstall.php must not delete keys outside its footprint on site {$site_id}" );
 
 			restore_current_blog();
 		}
 	}
+
+	// endregion.
+
+	// region HELPERS.
 
 	/**
 	 * Creates the second site the sweep proof runs against and returns its ID, deleting any
@@ -155,4 +160,6 @@ final class MultisiteUninstallTest extends TestCase {
 
 		return $proof_site_id;
 	}
+
+	// endregion.
 }

@@ -46,10 +46,7 @@ final class Component extends AbstractComponent {
 	 * @return  void
 	 */
 	public function register_blocks(): void {
-		wp_register_block_types_from_metadata_collection(
-			\constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'blocks/build',
-			\constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'blocks/build/blocks-manifest.php'
-		);
+		wp_register_block_types_from_metadata_collection( \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'blocks/build', \constant( 'A8CSP_TEMPLATE_DIR_PATH' ) . 'blocks/build/blocks-manifest.php' );
 	}
 
 	/**
@@ -76,13 +73,7 @@ final class Component extends AbstractComponent {
 		}
 
 		$plugin_slug = a8csp_template_get_plugin_slug();
-		wp_register_script(
-			"$plugin_slug-editor",
-			\constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/js/build/editor.js',
-			$asset_meta['dependencies'],
-			$asset_meta['version'],
-			false
-		);
+		wp_register_script( "$plugin_slug-editor", \constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/js/build/editor.js', $asset_meta['dependencies'], $asset_meta['version'], false );
 		wp_enqueue_script( "$plugin_slug-editor" );
 		wp_set_script_translations( "$plugin_slug-editor", 'a8csp-plugin-template' );
 	}

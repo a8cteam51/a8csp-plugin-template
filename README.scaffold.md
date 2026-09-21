@@ -16,7 +16,7 @@ With WooCommerce active at the required version, the plugin's settings appear in
 
 ## Updates
 
-The plugin updates itself from this repository's GitHub releases through its `Update URI` header, so WordPress offers a new release like any other plugin update. The check calls the GitHub API without authentication, which works only while the repository is public. An installed prerelease (a version containing `-`) follows every release; a stable installation follows stable releases only.
+The plugin updates itself from this repository's GitHub releases through its `Update URI` header, so WordPress offers a new release like any other plugin update — as long as the repository is public, because the check calls the GitHub API without authentication. OpsOasis creates repositories private, so a plugin generated through it does not update itself. An installed prerelease (a version containing `-`) follows every release; a stable installation follows stable releases only.
 
 ## Development
 
@@ -29,7 +29,7 @@ npm run build
 npm run wp-env:start
 ```
 
-The plugin is available at the wp-env port declared in `.wp-env.json`; `tests/README.md` documents the dedicated test environment. wp-env publishes the site on all network interfaces with fixed development credentials -- treat the dev site as visible to your local network, not just localhost.
+The plugin is available at the wp-env port declared in `.wp-env.json`; `tests/README.md` documents the dedicated test environment. wp-env publishes the site on all network interfaces with fixed development credentials — treat the dev site as visible to your local network, not just localhost.
 
 The architecture map, the component model, and the reshaping recipes (including watering the
 plugin down to plain WordPress) live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the test
@@ -39,7 +39,7 @@ workflow lives in [`tests/README.md`](tests/README.md).
 
 ### Releasing
 
-Every pull request that changes behaviour carries a changelog fragment:
+Every pull request that changes behavior carries a changelog fragment:
 
 ```sh
 composer changelog:add
@@ -67,17 +67,7 @@ Releases are cut from trunk, in four steps.
    git push origin "v1.0.0"
    ```
 
-   Tagging is the maintainer's step and the tag is signed, so expect the signing key's own confirmation prompt and GitHub reporting the tag as verified. The workflow triggers on `v*` tags only, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
-
-Both paths — the tag and the rehearsal — run the same jobs, and only the last one is conditional:
-
-| Job | What it proves |
-| --- | --- |
-| Verify release version | The plugin header, `package.json` and the newest `CHANGELOG.md` entry state one version. On a tag the tag states it too; on a dispatch there is no tag, so only the three declared versions are held against each other. Turning the release on from a non-tag ref fails here by design, which is why a dispatch cannot publish by accident. |
-| Verify release provenance | Trunk-push runs of `quality.yml` and `tests.yml` succeeded at this exact commit. A missing or red run fails the job; fix it, land the fix, and re-tag. |
-| Build the release artifact | Validates the changelog, installs production dependencies only, regenerates the committed POT — failing loudly if `make-pot` does not recognise the plugin — and packs `EXAMPLE_REPO_SLUG.zip`. |
-| Smoke test the artifact | Installs and activates that zip in a throwaway wp-env and checks the site serves. The artifact differs from the tested tree (production dependencies, a regenerated POT, `.distignore` filtering), so it is proven on its own. |
-| Publish the release | Runs only when the release is turned on. Takes the `CHANGELOG.md` section matching the tag as the release notes and creates the GitHub release with the zip attached. A hyphenated version such as `1.1.0-beta.1` publishes as a prerelease and stays off the latest-release endpoint, so stable installations are not offered it. |
+   Pushing a `v*` tag runs the release, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
 
 The release history is [`CHANGELOG.md`](CHANGELOG.md).
 

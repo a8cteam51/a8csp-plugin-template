@@ -8,7 +8,7 @@ fixtures at three WordPress-version tiers.
 - **Unit** (`tests/Unit/`) — no WordPress, no wp-env. Runs against plain PHPUnit `TestCase` with
   recording `add_action()`/`add_filter()` stubs (`tests/Unit/wp-hook-stubs.php`) instead of Mockery
   or Brain Monkey, so the real `Plugin::boot()` loop is exercised outside WordPress.
-  Fast; this is the suite `composer quality-check` runs on every push.
+  Fast, and part of `composer quality-check`.
 - **Integration** (`tests/Integration/`) — boots inside wp-env against a supported WordPress
   version and exercises the plugin's real boot path. `UninstallTest` runs the real
   `uninstall.php` end-to-end (seeds sentinels, defines `WP_UNINSTALL_PLUGIN`, asserts its
@@ -40,8 +40,7 @@ CI runs it as its own Tests job. `test:integration:no-wc` deactivates WooCommerc
 wp-env instance, runs that one test directly with `--fail-on-skipped`, then reactivates
 WooCommerce — failing when either the test or the reactivation fails — so the instance is left
 ready for the Integration suite, and a run in which WooCommerce stayed active fails instead of
-skipping. Its
-three steps are:
+skipping. Its three steps are:
 
 ```sh
 wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce
@@ -55,15 +54,6 @@ Each of the wp-env-backed verbs — `test:integration`, `test:integration:no-wc`
 and `test:multisite` — starts its own environment first: a container already running serves the
 mount set it was created with, and `start` is what replaces it when the resolved config moved.
 `test:unit` needs no container and starts none.
-
-The `[ -n "$GITHUB_ACTIONS" ]` guard in front of that start keeps it out of CI, which owns the
-container's lifecycle in its own step, and says so rather than skipping in silence. On the
-Integration leg the guard is also load-bearing: that is the only matrix passing `wp-env-core`, so a
-second start would fall back to whatever `core` the config names — and `.wp-env.tests.json` names
-none, which makes it wp-env's default of latest stable. The floor leg is exposed too, not just
-nightly: it passes `wp-version`, which the workflow maps into the same step-scoped variable, so it
-would go green without testing the version it asked for. The latest leg names no core, so the
-fallback is what it wanted anyway.
 
 Unit (no wp-env required):
 
@@ -92,7 +82,8 @@ composer test:multisite
 npm run wp-env:multisite:stop
 ```
 
-End-to-end (Playwright starts and stops the dev wp-env instance itself via its `webServer` config):
+End-to-end (Playwright's `webServer` config starts the dev instance when none is running; stop it
+with `npm run wp-env:stop`):
 
 ```sh
 npm run test:e2e
@@ -107,33 +98,26 @@ npm run test:e2e
 | Below-floor | `.wp-env.belowfloor.json` | 8891 |
 | Multisite   | `.wp-env.multisite.json`  | 8892 |
 
-Generated repositories get their own four-port block, derived from the repository name at
-generation, so plugins started side by side don't contend for the same host ports. If two
-environments still collide on one machine, wp-env's untracked override files take local
-precedence (`.wp-env.override.json`; custom configs pair with e.g.
+If another local environment already uses these ports, wp-env's untracked override files take
+local precedence (`.wp-env.override.json`; custom configs pair with e.g.
 `.wp-env.tests.override.json`).
 
 ## Why plain `TestCase`, not `WP_UnitTestCase`
 
-WordPress core's PHPUnit scaffold supports PHPUnit through version 9; open ticket
-[#62004](https://core.trac.wordpress.org/ticket/62004) tracks compatibility work for PHPUnit 11
-and later. This rig runs PHPUnit 13 directly against plain `TestCase` inside wp-env, without
-depending on `WP_UnitTestCase` or core's PHPUnit compatibility range.
+WordPress core's PHPUnit scaffold supports PHPUnit through version 9. This rig runs current
+PHPUnit directly against plain `TestCase` inside wp-env, without depending on `WP_UnitTestCase`
+or core's PHPUnit compatibility range.
 
 That trade gives up `$this->factory` fixture helpers, `go_to()` routing simulation, and
 `WP_UnitTestCase`'s per-test transaction rollback. The first two exist for content- and
-query-heavy plugins exercising post/term/user fixtures and template routing — this scaffold's
+query-heavy plugins exercising post/term/user fixtures and template routing — this plugin's
 Integration suite is narrower (boot path, requirements gating), so their absence costs little.
-Transaction rollback specifically would be counterproductive here: the Integration and
-Requirements suites exist to observe persistence and boot-time side effects, and auto-rolling back
-every test would mask exactly the behavior they're written to catch.
+Without rollback, the database persists across tests: each test removes what it seeds, except that
+the uninstall proofs leave their footprint to the `uninstall.php` run they assert on.
 
 ## Mutation testing
 
 `composer test:unit:mutation` runs Infection against the Unit suite's source. It sits outside the
 default `composer quality-check` target (only `quality-check:all` pulls it in) and does not gate
 pull requests — it runs on its own weekly schedule in CI (`.github/workflows/tests-mutation.yml`),
-since mutation testing is slow. Local runs on macOS are unreliable: a race in Infection's
-coverage-XML tmpdir handling can produce zero generated mutants or a hang, independent of anything
-in this repo's own configuration. Treat the CI job, not a local run, as authoritative for mutation
-results.
+since mutation testing is slow.

@@ -1,10 +1,9 @@
 name: Release
-# The repository this file ships from — the trunk-only template, pinned by its immutable ID — never releases itself; generated plugins have their own IDs, so the condition is permanently true for them. It rides along because generation can delete workflow files but never edit them.
 
 on:
   push:
     tags: ['v*']
-  # Exercises the release path without publishing, which is the only way to test it before a tag exists.
+  # With publish off, a dispatch rehearses the release before a tag exists.
   workflow_dispatch:
     inputs:
       publish:
@@ -22,6 +21,7 @@ permissions: {}
 jobs:
   release:
     name: Release
+    # The template's immutable ID: the template never releases, and every generated plugin has its own ID.
     if: github.repository_id != '1297277915'
     permissions:
       actions: read

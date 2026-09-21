@@ -20,7 +20,7 @@ use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
  * @since   1.0.0
  * @version 1.0.0
  *
- * @see uninstall.php
+ * @see footprint.php
  */
 final class Component extends AbstractComponent {
 	// region METHODS
@@ -55,8 +55,8 @@ final class Component extends AbstractComponent {
 	 * @return  void
 	 */
 	public function register_settings(): void {
-		// Every persisted key is mirrored in the `uninstall.php` footprint manifest in the same
-		// change that introduces the write.
+		// Every persisted key is listed in the `footprint.php` manifest in the same change that
+		// introduces the write.
 		register_setting(
 			'general',
 			'a8csp_template_example_option',
@@ -67,20 +67,9 @@ final class Component extends AbstractComponent {
 			)
 		);
 
-		add_settings_section(
-			'a8csp_template_example_section',
-			__( 'A8CSP Template Plugin', 'a8csp-plugin-template' ),
-			'__return_empty_string',
-			'general'
-		);
+		add_settings_section( 'a8csp_template_example_section', __( 'A8CSP Template Plugin', 'a8csp-plugin-template' ), '__return_empty_string', 'general' );
 
-		add_settings_field(
-			'a8csp_template_example_field',
-			__( 'Example option', 'a8csp-plugin-template' ),
-			array( $this, 'render_field' ),
-			'general',
-			'a8csp_template_example_section'
-		);
+		add_settings_field( 'a8csp_template_example_field', __( 'Example option', 'a8csp-plugin-template' ), array( $this, 'render_field' ), 'general', 'a8csp_template_example_section', array( 'label_for' => 'a8csp_template_example_option' ) );
 	}
 
 	/**
@@ -106,8 +95,8 @@ final class Component extends AbstractComponent {
 	 * Enqueues the admin stylesheet on the General options page — the surface this component's demo
 	 * field lives on. Gating on the hook suffix keeps the stylesheet off every other admin screen,
 	 * the worked example of a scoped admin enqueue. The compiled asset carries its version and
-	 * dependencies through the same `a8csp_template_get_asset_meta()` helper the block script uses,
-	 * and `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left
+	 * dependencies through the same asset-meta helper the block script uses, and
+	 * `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left
 	 * locales.
 	 *
 	 * @since   1.0.0
@@ -128,12 +117,7 @@ final class Component extends AbstractComponent {
 		}
 
 		$plugin_slug = a8csp_template_get_plugin_slug();
-		wp_enqueue_style(
-			"$plugin_slug-settings",
-			\constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/css/build/settings.css',
-			$asset_meta['dependencies'],
-			$asset_meta['version']
-		);
+		wp_enqueue_style( "$plugin_slug-settings", \constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/css/build/settings.css', $asset_meta['dependencies'], $asset_meta['version'] );
 		wp_style_add_data( "$plugin_slug-settings", 'rtl', 'replace' );
 	}
 
@@ -181,7 +165,7 @@ final class Component extends AbstractComponent {
 			array(
 				'title' => __( 'Example option', 'a8csp-plugin-template' ),
 				'desc'  => __( 'A persisted example setting owned by the WooCommerce settings surface.', 'a8csp-plugin-template' ),
-				// Mirrored in the `uninstall.php` footprint; the line there goes with this surface when it is deleted.
+				// Listed in the `footprint.php` manifest; the line there goes with this surface when it is deleted.
 				'id'    => 'a8csp_template_wc_example_option',
 				'type'  => 'text',
 			),

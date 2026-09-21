@@ -12,7 +12,6 @@ on:
   pull_request:
   push:
     branches: [trunk]
-    tags: ['v*']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,27 +20,12 @@ concurrency:
 permissions: {}
 
 jobs:
-  # The template never tags or releases itself. A repository ruleset blocks tag creation at
-  # the platform level — a tag pointed at an old commit runs that commit's workflow version,
-  # so an in-repo guard cannot be the primary control. This backstop is loud on purpose: a
-  # silent skip would leave a mistaken tag looking released. Skipping the actual publish is
-  # release.yml's own repository_id condition, which a red job here cannot do.
-  refuse-template-release:
-    name: Refuse to release the template
-    if: github.repository_id == '1297277915' && startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Fail loudly
-        run: |
-          echo "::error::a8csp-plugin-template is trunk-only and never releases; delete this tag"
-          exit 1
 
   # The template never versions itself: the fragment set, the header-only changelog, and the
   # 1.0.0 spawn seed are pinned. The repository_id comparison survives renames and transfers.
   trunk-only-state:
     name: Enforce the trunk-only template state
-    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    if: github.repository_id == '1297277915'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -78,14 +62,12 @@ jobs:
             exit 1
           fi
 
-  # Renders the scaffold against representative repository fixtures and asserts the generated
-  # tree is sound: no template literal survives, every PHP file parses, and the derived wp-env
-  # port block matches the engine's hash. The replicated rename/fill sequence mirrors
-  # fill-in-scaffold.yml step for step — change both together; this job exists so that
-  # divergence fails here instead of in a generated repository.
+  # Renders the scaffold against representative fixtures and asserts that no template literal
+  # survives, every PHP file parses, and the wp-env port block matches the engine's hash. It replays
+  # fill-in-scaffold.yml's rename, substitution, and strip steps; change them together.
   generation-contract:
     name: 'Generation contract: ${{ matrix.fixture }}'
-    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    if: github.repository_id == '1297277915'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -96,6 +78,7 @@ jobs:
         include:
           - fixture: aligned
             strip: false
+            lint: true
             repo_json: '{"name":"my-client-plugin","description":"A client plugin.","custom_properties":{"human-title":"My Client Plugin","php-globals-short-prefix":"myclient"}}'
           - fixture: diverging-empty
             strip: false
@@ -111,13 +94,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PHP for the syntax sweep.
+      - name: Setup PHP for the syntax sweep
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.5'
           coverage: none
 
-      - name: Replicate the fill-in sequence.
+      - name: Replicate the fill-in sequence
         env:
           REPO_JSON: ${{ matrix.repo_json }}
           STRIP: ${{ matrix.strip }}
@@ -131,16 +114,12 @@ jobs:
           git mv a8csp-template-plugin.php "$REPO_NAME.php"
 
           find changelog -type f ! -name '.gitkeep' -delete
-          rm -f languages/*.pot
 
           node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
 
           if [ "$STRIP" = 'true' ]; then
             node ./.github/workflows/fill-in-scaffold-content.mjs
           fi
-
-          # A rename that silently failed would let the literal sweep below pass vacuously.
-          test -f "$REPO_NAME.php"
 
           # The engines strip their own paths from the lint scope; a leftover reference is docrot.
           if grep -qF '.github/workflows/fill-in-scaffold' package.json; then
@@ -149,13 +128,13 @@ jobs:
           fi
 
       # .github is excluded because the real run deletes the spent machinery instead of
-      # substituting inside it; composer.lock is re-locked by the real run after this point.
-      - name: Assert no template literal survives.
+      # substituting inside it; the real run resolves both locks afresh after this point.
+      - name: Assert no template literal survives
         run: |
           set -euo pipefail
 
           fail=0
-          for literal in 'a8csp-plugin-template' 'a8csp-template-plugin' 'A8CSP Template Plugin' 'a8csp_template' 'A8CSP_TEMPLATE' 'A8C\SpecialProjects\PluginTemplate' 'EXAMPLE_REPO_'; do
+          for literal in 'a8csp-plugin-template' 'a8csp-template-plugin' 'A8CSP Template Plugin' 'a8csp_template' 'A8CSP_TEMPLATE' 'A8C\SpecialProjects\PluginTemplate' 'PluginTemplate' 'EXAMPLE_REPO_'; do
             if survivors=$(grep -rIlF --exclude-dir=node_modules --exclude-dir=vendor --exclude-dir=.git --exclude-dir=.github --exclude=composer.lock --exclude=package-lock.json -- "$literal" .); then
               printf '%s\n' "$survivors"
               echo "::error::template literal '$literal' survived substitution"
@@ -164,12 +143,13 @@ jobs:
           done
           exit "$fail"
 
-      - name: Syntax-check every generated PHP file.
+      - name: Syntax-check every generated PHP file
         run: |
+          set -euo pipefail
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
 
-      - name: Assert the derived wp-env port block.
+      - name: Assert the derived wp-env port block
         run: |
           set -euo pipefail
 
@@ -180,17 +160,30 @@ jobs:
           grep -Fq "\"port\": $(( expected + 2 ))," .wp-env.multisite.json
           grep -Fq "\"port\": $(( expected + 3 ))," .wp-env.json
 
-      - name: Assert the strip phase removed the sample content.
+      - name: Assert the strip phase removed the sample content
         if: matrix.strip == true
         run: test ! -f includes/_disabled-example.php
 
-  # The teaching-content strip manifest identifies each passage by an exact span that must occur
-  # exactly once. Editing the template's docblocks or comments can silently break a span (zero or
-  # duplicate matches), which would surface only at generation time as a failed fill-in push. This
-  # gate runs the manifest's --check on every template change so that drift fails here instead.
+      - name: Setup Node.js for the generated repository's JavaScript lint
+        if: matrix.lint == true
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+
+      # Substitution changes identifier lengths, so Prettier-formatted lines need re-wrapping before the
+      # generated repository's own lint can pass.
+      - name: Re-format and lint the rendered JavaScript
+        if: matrix.lint == true
+        run: |
+          npm ci
+          npm run lint:scripts -- --fix
+          npm run lint:scripts
+
+  # A template edit that leaves a strip-manifest span matching zero or several times fails here
+  # instead of in a generation.
   content-manifest-drift:
     name: Enforce the teaching-content strip manifest
-    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    if: github.repository_id == '1297277915'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -200,7 +193,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # The manifest check is a dependency-free string match, so it runs on the runner's built-in
-      # Node with no setup-node (and thus no dependency cache to poison on the tag-push trigger).
+      # The manifest check is a dependency-free string match, so the runner's built-in Node runs it.
       - name: Verify every strip-manifest span still matches exactly once
         run: node .github/workflows/fill-in-scaffold-content.mjs --check

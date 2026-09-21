@@ -2,7 +2,6 @@
 
 namespace A8C\SpecialProjects\PluginTemplate\Tests\Integration;
 
-use A8C\SpecialProjects\PluginTemplate\Settings;
 use PHPUnit\Framework\TestCase;
 
 /**
@@ -17,6 +16,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class PluginBootWithoutWooCommerceTest extends TestCase {
+	// region TESTS.
+
 	/**
 	 * With WooCommerce inactive, the requirements gate still passes and the boot hook still runs,
 	 * but the host gate latches the plugin un-booted: the block is not registered, Settings wires
@@ -50,35 +51,19 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 		);
 
 		self::assertFalse( \WP_Block_Type_Registry::get_instance()->is_registered( $block_metadata['name'] ) );
-		self::assertSame( 0, $this->count_settings_admin_init_registrations() );
 		self::assertFalse( has_filter( 'woocommerce_get_sections_advanced' ) );
+
+		// `admin_init` fires where WordPress has loaded the wp-admin includes; the settings
+		// template functions are loaded here to stand in for that context.
+		require_once ABSPATH . 'wp-admin/includes/template.php';
+		// Core's update checks also run on `admin_init` and call WordPress.org; detached, the proof
+		// does not depend on the network.
+		remove_action( 'admin_init', '_maybe_update_core' );
+		remove_action( 'admin_init', '_maybe_update_plugins' );
+		remove_action( 'admin_init', '_maybe_update_themes' );
+		do_action( 'admin_init' );
+		self::assertArrayNotHasKey( 'a8csp_template_example_option', get_registered_settings() );
 	}
 
-	/**
-	 * Counts the `admin_init` hook registrations that target a `Settings\Component` instance's
-	 * `register_settings` method, across all priorities.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  int
-	 */
-	private function count_settings_admin_init_registrations(): int {
-		$hook = $GLOBALS['wp_filter']['admin_init'] ?? null;
-		if ( ! $hook instanceof \WP_Hook ) {
-			return 0;
-		}
-
-		$count = 0;
-		foreach ( $hook->callbacks as $priority_callbacks ) {
-			foreach ( $priority_callbacks as $registration ) {
-				$callback = $registration['function'];
-				if ( \is_array( $callback ) && ( $callback[0] ?? null ) instanceof Settings\Component && 'register_settings' === ( $callback[1] ?? null ) ) {
-					++$count;
-				}
-			}
-		}
-
-		return $count;
-	}
+	// endregion.
 }

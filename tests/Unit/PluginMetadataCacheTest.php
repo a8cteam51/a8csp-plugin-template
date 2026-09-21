@@ -18,6 +18,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class PluginMetadataCacheTest extends TestCase {
+	// region LIFECYCLE.
+
 	/**
 	 * Satisfies the bootstrap file's `ABSPATH` guard and constants, stages the WordPress stubs,
 	 * then loads the real `functions-bootstrap.php` under test.
@@ -36,6 +38,10 @@ final class PluginMetadataCacheTest extends TestCase {
 		require_once __DIR__ . '/wp-bootstrap-stubs.php';
 		require_once \dirname( __DIR__, 2 ) . '/functions-bootstrap.php';
 	}
+
+	// endregion.
+
+	// region TESTS.
 
 	/**
 	 * Walks the reader through the request timeline: the include-time read (before any plugin
@@ -63,4 +69,6 @@ final class PluginMetadataCacheTest extends TestCase {
 		$GLOBALS['a8csp_template_test_plugin_data'] = array( 'Name' => 'mutated' );
 		self::assertSame( '11.1', a8csp_template_get_plugin_metadata( 'WC requires at least' ), 'A read taken once every plugin has loaded is stable and memoized for the request' );
 	}
+
+	// endregion.
 }

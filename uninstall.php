@@ -1,8 +1,8 @@
 <?php declare( strict_types=1 );
 /**
  * Uninstall handler. WordPress runs this file directly when the plugin is deleted, in a cold
- * bootstrap without the plugin loaded; the footprint comment below spells out what that means
- * for this file.
+ * bootstrap without the plugin loaded, so the durable keys it deletes come from a dependency-free
+ * manifest.
  *
  * @since       1.0.0
  * @version     1.0.0
@@ -11,11 +11,7 @@
 
 \defined( 'WP_UNINSTALL_PLUGIN' ) || exit;
 
-/*
- * The plugin's persisted footprint, loaded from the standalone manifest. Keeping it in a
- * dependency-free `footprint.php` lets both this cold uninstall bootstrap and the uninstall proofs
- * read the same list without either defining `WP_UNINSTALL_PLUGIN` or running the delete loops.
- */
+// The persisted footprint lives in the dependency-free `footprint.php` manifest, which the uninstall proofs read too.
 $a8csp_template_footprint = require __DIR__ . '/footprint.php';
 
 /*

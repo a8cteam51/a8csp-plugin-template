@@ -15,6 +15,8 @@ use PHPUnit\Framework\TestCase;
  */
 #[CoversClass( AbstractComponent::class )]
 final class AbstractComponentTest extends TestCase {
+	// region TESTS.
+
 	/**
 	 * An extending component inherits the open gate and a readiness phase that registers nothing.
 	 *
@@ -27,15 +29,20 @@ final class AbstractComponentTest extends TestCase {
 		$GLOBALS['a8csp_template_test_hooks'] = array();
 
 		$component = new class() extends AbstractComponent {
+			// region METHODS.
+
 			/**
 			 * {@inheritDoc}
 			 *
 			 * @since   1.0.0
 			 * @version 1.0.0
 			 */
+			#[\Override]
 			public function register_hooks(): void {
 				add_action( 'a8csp_template_test_hook', '__return_true' );
 			}
+
+			// endregion.
 		};
 
 		self::assertTrue( $component::should_load() );
@@ -46,4 +53,6 @@ final class AbstractComponentTest extends TestCase {
 		$component->register_hooks();
 		self::assertSame( array( 'a8csp_template_test_hook' ), $GLOBALS['a8csp_template_test_hooks'] );
 	}
+
+	// endregion.
 }

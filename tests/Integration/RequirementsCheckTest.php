@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
  * @version 1.0.0
  */
 final class RequirementsCheckTest extends TestCase {
+	// region TESTS.
+
 	/**
 	 * The requirements constant reflects the runtime it booted on.
 	 *
@@ -32,4 +34,6 @@ final class RequirementsCheckTest extends TestCase {
 			self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
 		}
 	}
+
+	// endregion.
 }

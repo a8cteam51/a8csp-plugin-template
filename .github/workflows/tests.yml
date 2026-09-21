@@ -70,6 +70,3 @@ jobs:
   e2e:
     name: End-to-End
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-playwright-e2e.yml@trunk
-    with:
-      artifact-slug: 'e2e'
-      composer-options: '--prefer-dist --ignore-platform-req=php+'

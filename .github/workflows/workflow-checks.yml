@@ -7,8 +7,7 @@ on:
   pull_request:
     paths: ['.github/workflows/**', '.github/zizmor.yml']
   schedule:
-    # Weekly Monday 06:00 UTC. Keeps zizmor's online audits (e.g.
-    # known-vulnerable-actions) fresh between workflow changes.
+    # Keeps zizmor's online audits (e.g. known-vulnerable-actions) fresh between workflow changes.
     - cron: '0 6 * * 1'
   workflow_dispatch:
 
@@ -19,11 +18,9 @@ concurrency:
 permissions: {}
 
 jobs:
-  # GitHub rejects a reusable-workflow call at startup unless this job grants
-  # every permission requested by every job in the called workflow. zizmor needs
-  # both security-events: write for SARIF upload and actions: read.
   workflow-checks:
-    name: Workflow checks
+    name: Workflow Checks
+    # A caller must grant every permission the called jobs declare, or the call fails at startup.
     permissions:
       contents: read
       actions: read

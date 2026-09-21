@@ -5,7 +5,7 @@ on:
   push:
     branches: [trunk]
   schedule:
-    # Weekly Monday 08:00 UTC -- catches newly published CodeQL query findings between workflow changes.
+    # Catches newly published CodeQL query findings between code changes.
     - cron: '0 8 * * 1'
 
 concurrency:
@@ -17,11 +17,10 @@ permissions: {}
 jobs:
   codeql:
     name: CodeQL
+    # A caller must grant every permission the called jobs declare, or the call fails at startup.
     permissions:
       contents: read
       actions: read
-      # CodeQL's SARIF upload in the called workflow needs this -- a reusable
-      # workflow can never escalate beyond what this job grants.
       security-events: write
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-codeql.yml@trunk
     with:

@@ -35,19 +35,7 @@
     "rtlcss": "^4.0.0",
     "sass": "^1.77.0"
   },
-  "rtlcssConfig": {
-    "options": {
-      "autoRename": false,
-      "autoRenameStrict": false,
-      "blacklist": {},
-      "clean": true,
-      "greedy": false,
-      "processUrls": false,
-      "stringMap": []
-    },
-    "plugins": [],
-    "map": false
-  },
+  "rtlcssConfig": {},
   "browserslist": [
     "extends @wordpress/browserslist-config"
   ],
@@ -60,7 +48,7 @@
     "build:blocks": "wp-scripts build --webpack-src-dir=blocks/src --output-path=blocks/build",
     "build:blocks-manifest": "wp-scripts build-blocks-manifest --input=blocks/build --output=blocks/build/blocks-manifest.php",
     "build:assets:scripts": "wp-scripts build assets/js/src/*.js --output-path=assets/js/build",
-    "build:assets:styles": "sass assets/css/src:assets/css/build && postcss assets/css/build/*.css --replace",
+    "build:assets:styles": "sass assets/css/src:assets/css/build && postcss assets/css/build/settings.css --replace",
     "build:assets:styles-rtl": "rtlcss assets/css/build/settings.css assets/css/build/settings-rtl.css",
 
     "start": "npm-run-all --parallel start:**",
@@ -74,7 +62,7 @@
 
     "lint": "npm-run-all --sequential lint:**",
     "lint:scripts": "wp-scripts lint-js blocks assets/js eslint.config.mjs postcss.config.js stylelint.config.js .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs playwright.config.js tests/EndToEnd --no-error-on-unmatched-pattern",
-    "lint:styles": "wp-scripts lint-style blocks/**/*.{css,sass,scss} assets/css/**/*.{css,sass,scss} --allow-empty-input --report-descriptionless-disables --report-invalid-scope-disables --report-needless-disables",
+    "lint:styles": "wp-scripts lint-style blocks/**/*.{css,scss} assets/css/**/*.{css,scss} --allow-empty-input",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:readme-md": "wp-scripts lint-md-docs README.md",
 
@@ -92,7 +80,7 @@
     "wp-env:multisite:stop": "wp-env --config .wp-env.multisite.json stop",
     "wp-env:multisite:destroy": "wp-env --config .wp-env.multisite.json destroy",
 
-    "audit": "composer audit --abandoned=report && npm audit --audit-level=high --omit=dev",
+    "audit": "composer audit --locked --abandoned=report && npm audit --audit-level=high --omit=dev",
     "audit:fix": "npm audit fix",
     "check:engines": "wp-scripts check-engines",
     "check:licenses": "wp-scripts check-licenses",
@@ -101,6 +89,6 @@
     "test:requirements": "wp-env --config .wp-env.belowfloor.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Requirements",
     "test:multisite": "wp-env --config .wp-env.multisite.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Multisite",
     "test:integration:no-wc": "wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce && ( wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Integration --filter=PluginBootWithoutWooCommerceTest --fail-on-skipped; A8CSP_STATUS=$?; wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce || A8CSP_STATUS=1; exit $A8CSP_STATUS )",
-    "test:e2e": "playwright test --config=playwright.config.js"
+    "test:e2e": "playwright test"
   }
 }

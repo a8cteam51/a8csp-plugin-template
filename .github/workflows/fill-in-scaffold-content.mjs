@@ -1,20 +1,14 @@
 import { access, readFile, unlink, writeFile } from 'fs/promises';
-import { join as joinPath } from 'path';
 import process from 'process';
 
 // A newline-joined block of source lines. Manifest spans are authored line by line so leading tabs
 // and blank comment lines (`\t *`) are unambiguous in this file's own source.
 const block = ( ...lines ) => lines.join( '\n' );
 
-// The teaching-content strip manifest. It runs as the optional second scaffold phase, AFTER
-// fill-in-scaffold.mjs has already substituted every identifier, so each `from` is matched against
-// post-substitution source: every span here is deliberately free of substitutable tokens
-// (a8csp_template, A8CSP Template Plugin, a8csp-plugin-template, the namespace) so it reads
-// identically before and after that pass. Two entry shapes:
-//   { action: 'replace-exact', path, from, to } — `from` must occur EXACTLY ONCE in `path`.
+// The teaching-content strip manifest. It runs after fill-in-scaffold.mjs, so no span may contain a
+// substitutable token: each must read the same before and after that pass.
+//   { action: 'replace-exact', path, from, to } — `from` must occur exactly once in `path`.
 //   { action: 'delete', path }                  — `path` must exist.
-// Each replacement rewrites an architectural teaching passage into the contract-level docblock a
-// production plugin would carry; load-bearing constraint one-liners are left untouched by omission.
 const MANIFEST = [
 	// includes/_disabled-example.php exists only to teach the underscore opt-out convention.
 	{ action: 'delete', path: 'includes/_disabled-example.php' },
@@ -158,21 +152,6 @@ const MANIFEST = [
 			' * phases. Owns the component-loop machinery once for the composition root and every group root.'
 		),
 	},
-	{
-		action: 'replace-exact',
-		path: 'src/ComponentCollection.php',
-		from: block(
-			'\t *',
-			'\t * A fail-loud boot is all-or-nothing, so "did component X boot?" decomposes into the root\'s',
-			'\t * `is_booted()` — the pipeline completed — plus this check — X survived its gate. There is',
-			'\t * deliberately no per-component failure state: a component failure fails the whole boot. And',
-			'\t * the check is deliberately collection-scoped: a caller holds the collection it asks, so the',
-			'\t * answer never straddles composition levels, and the class-keyed lookup never becomes a public',
-			'\t * contract that promoting a leaf into its own folder would silently break.',
-			'\t *'
-		),
-		to: block( '\t *' ),
-	},
 
 	{
 		action: 'replace-exact',
@@ -295,10 +274,7 @@ const MANIFEST = [
 			'\t * The value comes through the typed reader in `includes/settings.php`, the worked example of',
 			'\t * reading an option this component registers.'
 		),
-		to: block(
-			"\t * Renders the example option's settings field, escaping the persisted value on output even",
-			'\t * though it is also sanitized before it is stored.'
-		),
+		to: block( "\t * Renders the example option's settings field." ),
 	},
 	{
 		action: 'replace-exact',
@@ -306,11 +282,13 @@ const MANIFEST = [
 		from: block(
 			"\t * Enqueues the admin stylesheet on the General options page — the surface this component's demo",
 			'\t * field lives on. Gating on the hook suffix keeps the stylesheet off every other admin screen,',
-			'\t * the worked example of a scoped admin enqueue. The compiled asset carries its version and'
+			'\t * the worked example of a scoped admin enqueue. The compiled asset carries its version and',
+			'\t * dependencies through the same asset-meta helper the block script uses, and',
+			"\t * `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left",
+			'\t * locales.'
 		),
 		to: block(
-			'\t * Enqueues the settings stylesheet on the General options page. The compiled asset carries its',
-			'\t * version and'
+			'\t * Enqueues the settings stylesheet on the General options page.'
 		),
 	},
 	{
@@ -332,10 +310,7 @@ const MANIFEST = [
 			'\t * own settings save, so declaring the field is the whole persistence story and the option key',
 			'\t * still appears in the uninstallation footprint.'
 		),
-		to: block(
-			"\t * Declares this section's WooCommerce settings rows. WooCommerce persists the field through its",
-			'\t * own settings save, so declaring it is the whole persistence story.'
-		),
+		to: block( "\t * Declares this section's WooCommerce settings rows." ),
 	},
 
 	{
@@ -377,8 +352,8 @@ const MANIFEST = [
 		from: block(
 			'/**',
 			' * Composes the WooCommerce Subscriptions integration: it extends what the plugin already does',
-			' * instead of smuggling in a feature of its own, and it gates on its companion so none of this',
-			' * exists when Subscriptions is absent.',
+			' * instead of smuggling in a feature of its own, and it gates on its companion so none of it is',
+			' * constructed when Subscriptions is absent.',
 			' *',
 			' * This is what a leaf integration becomes the day it needs a second class: a folder owning a',
 			' * `Component` plus plain collaborators. The collaborators are plain final classes, not',
@@ -401,7 +376,7 @@ const MANIFEST = [
 			'\t * of an integration component: everything below may assume Subscriptions exists.'
 		),
 		to: block(
-			'\t * Whether WooCommerce Subscriptions is active; everything in this integration may assume it is.'
+			'\t * Whether WooCommerce Subscriptions is active; once constructed, the integration may assume it is.'
 		),
 	},
 
@@ -446,7 +421,7 @@ const MANIFEST = [
 			'\t * integration component: everything below may assume WooPayments exists.'
 		),
 		to: block(
-			'\t * Whether WooPayments is active; everything in this integration may assume it is.'
+			'\t * Whether WooPayments is active; once constructed, the integration may assume it is.'
 		),
 	},
 	{
@@ -466,8 +441,9 @@ const MANIFEST = [
 		action: 'replace-exact',
 		path: 'functions.php',
 		from: block(
-			"// This accessor is the plugin's whole supported surface for a peer plugin; the kernel classes",
-			'// behind it carry `@internal` and may change shape without notice.',
+			'// This accessor and the prefixed `get_plugin_slug()`, `get_plugin_name()` and `get_plugin_version()`',
+			"// getters in functions-bootstrap.php are the plugin's supported surface for a peer plugin; the",
+			'// kernel classes behind them carry `@internal` and may change shape without notice.',
 			'',
 			''
 		),
@@ -487,20 +463,234 @@ const MANIFEST = [
 		),
 		to: '',
 	},
+
+	{
+		action: 'replace-exact',
+		path: 'includes/settings.php',
+		from: block(
+			" * Returns the example option's value. Each typed option reader names its option, applies its",
+			' * default, and casts the return so callers never touch raw `get_option()` mixed values. The write',
+			" * side — registration, sanitization, and rendering — lives in the Settings feature's component",
+			' * in `src/Settings/Component.php`.'
+		),
+		to: block( " * Returns the example option's value." ),
+	},
+	{
+		action: 'replace-exact',
+		path: 'includes/assets.php',
+		from: block(
+			' * Returns an array with meta information for a given asset path. It starts from a fallback of the',
+			" * file's last-modified time as the version with no dependencies, overlays the version and",
+			' * dependencies from an `.asset.php` file beside the asset when one exists, and appends any extra',
+			' * dependencies passed in. A malformed generated payload is ignored entry by entry, so a stale or',
+			' * hand-edited `.asset.php` degrades to the fallback rather than enqueuing a broken handle.'
+		),
+		to: block(
+			' * Returns the version and dependencies for a given asset path, or null when the asset does not',
+			' * exist.'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'src/Integrations/WooCommerceSubscriptions/PriceNote.php',
+		from: block(
+			"\t * Appends the template's demonstration note to the companion-generated subscription price",
+			'\t * string.'
+		),
+		to: block(
+			'\t * Appends the example note to the subscription price string.'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'assets/css/src/settings.scss',
+		from: block(
+			' *',
+			' * `Settings\\Component::enqueue_admin_styles()` enqueues the compiled `settings.css` only on that',
+			' * screen. The physical `border-left` here is deliberate: it is what the RTL build step flips to',
+			' * `border-right` in the generated `settings-rtl.css`. Reach for logical properties in real styles;',
+			' * the physical property is the worked example that makes the RTL variant meaningfully different.',
+			''
+		),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/editor.scss',
+		from: block(
+			' *',
+			' * Replace them with your own styles or remove the file completely.',
+			''
+		),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/style.scss',
+		from: block(
+			' *',
+			' * Replace them with your own styles or remove the file completely.',
+			''
+		),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/block.json',
+		from: block( ' Copy this block to build your own.' ),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/edit.js',
+		from: block(
+			'/**',
+			' * Retrieves the translation of text.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/',
+			' */',
+			"import { __ } from '@wordpress/i18n';",
+			'',
+			'/**',
+			' * React hook that is used to mark the block wrapper element.',
+			' * It provides all the necessary props like the class name.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops',
+			' */',
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			' * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.',
+			' * Those files can contain any CSS code that gets applied to the editor.',
+			' *',
+			' * @see https://www.npmjs.com/package/@wordpress/scripts#using-css',
+			' */',
+			"import './editor.scss';",
+			'',
+			'/**',
+			' * The edit function describes the structure of your block in the context of the',
+			' * editor. This represents what the editor will render when the block is used.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit',
+			' *',
+			' * @return {Element} Element to render.',
+			' */'
+		),
+		to: block(
+			'/**',
+			' * WordPress dependencies',
+			' */',
+			"import { __ } from '@wordpress/i18n';",
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			' * Internal dependencies',
+			' */',
+			"import './editor.scss';",
+			'',
+			'/**',
+			' * Renders the block in the editor.',
+			' *',
+			' * @return {Element} Element to render.',
+			' */'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/index.js',
+		from: block(
+			'/**',
+			' * Registers a new block provided a unique name and an object defining its behavior.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/',
+			' */',
+			"import { registerBlockType } from '@wordpress/blocks';",
+			'',
+			'/**',
+			' * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.',
+			' * All files containing `style` keyword are bundled together. The code used',
+			' * gets applied both to the front of your site and to the editor.',
+			' *',
+			' * @see https://www.npmjs.com/package/@wordpress/scripts#using-css',
+			' */',
+			"import './style.scss';",
+			'',
+			'/**',
+			' * Internal dependencies',
+			' */',
+			"import Edit from './edit';",
+			"import save from './save';",
+			"import metadata from './block.json';",
+			'',
+			'/**',
+			' * Every block starts by registering a new block type definition.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/',
+			' */',
+			'registerBlockType( metadata.name, {',
+			'\t/**',
+			'\t * @see ./edit.js',
+			'\t */',
+			'\tedit: Edit,',
+			'',
+			'\t/**',
+			'\t * @see ./save.js',
+			'\t */',
+			'\tsave,',
+			'} );'
+		),
+		to: block(
+			'/**',
+			' * WordPress dependencies',
+			' */',
+			"import { registerBlockType } from '@wordpress/blocks';",
+			'',
+			'/**',
+			' * Internal dependencies',
+			' */',
+			"import './style.scss';",
+			"import Edit from './edit';",
+			"import save from './save';",
+			"import metadata from './block.json';",
+			'',
+			'registerBlockType( metadata.name, {',
+			'\tedit: Edit,',
+			'\tsave,',
+			'} );'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/save.js',
+		from: block(
+			'/**',
+			' * React hook that is used to mark the block wrapper element.',
+			' * It provides all the necessary props like the class name.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops',
+			' */',
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			' * The save function defines the way in which the different attributes should',
+			' * be combined into the final markup, which is then serialized by the block',
+			' * editor into `post_content`.',
+			' *'
+		),
+		to: block(
+			'/**',
+			' * WordPress dependencies',
+			' */',
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			" * Renders the block's saved markup.",
+			' *'
+		),
+	},
 ];
 
 const checkOnly = process.argv.includes( '--check' );
-
-// Group the manifest by target file so each file is read once and every entry against it is
-// applied to one working buffer in manifest order — the same buffer whether checking or writing,
-// so `--check` and the default apply never diverge.
-const entriesByPath = new Map();
-for ( const entry of MANIFEST ) {
-	if ( ! entriesByPath.has( entry.path ) ) {
-		entriesByPath.set( entry.path, [] );
-	}
-	entriesByPath.get( entry.path ).push( entry );
-}
 
 const fileExists = async ( path ) => {
 	try {
@@ -511,59 +701,46 @@ const fileExists = async ( path ) => {
 	}
 };
 
+// Every entry is checked before anything is written, so a drifted span fails the run with the tree
+// untouched; `--check` runs the same pass and stops there. Entries against one file apply in
+// manifest order to one buffer.
 const errors = [];
-const pendingWrites = [];
-const pendingDeletes = [];
-
-for ( const [ path, entries ] of entriesByPath ) {
-	const absolutePath = joinPath( '.', path );
-
-	const deleteEntries = entries.filter(
-		( entry ) => 'delete' === entry.action
-	);
-	const replaceEntries = entries.filter(
-		( entry ) => 'replace-exact' === entry.action
-	);
-
-	for ( const entry of deleteEntries ) {
-		if ( await fileExists( absolutePath ) ) {
-			pendingDeletes.push( absolutePath );
+const buffers = new Map();
+const deletes = [];
+for ( const { action, path, from, to } of MANIFEST ) {
+	if ( 'delete' === action ) {
+		if ( await fileExists( path ) ) {
+			deletes.push( path );
 		} else {
-			errors.push( `delete: ${ entry.path } does not exist` );
-		}
-	}
-
-	if ( 0 === replaceEntries.length ) {
-		continue;
-	}
-
-	if ( ! ( await fileExists( absolutePath ) ) ) {
-		for ( const entry of replaceEntries ) {
-			errors.push(
-				`replace-exact: ${ path } does not exist for span starting "${
-					entry.from.split( '\n' )[ 0 ]
-				}"`
-			);
+			errors.push( `delete: ${ path } does not exist` );
 		}
 		continue;
 	}
 
-	let buffer = await readFile( absolutePath, 'utf-8' );
-	for ( const entry of replaceEntries ) {
-		const occurrences = buffer.split( entry.from ).length - 1;
-		if ( 1 !== occurrences ) {
+	const span = from.split( '\n' )[ 0 ];
+	if ( ! buffers.has( path ) ) {
+		if ( ! ( await fileExists( path ) ) ) {
 			errors.push(
-				`replace-exact: ${ path } — span occurs ${ occurrences } times (want exactly 1): "${
-					entry.from.split( '\n' )[ 0 ]
-				}"`
+				`replace-exact: ${ path } does not exist for span starting "${ span }"`
 			);
 			continue;
 		}
-		// A function replacer inserts the text verbatim; a string replacement would interpret $-patterns inside it.
-		buffer = buffer.replace( entry.from, () => entry.to );
+		buffers.set( path, await readFile( path, 'utf-8' ) );
 	}
 
-	pendingWrites.push( { absolutePath, buffer } );
+	const buffer = buffers.get( path );
+	const occurrences = buffer.split( from ).length - 1;
+	if ( 1 !== occurrences ) {
+		errors.push(
+			`replace-exact: ${ path } — span occurs ${ occurrences } times (want exactly 1): "${ span }"`
+		);
+		continue;
+	}
+	// A function replacer inserts the text verbatim; a string replacement would interpret $-patterns inside it.
+	buffers.set(
+		path,
+		buffer.replace( from, () => to )
+	);
 }
 
 if ( 0 !== errors.length ) {
@@ -577,18 +754,11 @@ if ( 0 !== errors.length ) {
 	process.exit( 1 );
 }
 
-if ( checkOnly ) {
-	console.log(
-		'fill-in-scaffold-content: --check passed; every span matches exactly once.'
-	);
-	process.exit( 0 );
-}
-
-for ( const { absolutePath, buffer } of pendingWrites ) {
-	console.log( 'Stripping teaching content from %s', absolutePath );
-	await writeFile( absolutePath, buffer );
-}
-for ( const absolutePath of pendingDeletes ) {
-	console.log( 'Deleting %s', absolutePath );
-	await unlink( absolutePath );
+if ( ! checkOnly ) {
+	for ( const [ path, buffer ] of buffers ) {
+		await writeFile( path, buffer );
+	}
+	for ( const path of deletes ) {
+		await unlink( path );
+	}
 }
