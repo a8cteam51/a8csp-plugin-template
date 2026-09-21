@@ -153,15 +153,13 @@ jobs:
       - name: Commit the changed files.
         run: git commit -am "chore -- rename files from scaffolding"
 
-      - name: Clear the changelog fragments and the example POT.
+      - name: Clear the changelog fragments.
         run: |
           # Changelog fragments describe the scaffold's own development history, not the new plugin's, so they must not carry over into a freshly generated plugin.
           find changelog -type f ! -name '.gitkeep' -delete
-          # The POT's msgids and source references describe the template's own strings; a generated repo regenerates it with its own slug via the composer i18n scripts.
-          rm -f languages/*.pot
 
       - name: Commit the changed files.
-        run: git commit -am "chore -- clear scaffold changelog fragments and the example POT"
+        run: git commit -am "chore -- clear scaffold changelog fragments"
 
       - name: Setup PHP for the Composer resolve and the syntax sweep.
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2

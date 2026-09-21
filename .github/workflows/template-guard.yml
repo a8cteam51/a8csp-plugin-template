@@ -116,7 +116,6 @@ jobs:
           git mv a8csp-template-plugin.php "$REPO_NAME.php"
 
           find changelog -type f ! -name '.gitkeep' -delete
-          rm -f languages/*.pot
 
           node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
 

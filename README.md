@@ -22,8 +22,8 @@ changelogger and its `changelog/` fragments directory, `CHANGELOG.md`, and
 `release.yml` carry into generated plugins, which version by default — removing
 any of it is the generated plugin author's choice. The one tracked fragment,
 `changelog/initial-template-population`, is the machinery's fixture: it keeps
-`changelog:validate` non-vacuous here, and generation deletes it along with the
-example POT. A generated plugin's first release starts from the header-only
+`changelog:validate` non-vacuous here, and generation deletes it. A generated
+plugin's first release starts from the header-only
 `CHANGELOG.md`, where `changelogger write` has no entry to derive a version
 from, so that one write passes its version explicitly
 (`composer changelog:write -- --use-version=1.0.0`); the scaffold README
@@ -52,7 +52,7 @@ For generated repositories, the workflow:
    so a malformed value leaves the repository untouched.
 3. Renames `README.scaffold.md` to `README.md` and `a8csp-template-plugin.php` to the generated
    repository name.
-4. Deletes the template's changelog fragments and example POT.
+4. Deletes the template's changelog fragments.
 5. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
 6. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
    template's teaching prose (see below).
@@ -183,11 +183,6 @@ Generate translation files:
 ```sh
 composer run-script internationalize
 ```
-
-The tracked `languages/*.pot` file is an example of that output, generated from the template's own
-strings; regenerate it after changing translatable strings with `composer i18n:makepot` (the full
-`internationalize` script additionally refreshes `.po`/`.mo`/`.l10n.php` files and the
-JavaScript translation `.json` files when translations exist).
 
 ## Quality checks
 
