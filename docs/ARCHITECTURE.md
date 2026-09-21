@@ -141,8 +141,8 @@ WooCommerce tier:
    `add_settings()` method and its `woocommerce_get_settings_advanced` filter in
    `src/Integrations/WooCommerceSubscriptions/Component.php`.
 3. Empty the `options` list in the `footprint.php` manifest (`'options' => array(),`).
-   `uninstall.php` still clears the update-check transients; the uninstall proofs then check only
-   that their canary survives, until the first persisted key returns.
+   `uninstall.php` still clears the update-check transients; the uninstall proofs then cover only
+   those transients and their canary, until the first persisted key returns.
 4. Delete the example admin stylesheet (`assets/css/src/settings.scss` and its `assets/css/build/`
    output), the `build:assets:styles`, `build:assets:styles-rtl` and `start:assets:styles`
    scripts in `package.json`, and the `sass`, `postcss-cli` and `rtlcss` dev dependencies and
