@@ -87,8 +87,8 @@ The script replaces the following tracked template values:
 - `A8C\SpecialProjects\PluginTemplate` (including the JSON-escaped form in
   `composer.json`'s autoload keys) with a title-derived namespace.
 - `a8csp_template` and `A8CSP_TEMPLATE` with the configured PHP prefix.
-- `8890`–`8893` (the wp-env ports, matched only inside their `"port":`,
-  `localhost:`, and ports-table anchors) with a four-port block derived from a
+- `8890`–`8893` (the wp-env ports, matched only inside their `"port":` and
+  ports-table anchors) with a four-port block derived from a
   hash of the repository name, so fleet plugins started side by side don't
   contend for the same host ports.
 

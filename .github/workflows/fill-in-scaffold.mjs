@@ -143,12 +143,12 @@ const buildTemplate = async ( filePath ) => {
 
 	if ( 'README.md' !== filePath ) {
 		// Port literals are bare numbers, so they replace only inside their known anchors (the
-		// wp-env `"port":` keys, playwright's `localhost:` base URL, and the tests/README ports
-		// table) -- a tree-wide bare `8890` would also match inside package-lock.json integrity
-		// hashes. They also bypass the replacement map above: its values are JSON-escaped when
-		// landing in .json files, which would corrupt a match spanning structural JSON.
+		// wp-env `"port":` keys and the tests/README ports table) -- a tree-wide bare `8890` would
+		// also match inside package-lock.json integrity hashes. They also bypass the replacement
+		// map above: its values are JSON-escaped when landing in .json files, which would corrupt
+		// a match spanning structural JSON.
 		renderedTemplate = renderedTemplate.replace(
-			/(?<="port": |localhost:|\| )889[0-3](?=[,'\s|])/g,
+			/(?<="port": |\| )889[0-3](?=[,\s|])/g,
 			( match ) =>
 				String( portBase + ( Number( match ) - TEMPLATE_PORT_BASE ) )
 		);
