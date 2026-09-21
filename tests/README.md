@@ -56,15 +56,6 @@ and `test:multisite` — starts its own environment first: a container already r
 mount set it was created with, and `start` is what replaces it when the resolved config moved.
 `test:unit` needs no container and starts none.
 
-The `[ -n "$GITHUB_ACTIONS" ]` guard in front of that start keeps it out of CI, which owns the
-container's lifecycle in its own step, and says so rather than skipping in silence. On the
-Integration leg the guard is also load-bearing: that is the only matrix passing `wp-env-core`, so a
-second start would fall back to whatever `core` the config names — and `.wp-env.tests.json` names
-none, which makes it wp-env's default of latest stable. The floor leg is exposed too, not just
-nightly: it passes `wp-version`, which the workflow maps into the same step-scoped variable, so it
-would go green without testing the version it asked for. The latest leg names no core, so the
-fallback is what it wanted anyway.
-
 Unit (no wp-env required):
 
 ```sh
