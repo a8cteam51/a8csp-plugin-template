@@ -39,12 +39,8 @@ jobs:
             exit 1
           fi
 
-      # Validate every input before checkout so an invalid repository remains pristine.
-      # fill-in-scaffold.mjs derives every PHP global rename from php-globals-short-prefix and
-      # every title/namespace rename from human-title, and the repository description and name land
-      # in the plugin header and package identity. A malformed value bakes broken renames — up to
-      # unparseable PHP, or valid-but-injected PHP the syntax sweep cannot catch — into commits that
-      # are already pushed and trigger no CI.
+      # Validate every input before checkout: a malformed value would push broken or injected PHP in
+      # commits that trigger no CI, and an invalid repository stays pristine.
       - name: Validate the scaffold identity inputs.
         env:
           REPO_JSON: ${{ toJSON( github.event.repository ) }}
@@ -153,7 +149,7 @@ jobs:
 
       - name: Clear the changelog fragments.
         run: |
-          # Changelog fragments describe the scaffold's own development history, not the new plugin's, so they must not carry over into a freshly generated plugin.
+          # The template's one fragment only keeps its own changelog:validate non-vacuous.
           find changelog -type f ! -name '.gitkeep' -delete
 
       - name: Commit the changed files.
@@ -171,14 +167,8 @@ jobs:
           REPO_JSON: ${{ toJSON( github.event.repository ) }}
         run: node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
 
-      # Optional second phase: strip the template's teaching prose, rewriting each passage into the
-      # contract-level docblock a real plugin would carry, via the exact-match manifest in
-      # fill-in-scaffold-content.mjs. It runs only when the dispatch asked for it — the
-      # workflow_dispatch checkbox, or a `strip-teaching-content: true` key in the
-      # repository_dispatch client payload. The manifest's `from` spans are written in
-      # post-substitution form, so this MUST run after the identifier substitution above and before
-      # the syntax sweep below; a docrot drift (any span no longer matching exactly once) fails the
-      # build loudly rather than silently skipping.
+      # The manifest's spans are post-substitution text, so the strip runs after the substitution
+      # and before the syntax sweep.
       - name: Strip the template's teaching content.
         env:
           STRIP_INPUT: ${{ inputs.strip-teaching-content }}
@@ -217,10 +207,8 @@ jobs:
       - name: Resolve Composer dependencies afresh.
         run: composer update --no-install --prefer-stable --ignore-platform-req=php+ --no-interaction
 
-      # Substituted identifiers land inside PHP source, and the rebuild above regenerates PHP build
-      # assets — pushes from this workflow trigger no CI, so a parse error in either would ship a
-      # dead-on-arrival repository. The sweep runs after the build so it covers the committed build
-      # output too, and before anything is committed.
+      # This workflow's pushes trigger no CI, so the sweep covers substituted source and the rebuilt
+      # PHP assets before anything is committed.
       - name: Syntax-check every generated PHP file.
         run: |
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \

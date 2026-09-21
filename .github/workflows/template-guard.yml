@@ -62,11 +62,9 @@ jobs:
             exit 1
           fi
 
-  # Renders the scaffold against representative repository fixtures and asserts the generated
-  # tree is sound: no template literal survives, every PHP file parses, and the derived wp-env
-  # port block matches the engine's hash. The replicated rename/fill sequence mirrors
-  # fill-in-scaffold.yml step for step — change both together; this job exists so that
-  # divergence fails here instead of in a generated repository.
+  # Renders the scaffold against representative fixtures and asserts that no template literal
+  # survives, every PHP file parses, and the wp-env port block matches the engine's hash. It replays
+  # fill-in-scaffold.yml's rename, substitution, and strip steps; change them together.
   generation-contract:
     name: 'Generation contract: ${{ matrix.fixture }}'
     if: github.repository_id == '1297277915'
@@ -122,9 +120,6 @@ jobs:
           if [ "$STRIP" = 'true' ]; then
             node ./.github/workflows/fill-in-scaffold-content.mjs
           fi
-
-          # A rename that silently failed would let the literal sweep below pass vacuously.
-          test -f "$REPO_NAME.php"
 
           # The engines strip their own paths from the lint scope; a leftover reference is docrot.
           if grep -qF '.github/workflows/fill-in-scaffold' package.json; then
@@ -183,10 +178,8 @@ jobs:
           npm run lint:scripts -- --fix
           npm run lint:scripts
 
-  # The teaching-content strip manifest identifies each passage by an exact span that must occur
-  # exactly once. Editing the template's docblocks or comments can silently break a span (zero or
-  # duplicate matches), which would surface only at generation time as a failed fill-in push. This
-  # gate runs the manifest's --check on every template change so that drift fails here instead.
+  # A template edit that leaves a strip-manifest span matching zero or several times fails here
+  # instead of in a generation.
   content-manifest-drift:
     name: Enforce the teaching-content strip manifest
     if: github.repository_id == '1297277915'

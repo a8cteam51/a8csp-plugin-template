@@ -3,7 +3,7 @@ name: Release
 on:
   push:
     tags: ['v*']
-  # Exercises the release path without publishing, which is the only way to test it before a tag exists.
+  # With publish off, a dispatch rehearses the release before a tag exists.
   workflow_dispatch:
     inputs:
       publish:

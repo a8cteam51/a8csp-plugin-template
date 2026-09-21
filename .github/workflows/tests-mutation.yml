@@ -38,11 +38,7 @@ jobs:
 
       - name: Guard against a vacuously-green zero-mutant run
         run: |
-          # A guard-exit during Infection's in-process AST reflection can end a run
-          # "successfully" with zero mutants and no report (the ABSPATH bootstrap in
-          # infection.json prevents the known case). A green mutation job that tested
-          # nothing is not a pass, so this fails closed rather than trusting the exit
-          # code alone.
+          # Infection can exit 0 with zero mutants and no report; a run that tested nothing fails.
           summary=build/infection/infection-summary.json
           if [ ! -s "$summary" ]; then
             echo "::error::Infection produced no summary report at $summary -- zero mutants were generated (or the run aborted before reporting). A green mutation job with zero mutants is not a pass."
@@ -61,8 +57,7 @@ jobs:
 
           echo "Infection generated $count mutants."
 
-      # Local Infection runs are unreliable (macOS tmpdir coverage race), so CI is authoritative --
-      # keep the report even when the run or the guard above fails, to diagnose from.
+      # Keep the report even when the run or the guard above fails, to diagnose from.
       - name: Upload Infection logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1

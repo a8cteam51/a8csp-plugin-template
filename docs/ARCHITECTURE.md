@@ -64,7 +64,7 @@ every surviving component is initialized before any hook can fire.
   `assets/css/src/settings.scss` the compiled admin stylesheet example; `npm run build` is the
   single build contract and produces every tracked `build/` output, RTL variants included.
 - `tests/` contains the automated test suite; see `tests/README.md` for the local workflow.
-- `.github/workflows/` contains the quality, test, audit, and release workflows.
+- `.github/workflows/` contains the CI workflows.
 
 ## Multisite
 

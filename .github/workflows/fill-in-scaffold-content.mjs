@@ -5,15 +5,10 @@ import process from 'process';
 // and blank comment lines (`\t *`) are unambiguous in this file's own source.
 const block = ( ...lines ) => lines.join( '\n' );
 
-// The teaching-content strip manifest. It runs as the optional second scaffold phase, AFTER
-// fill-in-scaffold.mjs has already substituted every identifier, so each `from` is matched against
-// post-substitution source: every span here is deliberately free of substitutable tokens
-// (a8csp_template, A8CSP Template Plugin, a8csp-plugin-template, the namespace) so it reads
-// identically before and after that pass. Two entry shapes:
-//   { action: 'replace-exact', path, from, to } — `from` must occur EXACTLY ONCE in `path`.
+// The teaching-content strip manifest. It runs after fill-in-scaffold.mjs, so no span may contain a
+// substitutable token: each must read the same before and after that pass.
+//   { action: 'replace-exact', path, from, to } — `from` must occur exactly once in `path`.
 //   { action: 'delete', path }                  — `path` must exist.
-// Each replacement rewrites an architectural teaching passage into the contract-level docblock a
-// production plugin would carry; load-bearing constraint one-liners are left untouched by omission.
 const MANIFEST = [
 	// includes/_disabled-example.php exists only to teach the underscore opt-out convention.
 	{ action: 'delete', path: 'includes/_disabled-example.php' },

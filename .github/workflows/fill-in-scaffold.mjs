@@ -17,11 +17,8 @@ const escapeRegExp = ( string ) =>
 const repository = JSON.parse( process.argv[ 2 ] );
 const skippedDirectories = [ '.github', '.git' ];
 
-// Every generated repository gets its own wp-env port block, derived from the repository name:
-// deterministic across re-generations of the same repo, and collision-reducing (not unique —
-// 5000 blocks, so distinct names can hash together; wp-env override files cover that case) so
-// side-by-side `wp-env start`s rarely contend for the same host ports.
-// Blocks span 10000-29996, clear of the OS ephemeral port ranges.
+// A four-port wp-env block hashed from the repository name, in 10000-29996, clear of the OS ephemeral
+// ranges; distinct names can share a block, which wp-env override files resolve.
 const TEMPLATE_PORT_BASE = 8890;
 const nameHash = parseInt(
 	createHash( 'sha256' )
@@ -128,7 +125,7 @@ const buildTemplate = async ( filePath ) => {
 			const renderedValue = filePath.endsWith( '.json' )
 				? JSON.stringify( value ).slice( 1, -1 )
 				: value;
-			// A callback inserts each value literally, and the single pass leaves inserted metadata untouched by other keys.
+			// A callback keeps `$` sequences in the metadata literal, and one combined pass never re-substitutes inserted text.
 			return renderedValue;
 		}
 	);

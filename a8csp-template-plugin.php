@@ -35,8 +35,7 @@
 
 \defined( 'ABSPATH' ) || exit;
 
-// Define plugin constants. The metadata reader parses this absolute path: a WP_PLUGIN_DIR-derived
-// one resolves to nothing for an mu-plugin, and the kernel serves both load positions unmodified.
+// Define plugin constants.
 \define( 'A8CSP_TEMPLATE_FILE', __FILE__ );
 \define( 'A8CSP_TEMPLATE_BASENAME', plugin_basename( __FILE__ ) );
 \define( 'A8CSP_TEMPLATE_DIR_PATH', plugin_dir_path( __FILE__ ) );

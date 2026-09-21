@@ -67,17 +67,7 @@ Releases are cut from trunk, in four steps.
    git push origin "v1.0.0"
    ```
 
-   Tagging is the maintainer's step and the tag is signed, so expect the signing key's own confirmation prompt and GitHub reporting the tag as verified. The workflow triggers on `v*` tags only, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
-
-Both paths — the tag and the rehearsal — run the same jobs, and only the last one is conditional:
-
-| Job | What it proves |
-| --- | --- |
-| Verify release version | The plugin header, `package.json` and the newest `CHANGELOG.md` entry state one version. On a tag the tag states it too; on a dispatch there is no tag, so only the three declared versions are held against each other. Turning the release on from a non-tag ref fails here by design, which is why a dispatch cannot publish by accident. |
-| Verify release provenance | Trunk-push runs of `quality.yml` and `tests.yml` succeeded at this exact commit. A missing or red run fails the job; fix it, land the fix, and re-tag. |
-| Build the release artifact | Validates the changelog, installs production dependencies only, regenerates the POT — failing loudly if `make-pot` does not recognise the plugin — and packs `EXAMPLE_REPO_SLUG.zip`. |
-| Smoke test the artifact | Installs and activates that zip in a throwaway wp-env and checks the site serves. The artifact differs from the tested tree (production dependencies, a regenerated POT, `.distignore` filtering), so it is proven on its own. |
-| Publish the release | Runs only when the release is turned on. Takes the `CHANGELOG.md` section matching the tag as the release notes and creates the GitHub release with the zip attached. A hyphenated version such as `1.1.0-beta.1` publishes as a prerelease and stays off the latest-release endpoint, so stable installations are not offered it. |
+   The workflow triggers on `v*` tags only, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
 
 The release history is [`CHANGELOG.md`](CHANGELOG.md).
 

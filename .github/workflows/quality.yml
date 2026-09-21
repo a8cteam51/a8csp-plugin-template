@@ -51,10 +51,8 @@ jobs:
           coverage: none
           tools: none
 
-      # The entry file, functions-bootstrap.php, uninstall.php and the footprint.php it requires must
-      # parse below the plugin's PHP floor; functions.php loads only after the requirements gate.
-      # Generation renames the entry file without rewriting .github/, so it is found by its
-      # "Plugin Name:" header; the other three keep their names and are linted by name.
+      # These four files must parse below the plugin's PHP floor. Generation renames the entry file
+      # without rewriting .github/, so it is found by its "Plugin Name:" header.
       - name: Check the below-floor files for syntax errors
         run: |
           set -euo pipefail
