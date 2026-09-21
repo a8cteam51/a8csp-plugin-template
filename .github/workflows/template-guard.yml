@@ -200,7 +200,6 @@ jobs:
         with:
           persist-credentials: false
 
-      # The manifest check is a dependency-free string match, so it runs on the runner's built-in
-      # Node with no setup-node (and thus no dependency cache to poison on the tag-push trigger).
+      # The manifest check is a dependency-free string match, so the runner's built-in Node runs it.
       - name: Verify every strip-manifest span still matches exactly once
         run: node .github/workflows/fill-in-scaffold-content.mjs --check
