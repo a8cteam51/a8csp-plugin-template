@@ -169,8 +169,8 @@ jobs:
         with:
           node-version-file: 'package.json'
 
-      # Substitution changes identifier lengths, so Prettier-formatted lines need re-wrapping; this
-      # runs the fill-in's re-format step and then the generated repository's own JavaScript lint.
+      # Substitution changes identifier lengths, so Prettier-formatted lines need re-wrapping before the
+      # generated repository's own lint can pass.
       - name: Re-format and lint the rendered JavaScript
         if: matrix.lint == true
         run: |
