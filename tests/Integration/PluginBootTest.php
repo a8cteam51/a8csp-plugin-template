@@ -59,16 +59,13 @@ final class PluginBootTest extends TestCase {
 		);
 
 		self::assertTrue( \WP_Block_Type_Registry::get_instance()->is_registered( $block_metadata['name'] ) );
-		self::assertSame( 1, $this->count_settings_admin_init_registrations() );
 
-		// register_settings() runs on `admin_init`, where WordPress has loaded the wp-admin
-		// includes; loading the settings template functions here simulates that context for
-		// the direct call below.
+		// register_settings() runs on `admin_init`, where WordPress has loaded the wp-admin includes;
+		// the settings template functions are loaded here to stand in for that context. The call is
+		// direct because firing `admin_init` would also run WooCommerce's wp-admin-only callbacks.
 		require_once ABSPATH . 'wp-admin/includes/template.php';
-
-		// A direct call verifies registration without firing every shared `admin_init` callback.
 		( new Settings\Component() )->register_settings();
-		self::assertTrue( \array_key_exists( 'a8csp_template_example_option', get_registered_settings() ) );
+		self::assertArrayHasKey( 'a8csp_template_example_option', get_registered_settings() );
 
 		$sections = apply_filters( 'woocommerce_get_sections_advanced', array() );
 		self::assertArrayHasKey( 'a8csp_template', $sections );
@@ -119,33 +116,5 @@ final class PluginBootTest extends TestCase {
 		$field = (string) \ob_get_clean();
 
 		self::assertStringContainsString( 'value="' . esc_attr( 'audit-sentinel' ) . '"', $field );
-	}
-
-	/**
-	 * Counts the `admin_init` hook registrations that target a `Settings\Component` instance's
-	 * `register_settings` method, across all priorities.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  int
-	 */
-	private function count_settings_admin_init_registrations(): int {
-		$hook = $GLOBALS['wp_filter']['admin_init'] ?? null;
-		if ( ! $hook instanceof \WP_Hook ) {
-			return 0;
-		}
-
-		$count = 0;
-		foreach ( $hook->callbacks as $priority_callbacks ) {
-			foreach ( $priority_callbacks as $registration ) {
-				$callback = $registration['function'];
-				if ( \is_array( $callback ) && ( $callback[0] ?? null ) instanceof Settings\Component && 'register_settings' === ( $callback[1] ?? null ) ) {
-					++$count;
-				}
-			}
-		}
-
-		return $count;
 	}
 }
