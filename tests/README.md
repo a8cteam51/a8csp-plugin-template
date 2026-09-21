@@ -83,7 +83,8 @@ composer test:multisite
 npm run wp-env:multisite:stop
 ```
 
-End-to-end (Playwright starts and stops the dev wp-env instance itself via its `webServer` config):
+End-to-end (Playwright's `webServer` config starts the dev instance when none is running; stop it
+with `npm run wp-env:stop`):
 
 ```sh
 npm run test:e2e
