@@ -17,9 +17,9 @@ docblocks. The example block copy, settings labels, and option keys are yours to
 
 ## Working on the template
 
-The template never versions itself: no tags, releases, or changelog fragments, which
-`template-guard.yml` enforces. The changelog machinery, the header-only `CHANGELOG.md`, and
-`release.yml` are payload for generated plugins, which release from `1.0.0`.
+The template never versions itself: a repository ruleset blocks tags, `release.yml` skips its
+release job here, and `template-guard.yml` stops pull requests from adding changelog fragments or
+bumping the version. The changelog machinery, `CHANGELOG.md`, and `release.yml` are generated-plugin payload.
 
 [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) maps every file and holds the reshaping recipes,
 `README.scaffold.md` becomes a generated plugin's README, and [`tests/README.md`](tests/README.md)
