@@ -20,7 +20,7 @@ use A8C\SpecialProjects\PluginTemplate\AbstractComponent;
  * @since   1.0.0
  * @version 1.0.0
  *
- * @see uninstall.php
+ * @see footprint.php
  */
 final class Component extends AbstractComponent {
 	// region METHODS
@@ -55,8 +55,8 @@ final class Component extends AbstractComponent {
 	 * @return  void
 	 */
 	public function register_settings(): void {
-		// Every persisted key is mirrored in the `uninstall.php` footprint manifest in the same
-		// change that introduces the write.
+		// Every persisted key is listed in the `footprint.php` manifest in the same change that
+		// introduces the write.
 		register_setting(
 			'general',
 			'a8csp_template_example_option',
@@ -182,7 +182,7 @@ final class Component extends AbstractComponent {
 			array(
 				'title' => __( 'Example option', 'a8csp-plugin-template' ),
 				'desc'  => __( 'A persisted example setting owned by the WooCommerce settings surface.', 'a8csp-plugin-template' ),
-				// Mirrored in the `uninstall.php` footprint; the line there goes with this surface when it is deleted.
+				// Listed in the `footprint.php` manifest; the line there goes with this surface when it is deleted.
 				'id'    => 'a8csp_template_wc_example_option',
 				'type'  => 'text',
 			),

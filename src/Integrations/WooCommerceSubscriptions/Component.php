@@ -19,7 +19,7 @@ use A8C\SpecialProjects\PluginTemplate\ComponentInterface;
  * @since   1.0.0
  * @version 1.0.0
  *
- * @see uninstall.php
+ * @see footprint.php
  */
 final class Component implements ComponentInterface {
 	// region FIELDS AND CONSTANTS
@@ -105,7 +105,7 @@ final class Component implements ComponentInterface {
 		$subscriptions_row = array(
 			'title' => __( 'Subscriptions example option', 'a8csp-plugin-template' ),
 			'desc'  => __( 'A persisted example setting owned by the WooCommerce Subscriptions integration.', 'a8csp-plugin-template' ),
-			// Mirrored in the `uninstall.php` footprint; the line there goes with this component when it is deleted.
+			// Listed in the `footprint.php` manifest; the line there goes with this component when it is deleted.
 			'id'    => 'a8csp_template_wcs_example_option',
 			'type'  => 'text',
 		);
