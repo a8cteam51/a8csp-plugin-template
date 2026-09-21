@@ -56,8 +56,8 @@ For generated repositories, the workflow:
 5. Runs `.github/workflows/fill-in-scaffold.mjs` to replace template placeholder strings.
 6. Optionally runs `.github/workflows/fill-in-scaffold-content.mjs` to strip the
    template's teaching prose (see below).
-7. Resolves npm and Composer dependencies afresh (npm only to releases at least seven days old),
-   re-formats the substituted JavaScript, and rebuilds the committed assets.
+7. Resolves npm dependencies afresh (only to releases at least seven days old), re-formats the
+   substituted JavaScript, rebuilds the committed assets, and resolves Composer dependencies afresh.
 8. Syntax-checks every generated PHP file.
 9. Deletes the spent scaffold workflows and the template guard.
 10. Commits and pushes the generated files.

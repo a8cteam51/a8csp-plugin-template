@@ -134,7 +134,7 @@ jobs:
           fi
 
       # .github is excluded because the real run deletes the spent machinery instead of
-      # substituting inside it; composer.lock is re-locked by the real run after this point.
+      # substituting inside it; the real run resolves both locks afresh after this point.
       - name: Assert no template literal survives.
         run: |
           set -euo pipefail
