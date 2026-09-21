@@ -79,7 +79,8 @@ final class Component extends AbstractComponent {
 			__( 'Example option', 'a8csp-plugin-template' ),
 			array( $this, 'render_field' ),
 			'general',
-			'a8csp_template_example_section'
+			'a8csp_template_example_section',
+			array( 'label_for' => 'a8csp_template_example_option' )
 		);
 	}
 
