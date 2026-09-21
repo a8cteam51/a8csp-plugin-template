@@ -2,7 +2,7 @@ name: Mutation Tests
 
 on:
   schedule:
-    # Weekly Monday 05:00 UTC -- mutation testing is slow, so it runs off the PR/push path.
+    # Mutation testing is slow, so it runs off the pull request and push path.
     - cron: '0 5 * * 1'
   workflow_dispatch:
 

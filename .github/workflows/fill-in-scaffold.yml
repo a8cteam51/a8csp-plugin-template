@@ -88,9 +88,7 @@ jobs:
           elif [[ ! "$human_title" =~ $title_grammar ]]; then
             report_error "repository custom property 'human-title'" "$human_title" 'it must contain only letters, digits, and spaces (it lands in PHP string literals and a namespace segment)'
           else
-            # This template generates a real PHP namespace from the title (unlike the site template,
-            # whose title-derived value reaches only @package tags), so the space-stripped form must
-            # itself be a valid PHP identifier.
+            # The space-stripped title becomes a PHP namespace segment, so it must be a valid identifier.
             namespace_segment=$(printf '%s' "$human_title" | sed 's/ //g; s/A8CSP//')
             if ! printf '%s' "$namespace_segment" | grep -Eq '^[A-Za-z_][A-Za-z0-9_]*$'; then
               report_error "repository custom property 'human-title'" "$human_title" "its space-stripped form '$namespace_segment' must be a valid PHP namespace segment (start with a letter)"
@@ -231,9 +229,6 @@ jobs:
       - name: Commit the changed files.
         run: git commit -am "chore -- fill in scaffolding placeholders"
 
-      # Deleting workflow files is the one .github/workflows change the push token permits
-      # (it can never create or update them), which is why the template guard is a whole
-      # separate workflow instead of steps inside quality.yml and release.yml.
       - name: Remove the spent fill-in-scaffold workflow and the template guard.
         run: |
           rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs .github/workflows/template-guard.yml

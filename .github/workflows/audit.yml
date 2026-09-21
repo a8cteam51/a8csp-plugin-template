@@ -5,7 +5,7 @@ on:
   push:
     branches: [trunk]
   schedule:
-    # Weekly Monday 07:00 UTC -- catches newly disclosed advisories between dependency bumps.
+    # Catches newly disclosed advisories between dependency bumps.
     - cron: '0 7 * * 1'
 
 concurrency:

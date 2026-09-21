@@ -13,7 +13,5 @@ parameters:
         - %currentWorkingDirectory%/a8csp-template-plugin.php
         - %currentWorkingDirectory%/footprint.php
     WPCompat:
-        # wp-compat's own fallback guesses "{cwd}/{basename(cwd)}.php", which only holds
-        # by coincidence when a repo's directory name matches its entry file; declared
-        # explicitly so it doesn't depend on that coincidence.
+        # wp-compat's fallback finds the entry file only when the checkout directory shares its name.
         pluginFile: %currentWorkingDirectory%/a8csp-template-plugin.php
