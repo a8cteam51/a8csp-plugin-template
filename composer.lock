@@ -13,12 +13,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/a8cteam51/a8csp-configs.git",
-                "reference": "8d6e3bd85bfcf6daa0ed050af81259c785cdcb5e"
+                "reference": "c73f412154b281ffb8964b69e3bf6676087f8e49"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/8d6e3bd85bfcf6daa0ed050af81259c785cdcb5e",
-                "reference": "8d6e3bd85bfcf6daa0ed050af81259c785cdcb5e",
+                "url": "https://api.github.com/repos/a8cteam51/a8csp-configs/zipball/c73f412154b281ffb8964b69e3bf6676087f8e49",
+                "reference": "c73f412154b281ffb8964b69e3bf6676087f8e49",
                 "shasum": ""
             },
             "require": {
@@ -37,7 +37,6 @@
                 "wp-coding-standards/wpcs": "^3"
             },
             "require-dev": {
-                "composer/composer": "^2",
                 "phpcompatibility/php-compatibility": "^10@alpha",
                 "phpcompatibility/phpcompatibility-paragonie": "^2@alpha",
                 "phpcompatibility/phpcompatibility-wp": "^3@alpha",
@@ -79,7 +78,7 @@
                 "source": "https://github.com/a8cteam51/a8csp-configs/tree/trunk",
                 "issues": "https://github.com/a8cteam51/a8csp-configs/issues"
             },
-            "time": "2026-09-17T15:32:23+00:00"
+            "time": "2026-09-21T17:46:43+00:00"
         },
         {
             "name": "automattic/jetpack-changelogger",
@@ -7630,7 +7629,7 @@
         "phpcompatibility/phpcompatibility-wp": 15,
         "roave/security-advisories": 20
     },
-    "prefer-stable": false,
+    "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": ">=8.5",
