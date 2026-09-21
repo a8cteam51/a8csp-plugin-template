@@ -213,12 +213,19 @@ jobs:
             echo "::notice::the dispatch did not ask for strip-teaching-content; keeping the template teaching prose"
           fi
 
-      # --ignore-scripts keeps dependency lifecycle code from executing inside a job that will
-      # push to the repository; the generated repository's own developers install normally. A full
-      # re-resolve (not an in-place name substitution) is what correctly hoists git-dependency edges.
-      - name: Regenerate package-lock.json after the name substitution.
+      # A new repository starts on current dependencies, not on the template's possibly old lock,
+      # holding npm to releases at least seven days old. --ignore-scripts skips install scripts; the
+      # re-format and build steps below still run dependency code.
+      - name: Resolve npm dependencies afresh.
         if: steps.scaffold-check.outputs.already-filled != 'true'
-        run: rm -f package-lock.json && npm install --ignore-scripts
+        run: |
+          rm -f package-lock.json
+          npm install --ignore-scripts --min-release-age=7 2>&1 | tee "$RUNNER_TEMP/npm-install.log"
+          # An npm without the option only warns and then resolves without the release-age window.
+          if grep -qF 'Unknown cli config "--min-release-age"' "$RUNNER_TEMP/npm-install.log"; then
+            echo "::error::this npm does not support --min-release-age, so the resolve ignored the release-age window"
+            exit 1
+          fi
 
       # Substitution changes identifier lengths inside Prettier-formatted JavaScript, so lines wrap
       # differently; re-formatting here keeps the generated repository's first lint run green.
@@ -232,10 +239,10 @@ jobs:
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: npm run build
 
-      # The name substitution invalidates composer.lock's content-hash, so the lock is refreshed before the commit includes it.
-      - name: Re-lock composer.json after the name substitution.
+      # A new repository starts on current Composer dependencies too; the lock is resolved, not installed.
+      - name: Resolve Composer dependencies afresh.
         if: steps.scaffold-check.outputs.already-filled != 'true'
-        run: composer update --lock --no-install
+        run: composer update --no-install --prefer-stable --ignore-platform-req=php+ --no-interaction
 
       # Substituted identifiers land inside PHP source, and the rebuild above regenerates PHP build
       # assets — pushes from this workflow trigger no CI, so a parse error in either would ship a
