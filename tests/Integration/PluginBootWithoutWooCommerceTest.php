@@ -56,6 +56,11 @@ final class PluginBootWithoutWooCommerceTest extends TestCase {
 		// `admin_init` fires where WordPress has loaded the wp-admin includes; the settings
 		// template functions are loaded here to stand in for that context.
 		require_once ABSPATH . 'wp-admin/includes/template.php';
+		// Core's update checks also run on `admin_init` and call WordPress.org; detached, the proof
+		// does not depend on the network.
+		remove_action( 'admin_init', '_maybe_update_core' );
+		remove_action( 'admin_init', '_maybe_update_plugins' );
+		remove_action( 'admin_init', '_maybe_update_themes' );
 		do_action( 'admin_init' );
 		self::assertArrayNotHasKey( 'a8csp_template_example_option', get_registered_settings() );
 	}
