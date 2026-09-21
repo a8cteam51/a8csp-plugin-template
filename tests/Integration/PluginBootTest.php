@@ -35,8 +35,8 @@ final class PluginBootTest extends TestCase {
 	 * On an at-floor runtime the requirements gate passes, `plugins_loaded` is wired to the
 	 * memoized root's `boot()` (the accessor constructs eagerly at include time, so the wiring
 	 * check below resolves against the same instance), and by request time the pipeline has run
-	 * the demo components far enough to register the block, wire and register the base setting,
-	 * and expose the WooCommerce section and its persisted field.
+	 * the demo components far enough to register the block and expose the WooCommerce section and
+	 * its persisted field. The base setting's callback registers it when called directly.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
