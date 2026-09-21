@@ -1,8 +1,7 @@
 # Architecture
 
 This is the map of the plugin: what each file owns, how the pieces boot, and the recipes for
-reshaping them. It ships with the plugin repository so the map survives for every future
-maintainer, not just the person who generated it.
+reshaping them.
 
 ## The component model
 
@@ -43,7 +42,7 @@ every surviving component is initialized before any hook can fire.
   one of its payment-metadata filters — and `src/Integrations/WooCommerceSubscriptions/` is the
   grown sub-feature folder owning its own `Component` plus a plain collaborator, still
   forwarding-depth one. More nesting than this is the signal a plugin has outgrown manual
-  composition; see the group root's notes.
+  composition.
 - `includes/` contains automatically loaded procedural helpers, including typed option readers;
   PHP files dropped there load automatically inside WordPress, while underscore-prefixed files
   are skipped.

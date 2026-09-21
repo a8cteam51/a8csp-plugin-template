@@ -5,10 +5,7 @@ test.describe( 'Plugin activation', () => {
 		await requestUtils.activatePlugin( 'a8csp-template-plugin' );
 	} );
 
-	test( 'the scaffold plugin is listed as active', async ( {
-		admin,
-		page,
-	} ) => {
+	test( 'the plugin is listed as active', async ( { admin, page } ) => {
 		await admin.visitAdminPage( 'plugins.php' );
 
 		const pluginRow = page.locator(

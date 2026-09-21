@@ -98,10 +98,8 @@ npm run test:e2e
 | Below-floor | `.wp-env.belowfloor.json` | 8891 |
 | Multisite   | `.wp-env.multisite.json`  | 8892 |
 
-Generated repositories get their own four-port block, derived from the repository name at
-generation, so plugins started side by side don't contend for the same host ports. If two
-environments still collide on one machine, wp-env's untracked override files take local
-precedence (`.wp-env.override.json`; custom configs pair with e.g.
+If another local environment already uses these ports, wp-env's untracked override files take
+local precedence (`.wp-env.override.json`; custom configs pair with e.g.
 `.wp-env.tests.override.json`).
 
 ## Why plain `TestCase`, not `WP_UnitTestCase`
@@ -112,7 +110,7 @@ or core's PHPUnit compatibility range.
 
 That trade gives up `$this->factory` fixture helpers, `go_to()` routing simulation, and
 `WP_UnitTestCase`'s per-test transaction rollback. The first two exist for content- and
-query-heavy plugins exercising post/term/user fixtures and template routing — this scaffold's
+query-heavy plugins exercising post/term/user fixtures and template routing — this plugin's
 Integration suite is narrower (boot path, requirements gating), so their absence costs little.
 Without rollback, the database persists across tests: each test removes what it seeds, except that
 the uninstall proofs leave their footprint to the `uninstall.php` run they assert on.

@@ -289,10 +289,7 @@ const MANIFEST = [
 			'\t * The value comes through the typed reader in `includes/settings.php`, the worked example of',
 			'\t * reading an option this component registers.'
 		),
-		to: block(
-			"\t * Renders the example option's settings field, escaping the persisted value on output even",
-			'\t * though it is also sanitized before it is stored.'
-		),
+		to: block( "\t * Renders the example option's settings field." ),
 	},
 	{
 		action: 'replace-exact',
@@ -300,11 +297,13 @@ const MANIFEST = [
 		from: block(
 			"\t * Enqueues the admin stylesheet on the General options page — the surface this component's demo",
 			'\t * field lives on. Gating on the hook suffix keeps the stylesheet off every other admin screen,',
-			'\t * the worked example of a scoped admin enqueue. The compiled asset carries its version and'
+			'\t * the worked example of a scoped admin enqueue. The compiled asset carries its version and',
+			'\t * dependencies through the same asset-meta helper the block script uses, and',
+			"\t * `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left",
+			'\t * locales.'
 		),
 		to: block(
-			'\t * Enqueues the settings stylesheet on the General options page. The compiled asset carries its',
-			'\t * version and'
+			'\t * Enqueues the settings stylesheet on the General options page.'
 		),
 	},
 	{
@@ -326,10 +325,7 @@ const MANIFEST = [
 			'\t * own settings save, so declaring the field is the whole persistence story and the option key',
 			'\t * still appears in the uninstallation footprint.'
 		),
-		to: block(
-			"\t * Declares this section's WooCommerce settings rows. WooCommerce persists the field through its",
-			'\t * own settings save, so declaring it is the whole persistence story.'
-		),
+		to: block( "\t * Declares this section's WooCommerce settings rows." ),
 	},
 
 	{
@@ -481,6 +477,231 @@ const MANIFEST = [
 			''
 		),
 		to: '',
+	},
+
+	{
+		action: 'replace-exact',
+		path: 'includes/settings.php',
+		from: block(
+			" * Returns the example option's value. Each typed option reader names its option, applies its",
+			' * default, and casts the return so callers never touch raw `get_option()` mixed values. The write',
+			" * side — registration, sanitization, and rendering — lives in the Settings feature's component",
+			' * in `src/Settings/Component.php`.'
+		),
+		to: block( " * Returns the example option's value." ),
+	},
+	{
+		action: 'replace-exact',
+		path: 'includes/assets.php',
+		from: block(
+			' * Returns an array with meta information for a given asset path. It starts from a fallback of the',
+			" * file's last-modified time as the version with no dependencies, overlays the version and",
+			' * dependencies from an `.asset.php` file beside the asset when one exists, and appends any extra',
+			' * dependencies passed in. A malformed generated payload is ignored entry by entry, so a stale or',
+			' * hand-edited `.asset.php` degrades to the fallback rather than enqueuing a broken handle.'
+		),
+		to: block(
+			' * Returns the version and dependencies for a given asset path, or null when the asset does not',
+			' * exist.'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'src/Integrations/WooCommerceSubscriptions/PriceNote.php',
+		from: block(
+			"\t * Appends the template's demonstration note to the companion-generated subscription price",
+			'\t * string.'
+		),
+		to: block(
+			'\t * Appends the example note to the subscription price string.'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'assets/css/src/settings.scss',
+		from: block(
+			' *',
+			' * `Settings\\Component::enqueue_admin_styles()` enqueues the compiled `settings.css` only on that',
+			' * screen. The physical `border-left` here is deliberate: it is what the RTL build step flips to',
+			' * `border-right` in the generated `settings-rtl.css`. Reach for logical properties in real styles;',
+			' * the physical property is the worked example that makes the RTL variant meaningfully different.',
+			''
+		),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/editor.scss',
+		from: block(
+			' *',
+			' * Replace them with your own styles or remove the file completely.',
+			''
+		),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/style.scss',
+		from: block(
+			' *',
+			' * Replace them with your own styles or remove the file completely.',
+			''
+		),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/block.json',
+		from: block( ' Copy this block to build your own.' ),
+		to: '',
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/edit.js',
+		from: block(
+			'/**',
+			' * Retrieves the translation of text.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-i18n/',
+			' */',
+			"import { __ } from '@wordpress/i18n';",
+			'',
+			'/**',
+			' * React hook that is used to mark the block wrapper element.',
+			' * It provides all the necessary props like the class name.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops',
+			' */',
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			' * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.',
+			' * Those files can contain any CSS code that gets applied to the editor.',
+			' *',
+			' * @see https://www.npmjs.com/package/@wordpress/scripts#using-css',
+			' */',
+			"import './editor.scss';",
+			'',
+			'/**',
+			' * The edit function describes the structure of your block in the context of the',
+			' * editor. This represents what the editor will render when the block is used.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-edit-save/#edit',
+			' *',
+			' * @return {Element} Element to render.',
+			' */'
+		),
+		to: block(
+			'/**',
+			' * WordPress dependencies',
+			' */',
+			"import { __ } from '@wordpress/i18n';",
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			' * Internal dependencies',
+			' */',
+			"import './editor.scss';",
+			'',
+			'/**',
+			' * Renders the block in the editor.',
+			' *',
+			' * @return {Element} Element to render.',
+			' */'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/index.js',
+		from: block(
+			'/**',
+			' * Registers a new block provided a unique name and an object defining its behavior.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/',
+			' */',
+			"import { registerBlockType } from '@wordpress/blocks';",
+			'',
+			'/**',
+			' * Lets webpack process CSS, SASS or SCSS files referenced in JavaScript files.',
+			' * All files containing `style` keyword are bundled together. The code used',
+			' * gets applied both to the front of your site and to the editor.',
+			' *',
+			' * @see https://www.npmjs.com/package/@wordpress/scripts#using-css',
+			' */',
+			"import './style.scss';",
+			'',
+			'/**',
+			' * Internal dependencies',
+			' */',
+			"import Edit from './edit';",
+			"import save from './save';",
+			"import metadata from './block.json';",
+			'',
+			'/**',
+			' * Every block starts by registering a new block type definition.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/block-api/block-registration/',
+			' */',
+			'registerBlockType( metadata.name, {',
+			'\t/**',
+			'\t * @see ./edit.js',
+			'\t */',
+			'\tedit: Edit,',
+			'',
+			'\t/**',
+			'\t * @see ./save.js',
+			'\t */',
+			'\tsave,',
+			'} );'
+		),
+		to: block(
+			'/**',
+			' * WordPress dependencies',
+			' */',
+			"import { registerBlockType } from '@wordpress/blocks';",
+			'',
+			'/**',
+			' * Internal dependencies',
+			' */',
+			"import './style.scss';",
+			"import Edit from './edit';",
+			"import save from './save';",
+			"import metadata from './block.json';",
+			'',
+			'registerBlockType( metadata.name, {',
+			'\tedit: Edit,',
+			'\tsave,',
+			'} );'
+		),
+	},
+	{
+		action: 'replace-exact',
+		path: 'blocks/src/example-notice/save.js',
+		from: block(
+			'/**',
+			' * React hook that is used to mark the block wrapper element.',
+			' * It provides all the necessary props like the class name.',
+			' *',
+			' * @see https://developer.wordpress.org/block-editor/reference-guides/packages/packages-block-editor/#useblockprops',
+			' */',
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			' * The save function defines the way in which the different attributes should',
+			' * be combined into the final markup, which is then serialized by the block',
+			' * editor into `post_content`.',
+			' *'
+		),
+		to: block(
+			'/**',
+			' * WordPress dependencies',
+			' */',
+			"import { useBlockProps } from '@wordpress/block-editor';",
+			'',
+			'/**',
+			" * Renders the block's saved markup.",
+			' *'
+		),
 	},
 ];
 

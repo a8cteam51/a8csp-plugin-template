@@ -107,8 +107,8 @@ final class Component extends AbstractComponent {
 	 * Enqueues the admin stylesheet on the General options page — the surface this component's demo
 	 * field lives on. Gating on the hook suffix keeps the stylesheet off every other admin screen,
 	 * the worked example of a scoped admin enqueue. The compiled asset carries its version and
-	 * dependencies through the same `a8csp_template_get_asset_meta()` helper the block script uses,
-	 * and `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left
+	 * dependencies through the same asset-meta helper the block script uses, and
+	 * `wp_style_add_data( …, 'rtl', 'replace' )` swaps in the built `-rtl.css` on right-to-left
 	 * locales.
 	 *
 	 * @since   1.0.0

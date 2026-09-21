@@ -97,9 +97,8 @@ final class PluginBootTest extends TestCase {
 	}
 
 	/**
-	 * The example option round-trips through the surfaces the scaffold models: a persisted value
-	 * comes back through the typed reader, and the settings field renders it escaped into its
-	 * `value` attribute.
+	 * The example option round-trips: a persisted value comes back through the typed reader, and
+	 * the settings field renders it escaped into its `value` attribute.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
