@@ -7,8 +7,8 @@ use PHPUnit\Framework\TestCase;
 
 /**
  * Proves the GitHub release updater's channel and packaging decisions: a stable installation
- * follows only the latest-release endpoint while a prerelease installation scans the full
- * release list for the first non-draft entry, each channel caches under its own transient key
+ * follows only the latest-release endpoint while a prerelease installation scans the full release
+ * list for the highest-versioned non-draft entry, each channel caches under its own transient key
  * so a channel switch never serves the other channel's releases, the update package is the
  * release asset matched by name, an up-to-date installation is offered nothing, and a failed
  * fetch is negative-cached briefly so update checks don't hammer a failing API.
