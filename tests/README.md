@@ -114,7 +114,8 @@ That trade gives up `$this->factory` fixture helpers, `go_to()` routing simulati
 `WP_UnitTestCase`'s per-test transaction rollback. The first two exist for content- and
 query-heavy plugins exercising post/term/user fixtures and template routing — this scaffold's
 Integration suite is narrower (boot path, requirements gating), so their absence costs little.
-Without rollback, the database persists across tests, so each test cleans up what it writes.
+Without rollback, the database persists across tests: each test removes what it seeds, except that
+the uninstall proofs leave their footprint to the `uninstall.php` run they assert on.
 
 ## Mutation testing
 

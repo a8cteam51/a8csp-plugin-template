@@ -67,7 +67,7 @@ Releases are cut from trunk, in four steps.
    git push origin "v1.0.0"
    ```
 
-   The workflow triggers on `v*` tags only, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
+   Pushing a `v*` tag runs the release, and the publish step passes `--verify-tag`, so the tag has to reach the remote before the release can be created.
 
 The release history is [`CHANGELOG.md`](CHANGELOG.md).
 
