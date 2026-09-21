@@ -11,7 +11,7 @@ on:
         required: false
         default: false
 
-# Serialize runs repo-wide; a cancelled half-pushed fill would leave the generated repo inconsistent.
+# One fill at a time; a duplicate dispatch then fills from the pre-fill commit and its push is rejected.
 concurrency:
   group: fill-scaffold-${{ github.repository_id }}
   cancel-in-progress: false
@@ -135,28 +135,15 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Check whether the scaffold was already filled.
-        id: scaffold-check
-        run: |
-          if [ ! -f .github/workflows/fill-in-scaffold.mjs ] || [ ! -f .github/workflows/fill-in-scaffold-content.mjs ] || [ ! -f README.scaffold.md ]; then
-            echo "::notice::a prior fill-in-scaffold run already completed; this duplicate run is a no-op"
-            echo "already-filled=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "already-filled=false" >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Setup proper Node.js version
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
           node-version-file: 'package.json'
 
       - name: Set github actions[bot] as the committer.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: git config --local user.name 'github-actions[bot]' && git config --local user.email 'github-actions[bot]@users.noreply.github.com'
 
       - name: Rename the readme and plugin file.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         env:
           REPO_NAME: ${{ github.event.repository.name }}
         run: |
@@ -164,11 +151,9 @@ jobs:
           git mv a8csp-template-plugin.php "$REPO_NAME.php"
 
       - name: Commit the changed files.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: git commit -am "chore -- rename files from scaffolding"
 
       - name: Clear the changelog fragments and the example POT.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
           # Changelog fragments describe the scaffold's own development history, not the new plugin's, so they must not carry over into a freshly generated plugin.
           find changelog -type f ! -name '.gitkeep' -delete
@@ -176,11 +161,9 @@ jobs:
           rm -f languages/*.pot
 
       - name: Commit the changed files.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: git commit -am "chore -- clear scaffold changelog fragments and the example POT"
 
       - name: Setup PHP for the syntax sweep and composer re-lock.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.5'
@@ -188,7 +171,6 @@ jobs:
           tools: composer:v2
 
       - name: Perform string replacements within the files.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         env:
           REPO_JSON: ${{ toJSON( github.event.repository ) }}
         run: node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
@@ -202,7 +184,6 @@ jobs:
       # the syntax sweep below; a docrot drift (any span no longer matching exactly once) fails the
       # build loudly rather than silently skipping.
       - name: Strip the template's teaching content.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         env:
           STRIP_INPUT: ${{ inputs.strip-teaching-content }}
           STRIP_PAYLOAD: ${{ github.event.client_payload.strip-teaching-content }}
@@ -217,7 +198,6 @@ jobs:
       # holding npm to releases at least seven days old. --ignore-scripts skips install scripts; the
       # re-format and build steps below still run dependency code.
       - name: Resolve npm dependencies afresh.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
           rm -f package-lock.json
           npm install --ignore-scripts --min-release-age=7 2>&1 | tee "$RUNNER_TEMP/npm-install.log"
@@ -230,18 +210,15 @@ jobs:
       # Substitution changes identifier lengths inside Prettier-formatted JavaScript, so lines wrap
       # differently; re-formatting here keeps the generated repository's first lint run green.
       - name: Re-format the substituted JavaScript.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: npm run lint:scripts -- --fix
 
       # Substitution rewrote asset sources (slugs, text domains), so the committed build output is
       # rebuilt to match what this tree itself produces -- the build-integrity gate diffs exactly that.
       - name: Rebuild the committed assets from the substituted sources.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: npm run build
 
       # A new repository starts on current Composer dependencies too; the lock is resolved, not installed.
       - name: Resolve Composer dependencies afresh.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: composer update --no-install --prefer-stable --ignore-platform-req=php+ --no-interaction
 
       # Substituted identifiers land inside PHP source, and the rebuild above regenerates PHP build
@@ -249,27 +226,23 @@ jobs:
       # dead-on-arrival repository. The sweep runs after the build so it covers the committed build
       # output too, and before anything is committed.
       - name: Syntax-check every generated PHP file.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
 
       - name: Commit the changed files.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: git commit -am "chore -- fill in scaffolding placeholders"
 
       # Deleting workflow files is the one .github/workflows change the push token permits
       # (it can never create or update them), which is why the template guard is a whole
       # separate workflow instead of steps inside quality.yml and release.yml.
       - name: Remove the spent fill-in-scaffold workflow and the template guard.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         run: |
           rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs .github/workflows/template-guard.yml
           git add .github/workflows
           git commit -m "chore -- remove the spent fill-in-scaffold workflow and the template guard"
 
       - name: Publish all the changed commits.
-        if: steps.scaffold-check.outputs.already-filled != 'true'
         env:
           GITHUB_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}
