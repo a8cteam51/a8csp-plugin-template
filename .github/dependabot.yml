@@ -10,6 +10,8 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+      exclude:
+        - "a8cteam51/a8csp-configs"
     commit-message:
       prefix: "ci"
     open-pull-requests-limit: 5
@@ -24,6 +26,8 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+      exclude:
+        - "a8csp/configs"
     commit-message:
       prefix: "composer"
     open-pull-requests-limit: 5
@@ -38,6 +42,8 @@ updates:
           - "*"
     cooldown:
       default-days: 7
+      exclude:
+        - "@a8csp/configs"
     commit-message:
       prefix: "npm"
     open-pull-requests-limit: 5
