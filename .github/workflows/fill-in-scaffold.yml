@@ -220,6 +220,12 @@ jobs:
         if: steps.scaffold-check.outputs.already-filled != 'true'
         run: rm -f package-lock.json && npm install --ignore-scripts
 
+      # Substitution changes identifier lengths inside Prettier-formatted JavaScript, so lines wrap
+      # differently; re-formatting here keeps the generated repository's first lint run green.
+      - name: Re-format the substituted JavaScript.
+        if: steps.scaffold-check.outputs.already-filled != 'true'
+        run: npm run lint:scripts -- --fix
+
       # Substitution rewrote asset sources (slugs, text domains), so the committed build output is
       # rebuilt to match what this tree itself produces -- the build-integrity gate diffs exactly that.
       - name: Rebuild the committed assets from the substituted sources.
