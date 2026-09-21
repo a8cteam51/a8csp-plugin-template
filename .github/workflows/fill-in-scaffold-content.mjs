@@ -400,7 +400,7 @@ const MANIFEST = [
 			'\t * of an integration component: everything below may assume Subscriptions exists.'
 		),
 		to: block(
-			'\t * Whether WooCommerce Subscriptions is active; everything in this integration may assume it is.'
+			'\t * Whether WooCommerce Subscriptions is active; once constructed, the integration may assume it is.'
 		),
 	},
 
@@ -445,7 +445,7 @@ const MANIFEST = [
 			'\t * integration component: everything below may assume WooPayments exists.'
 		),
 		to: block(
-			'\t * Whether WooPayments is active; everything in this integration may assume it is.'
+			'\t * Whether WooPayments is active; once constructed, the integration may assume it is.'
 		),
 	},
 	{
