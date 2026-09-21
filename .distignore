@@ -39,6 +39,9 @@ composer.json
 composer.lock
 README.scaffold.md
 /docs
+AGENTS.md
+CLAUDE.md
+.agents
 
 # Secret material — never ship, even if a consumer forgets to list it.
 # .pem/.key are root-anchored (leading /) so certs bundled under vendor/
