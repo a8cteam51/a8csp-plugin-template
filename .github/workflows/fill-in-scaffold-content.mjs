@@ -376,8 +376,8 @@ const MANIFEST = [
 		from: block(
 			'/**',
 			' * Composes the WooCommerce Subscriptions integration: it extends what the plugin already does',
-			' * instead of smuggling in a feature of its own, and it gates on its companion so none of this',
-			' * exists when Subscriptions is absent.',
+			' * instead of smuggling in a feature of its own, and it gates on its companion so none of it is',
+			' * constructed when Subscriptions is absent.',
 			' *',
 			' * This is what a leaf integration becomes the day it needs a second class: a folder owning a',
 			' * `Component` plus plain collaborators. The collaborators are plain final classes, not',

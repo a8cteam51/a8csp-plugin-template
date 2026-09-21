@@ -29,9 +29,10 @@ interface ComponentInterface {
 	/**
 	 * Determines whether the component should take part in this request at all.
 	 *
-	 * Static so the gate runs BEFORE construction — an optional integration must never fatal on
-	 * construction when its companion is absent. Calling the gate autoloads the class, so the class
-	 * itself must load without its companion: it may not extend or implement a companion's types.
+	 * Static so the gate runs BEFORE construction: a closed gate means the component is never
+	 * constructed, so an optional integration's constructor never runs without its companion.
+	 * Calling the gate autoloads the class, so the class itself must load without its companion: it
+	 * may not extend or implement a companion's types.
 	 * Gate only on facts stable at composition time (environment, companion-plugin presence,
 	 * WP_CLI, is_admin(), wp_installing()). Request-type surfaces such as REST are NOT gates — they
 	 * stage onto their own hooks in `register_hooks()`. Capability checks run inside the hook
