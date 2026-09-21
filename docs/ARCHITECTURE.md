@@ -132,18 +132,31 @@ WooCommerce tier:
 12. Run `composer quality-check`. What remains — blocks, settings, the component list, the
     `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 
-**For a plugin that persists nothing:** delete `src/Settings/`, its `COMPONENTS` entry in
-`src/Plugin.php`, its option lines in the `footprint.php` manifest, `includes/settings.php`, and
-the example admin stylesheet (`assets/css/src/settings.scss` plus its `assets/css/build/`
-output) together with the `build:assets:styles`, `build:assets:styles-rtl` and
-`start:assets:styles` scripts in `package.json` that build only that stylesheet; the `sass`,
-`postcss-cli` and `rtlcss` dev dependencies and the `rtlcssConfig` key serve only those scripts,
-so remove them too and run `npm install`. Then delete `tests/Unit/SettingsComponentTest.php`,
-and drop `Settings\Component` from `tests/Unit/ComponentCollectionTest.php` and
-`tests/Unit/PluginBootGateTest.php` and the example-option assertions, round-trip test and
-`tearDown()` cleanup from `tests/Integration/PluginBootTest.php` and
-`tests/Integration/PluginBootWithoutWooCommerceTest.php`. Finally, drop the settings sentence
-under Installation in `README.md` and the settings and stylesheet entries in this document.
+**For a plugin that persists nothing:**
+
+1. Delete `src/Settings/` and `includes/settings.php`, and remove `Settings\Component::class` from
+   the `COMPONENTS` list in `src/Plugin.php`.
+2. Remove the Subscriptions example setting, which lives in the Settings section: the
+   `add_settings()` method and its `woocommerce_get_settings_advanced` filter in
+   `src/Integrations/WooCommerceSubscriptions/Component.php`.
+3. Empty the `options` list in the `footprint.php` manifest (`'options' => array(),`);
+   `uninstall.php` still clears the update-check transients.
+4. Delete the example admin stylesheet (`assets/css/src/settings.scss` and its `assets/css/build/`
+   output), the `build:assets:styles`, `build:assets:styles-rtl` and `start:assets:styles`
+   scripts in `package.json`, and the `sass`, `postcss-cli` and `rtlcss` dev dependencies and
+   `rtlcssConfig` key that serve only those scripts; run `npm install`.
+5. Delete `tests/Unit/SettingsComponentTest.php`. Drop `Settings\Component` and the assertions on
+   its hooks (`admin_init`, `admin_enqueue_scripts`, `woocommerce_get_sections_advanced` and
+   `woocommerce_get_settings_advanced`) from `tests/Unit/ComponentCollectionTest.php` and
+   `tests/Unit/PluginBootGateTest.php`; the `add_settings()` tests and filter assertions from
+   `tests/Unit/WooCommerceSubscriptionsComponentTest.php` and
+   `tests/Unit/IntegrationsComponentTest.php`; and, from `tests/Integration/PluginBootTest.php`
+   and `tests/Integration/PluginBootWithoutWooCommerceTest.php`, the settings and section
+   assertions, the section-output and round-trip tests, and the `tearDown()` cleanup.
+6. Drop the settings sentence under Installation in `README.md`, the settings steps in
+   `.github/ISSUE_TEMPLATE/bug_report.yml`, and the settings and stylesheet entries in this
+   document.
+7. Run `composer quality-check`.
 
 ## Version tags on transplant
 
