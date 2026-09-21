@@ -35,19 +35,6 @@
     "rtlcss": "^4.0.0",
     "sass": "^1.77.0"
   },
-  "rtlcssConfig": {
-    "options": {
-      "autoRename": false,
-      "autoRenameStrict": false,
-      "blacklist": {},
-      "clean": true,
-      "greedy": false,
-      "processUrls": false,
-      "stringMap": []
-    },
-    "plugins": [],
-    "map": false
-  },
   "browserslist": [
     "extends @wordpress/browserslist-config"
   ],
@@ -74,7 +61,7 @@
 
     "lint": "npm-run-all --sequential lint:**",
     "lint:scripts": "wp-scripts lint-js blocks assets/js eslint.config.mjs postcss.config.js stylelint.config.js .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs playwright.config.js tests/EndToEnd --no-error-on-unmatched-pattern",
-    "lint:styles": "wp-scripts lint-style blocks/**/*.{css,sass,scss} assets/css/**/*.{css,sass,scss} --allow-empty-input",
+    "lint:styles": "wp-scripts lint-style blocks/**/*.{css,scss} assets/css/**/*.{css,scss} --allow-empty-input",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:readme-md": "wp-scripts lint-md-docs README.md",
 
@@ -101,6 +88,6 @@
     "test:requirements": "wp-env --config .wp-env.belowfloor.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Requirements",
     "test:multisite": "wp-env --config .wp-env.multisite.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Multisite",
     "test:integration:no-wc": "wp-env --config .wp-env.tests.json run cli wp plugin deactivate woocommerce && ( wp-env --config .wp-env.tests.json run cli --env-cwd=wp-content/plugins/a8csp-plugin-template vendor/bin/phpunit --testsuite=Integration --filter=PluginBootWithoutWooCommerceTest --fail-on-skipped; A8CSP_STATUS=$?; wp-env --config .wp-env.tests.json run cli wp plugin activate woocommerce || A8CSP_STATUS=1; exit $A8CSP_STATUS )",
-    "test:e2e": "playwright test --config=playwright.config.js"
+    "test:e2e": "playwright test"
   }
 }
