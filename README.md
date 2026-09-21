@@ -203,8 +203,8 @@ npm run lint:pkg-json
 npm run lint:readme-md
 ```
 
-The GitHub workflows, including the JavaScript/CSS and PHP syntax workflows, run
-on `trunk` pushes and on pull requests.
+The Quality workflow runs `lint:scripts` and `lint:styles` on pull requests and
+`trunk` pushes; `lint:pkg-json` and `lint:readme-md` run only locally.
 
 ## Tests
 
