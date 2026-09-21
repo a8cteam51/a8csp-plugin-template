@@ -69,6 +69,8 @@ function a8csp_template_get_plugin_metadata( $property = null ) {
 /**
  * Returns the plugin's slug.
  *
+ * @api
+ *
  * @since   1.0.0
  * @version 1.0.0
  *
@@ -82,6 +84,8 @@ function a8csp_template_get_plugin_slug() {
 /**
  * Returns the plugin's name.
  *
+ * @api
+ *
  * @since   1.0.0
  * @version 1.0.0
  *
@@ -93,6 +97,8 @@ function a8csp_template_get_plugin_name() {
 
 /**
  * Returns the plugin's version.
+ *
+ * @api
  *
  * @since   1.0.0
  * @version 1.0.0

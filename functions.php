@@ -6,8 +6,9 @@ use A8C\SpecialProjects\PluginTemplate\Plugin;
 
 // region META
 
-// This accessor is the plugin's whole supported surface for a peer plugin; the kernel classes
-// behind it carry `@internal` and may change shape without notice.
+// This accessor and the prefixed `get_plugin_slug()`, `get_plugin_name()` and `get_plugin_version()`
+// getters in functions-bootstrap.php are the plugin's supported surface for a peer plugin; the
+// kernel classes behind them carry `@internal` and may change shape without notice.
 
 /**
  * Returns the plugin's composition root.
