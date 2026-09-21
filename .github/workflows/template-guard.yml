@@ -80,6 +80,7 @@ jobs:
         include:
           - fixture: aligned
             strip: false
+            lint: true
             repo_json: '{"name":"my-client-plugin","description":"A client plugin.","custom_properties":{"human-title":"My Client Plugin","php-globals-short-prefix":"myclient"}}'
           - fixture: diverging-empty
             strip: false
@@ -167,6 +168,21 @@ jobs:
       - name: Assert the strip phase removed the sample content.
         if: matrix.strip == true
         run: test ! -f includes/_disabled-example.php
+
+      - name: Setup Node.js for the generated repository's JavaScript lint.
+        if: matrix.lint == true
+        uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: 'package.json'
+
+      # Substitution re-flows Prettier-formatted lines, so this runs the fill-in's re-format step and
+      # then the generated repository's own JavaScript lint over the rendered tree.
+      - name: Re-format and lint the rendered JavaScript.
+        if: matrix.lint == true
+        run: |
+          npm ci
+          npm run lint:scripts -- --fix
+          npm run lint:scripts
 
   # The teaching-content strip manifest identifies each passage by an exact span that must occur
   # exactly once. Editing the template's docblocks or comments can silently break a span (zero or
