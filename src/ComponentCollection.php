@@ -102,13 +102,6 @@ final class ComponentCollection {
 	/**
 	 * Whether the given component class survived its gate into this collection.
 	 *
-	 * A fail-loud boot is all-or-nothing, so "did component X boot?" decomposes into the root's
-	 * `is_booted()` — the pipeline completed — plus this check — X survived its gate. There is
-	 * deliberately no per-component failure state: a component failure fails the whole boot. And
-	 * the check is deliberately collection-scoped: a caller holds the collection it asks, so the
-	 * answer never straddles composition levels, and the class-keyed lookup never becomes a public
-	 * contract that promoting a leaf into its own folder would silently break.
-	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
 	 *

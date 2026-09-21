@@ -152,21 +152,6 @@ const MANIFEST = [
 			' * phases. Owns the component-loop machinery once for the composition root and every group root.'
 		),
 	},
-	{
-		action: 'replace-exact',
-		path: 'src/ComponentCollection.php',
-		from: block(
-			'\t *',
-			'\t * A fail-loud boot is all-or-nothing, so "did component X boot?" decomposes into the root\'s',
-			'\t * `is_booted()` — the pipeline completed — plus this check — X survived its gate. There is',
-			'\t * deliberately no per-component failure state: a component failure fails the whole boot. And',
-			'\t * the check is deliberately collection-scoped: a caller holds the collection it asks, so the',
-			'\t * answer never straddles composition levels, and the class-keyed lookup never becomes a public',
-			'\t * contract that promoting a leaf into its own folder would silently break.',
-			'\t *'
-		),
-		to: block( '\t *' ),
-	},
 
 	{
 		action: 'replace-exact',
