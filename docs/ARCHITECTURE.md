@@ -47,8 +47,8 @@ every surviving component is initialized before any hook can fire.
 - `includes/` contains automatically loaded procedural helpers, including typed option readers;
   PHP files dropped there load automatically inside WordPress, while underscore-prefixed files
   are skipped.
-- `languages/` contains translations and the POT generated from the plugin's strings; regenerate
-  it with `composer i18n:makepot`.
+- `languages/` holds the plugin's translations; `composer i18n:makepot` generates the POT from the
+  plugin's strings, and every release regenerates it.
 - `models/` is the extension point for namespace-less classmapped classes that are part of a
   public contract — the `WC_Order` shape.
 - `templates/` is an extension point for template partials rendered by components.
