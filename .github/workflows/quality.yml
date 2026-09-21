@@ -55,9 +55,9 @@ jobs:
       # PHP floor; functions.php and index.php load after the requirements gate and are excluded.
       # Discover the entry by its WordPress "Plugin Name:" header because
       # generation renames the file per repo without rewriting .github/.
-      # functions-bootstrap.php and uninstall.php share the below-floor constraint but keep static
-      # names across generation. Header discovery excludes them because neither has the plugin header,
-      # so the matrix lints both explicitly by name.
+      # functions-bootstrap.php, uninstall.php and the footprint.php it requires share the below-floor
+      # constraint but keep static names across generation. Header discovery excludes them because none
+      # has the plugin header, so the matrix lints them explicitly by name.
       - name: Check the below-floor files for syntax errors
         run: |
           set -euo pipefail
@@ -71,6 +71,7 @@ jobs:
           php -l "${entry_files[0]}"
           php -l "$GITHUB_WORKSPACE/functions-bootstrap.php"
           php -l "$GITHUB_WORKSPACE/uninstall.php"
+          php -l "$GITHUB_WORKSPACE/footprint.php"
 
   build-integrity:
     name: Build integrity
