@@ -1,5 +1,4 @@
 import { access, readFile, unlink, writeFile } from 'fs/promises';
-import { join as joinPath } from 'path';
 import process from 'process';
 
 // A newline-joined block of source lines. Manifest spans are authored line by line so leading tabs
@@ -491,17 +490,6 @@ const MANIFEST = [
 
 const checkOnly = process.argv.includes( '--check' );
 
-// Group the manifest by target file so each file is read once and every entry against it is
-// applied to one working buffer in manifest order — the same buffer whether checking or writing,
-// so `--check` and the default apply never diverge.
-const entriesByPath = new Map();
-for ( const entry of MANIFEST ) {
-	if ( ! entriesByPath.has( entry.path ) ) {
-		entriesByPath.set( entry.path, [] );
-	}
-	entriesByPath.get( entry.path ).push( entry );
-}
-
 const fileExists = async ( path ) => {
 	try {
 		await access( path );
@@ -511,59 +499,46 @@ const fileExists = async ( path ) => {
 	}
 };
 
+// Every entry is checked before anything is written, so a drifted span fails the run with the tree
+// untouched; `--check` runs the same pass and stops there. Entries against one file apply in
+// manifest order to one buffer.
 const errors = [];
-const pendingWrites = [];
-const pendingDeletes = [];
-
-for ( const [ path, entries ] of entriesByPath ) {
-	const absolutePath = joinPath( '.', path );
-
-	const deleteEntries = entries.filter(
-		( entry ) => 'delete' === entry.action
-	);
-	const replaceEntries = entries.filter(
-		( entry ) => 'replace-exact' === entry.action
-	);
-
-	for ( const entry of deleteEntries ) {
-		if ( await fileExists( absolutePath ) ) {
-			pendingDeletes.push( absolutePath );
+const buffers = new Map();
+const deletes = [];
+for ( const { action, path, from, to } of MANIFEST ) {
+	if ( 'delete' === action ) {
+		if ( await fileExists( path ) ) {
+			deletes.push( path );
 		} else {
-			errors.push( `delete: ${ entry.path } does not exist` );
-		}
-	}
-
-	if ( 0 === replaceEntries.length ) {
-		continue;
-	}
-
-	if ( ! ( await fileExists( absolutePath ) ) ) {
-		for ( const entry of replaceEntries ) {
-			errors.push(
-				`replace-exact: ${ path } does not exist for span starting "${
-					entry.from.split( '\n' )[ 0 ]
-				}"`
-			);
+			errors.push( `delete: ${ path } does not exist` );
 		}
 		continue;
 	}
 
-	let buffer = await readFile( absolutePath, 'utf-8' );
-	for ( const entry of replaceEntries ) {
-		const occurrences = buffer.split( entry.from ).length - 1;
-		if ( 1 !== occurrences ) {
+	const span = from.split( '\n' )[ 0 ];
+	if ( ! buffers.has( path ) ) {
+		if ( ! ( await fileExists( path ) ) ) {
 			errors.push(
-				`replace-exact: ${ path } — span occurs ${ occurrences } times (want exactly 1): "${
-					entry.from.split( '\n' )[ 0 ]
-				}"`
+				`replace-exact: ${ path } does not exist for span starting "${ span }"`
 			);
 			continue;
 		}
-		// A function replacer inserts the text verbatim; a string replacement would interpret $-patterns inside it.
-		buffer = buffer.replace( entry.from, () => entry.to );
+		buffers.set( path, await readFile( path, 'utf-8' ) );
 	}
 
-	pendingWrites.push( { absolutePath, buffer } );
+	const buffer = buffers.get( path );
+	const occurrences = buffer.split( from ).length - 1;
+	if ( 1 !== occurrences ) {
+		errors.push(
+			`replace-exact: ${ path } — span occurs ${ occurrences } times (want exactly 1): "${ span }"`
+		);
+		continue;
+	}
+	// A function replacer inserts the text verbatim; a string replacement would interpret $-patterns inside it.
+	buffers.set(
+		path,
+		buffer.replace( from, () => to )
+	);
 }
 
 if ( 0 !== errors.length ) {
@@ -577,18 +552,11 @@ if ( 0 !== errors.length ) {
 	process.exit( 1 );
 }
 
-if ( checkOnly ) {
-	console.log(
-		'fill-in-scaffold-content: --check passed; every span matches exactly once.'
-	);
-	process.exit( 0 );
-}
-
-for ( const { absolutePath, buffer } of pendingWrites ) {
-	console.log( 'Stripping teaching content from %s', absolutePath );
-	await writeFile( absolutePath, buffer );
-}
-for ( const absolutePath of pendingDeletes ) {
-	console.log( 'Deleting %s', absolutePath );
-	await unlink( absolutePath );
+if ( ! checkOnly ) {
+	for ( const [ path, buffer ] of buffers ) {
+		await writeFile( path, buffer );
+	}
+	for ( const path of deletes ) {
+		await unlink( path );
+	}
 }

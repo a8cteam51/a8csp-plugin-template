@@ -38,10 +38,8 @@ const portBase = 10000 + 4 * ( nameHash % 5000 );
  */
 const traverseDirectory = async ( dirPath, callback ) => {
 	if ( skippedDirectories.includes( dirPath ) ) {
-		console.log( 'Skipping %s', dirPath );
 		return;
 	}
-	console.log( 'Traversing %s', dirPath );
 
 	const files = await readdir( dirPath );
 	for ( const file of files ) {
@@ -65,11 +63,8 @@ const buildTemplate = async ( filePath ) => {
 	if ( [ 'composer.lock', 'package-lock.json' ].includes( filePath ) ) {
 		// Both locks are regenerated from the substituted manifests after this pass, so
 		// substituting names into them in place would only risk corrupting integrity hashes.
-		console.log( 'Skipping %s', filePath );
 		return;
 	}
-
-	console.log( 'Building %s', filePath );
 
 	const templateFile = await readFile( filePath, 'utf-8' );
 	let renderedTemplate = templateFile,
@@ -106,9 +101,6 @@ const buildTemplate = async ( filePath ) => {
 				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			'A8C\\SpecialProjects\\PluginTemplate':
 				'A8C\\SpecialProjects\\' +
-				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
-			'A8C\\SpecialProjects\\\\PluginTemplate':
-				'A8C\\SpecialProjects\\\\' +
 				title.replaceAll( ' ', '' ).replace( 'A8CSP', '' ),
 			a8csp_template:
 				repository.custom_properties[ 'php-globals-short-prefix' ],
@@ -160,7 +152,6 @@ const buildTemplate = async ( filePath ) => {
 	}
 
 	if ( renderedTemplate !== templateFile ) {
-		console.log( 'Changes were made. Overwriting file.' );
 		await writeFile( filePath, renderedTemplate );
 	}
 };
