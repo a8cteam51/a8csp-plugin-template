@@ -12,7 +12,6 @@ on:
   pull_request:
   push:
     branches: [trunk]
-    tags: ['v*']
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,27 +20,12 @@ concurrency:
 permissions: {}
 
 jobs:
-  # The template never tags or releases itself. A repository ruleset blocks tag creation at
-  # the platform level — a tag pointed at an old commit runs that commit's workflow version,
-  # so an in-repo guard cannot be the primary control. This backstop is loud on purpose: a
-  # silent skip would leave a mistaken tag looking released. Skipping the actual publish is
-  # release.yml's own repository_id condition, which a red job here cannot do.
-  refuse-template-release:
-    name: Refuse to release the template
-    if: github.repository_id == '1297277915' && startsWith(github.ref, 'refs/tags/')
-    runs-on: ubuntu-latest
-    timeout-minutes: 30
-    steps:
-      - name: Fail loudly
-        run: |
-          echo "::error::a8csp-plugin-template is trunk-only and never releases; delete this tag"
-          exit 1
 
   # The template never versions itself: the fragment set, the header-only changelog, and the
   # 1.0.0 spawn seed are pinned. The repository_id comparison survives renames and transfers.
   trunk-only-state:
     name: Enforce the trunk-only template state
-    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    if: github.repository_id == '1297277915'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -85,7 +69,7 @@ jobs:
   # divergence fails here instead of in a generated repository.
   generation-contract:
     name: 'Generation contract: ${{ matrix.fixture }}'
-    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    if: github.repository_id == '1297277915'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
@@ -190,7 +174,7 @@ jobs:
   # gate runs the manifest's --check on every template change so that drift fails here instead.
   content-manifest-drift:
     name: Enforce the teaching-content strip manifest
-    if: github.repository_id == '1297277915' && !startsWith(github.ref, 'refs/tags/')
+    if: github.repository_id == '1297277915'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     permissions:
