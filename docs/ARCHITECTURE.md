@@ -121,13 +121,14 @@ WooCommerce tier:
    `tests/Unit/WooCommerceSubscriptionsComponentTest.php`, `tests/Unit/WooPaymentsTest.php`, and
    their `tests/Unit/wcs-stubs.php` / `tests/Unit/wcpay-stubs.php` stand-ins; drop the
    WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`,
-   `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including
-   `tests/Unit/wc-host-stubs.php`).
+   `tests/Unit/ComponentCollectionTest.php`, `tests/Unit/PluginBootGateTest.php`, and
+   `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`).
 10. Remove the WooCommerce-less proof section from `tests/README.md`, the
     `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
     `integration-no-wc` job from `.github/workflows/tests.yml`.
 11. Rewrite the WooCommerce-flavored prose: the Requirements section and the settings sentence
-    under Installation in `README.md`, and the WooCommerce references in this document.
+    under Installation in `README.md`, the WooCommerce references in this document, and whatever
+    else `git grep -i woocommerce` still finds, such as the bug-report issue template.
 12. Run `composer quality-check`. What remains — blocks, settings, the component list, the
     `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 
@@ -135,11 +136,14 @@ WooCommerce tier:
 `src/Plugin.php`, its option lines in the `footprint.php` manifest, `includes/settings.php`, and
 the example admin stylesheet (`assets/css/src/settings.scss` plus its `assets/css/build/`
 output) together with the `build:assets:styles`, `build:assets:styles-rtl` and
-`start:assets:styles` scripts in `package.json` that build only that stylesheet. Then delete
-`tests/Unit/SettingsComponentTest.php`, and drop `Settings\Component` from
-`tests/Unit/ComponentCollectionTest.php` and `tests/Unit/PluginBootGateTest.php` and the
-example-option assertions and round-trip test from `tests/Integration/PluginBootTest.php` and
-`tests/Integration/PluginBootWithoutWooCommerceTest.php`.
+`start:assets:styles` scripts in `package.json` that build only that stylesheet; the `sass`,
+`postcss-cli` and `rtlcss` dev dependencies and the `rtlcssConfig` key serve only those scripts,
+so remove them too and run `npm install`. Then delete `tests/Unit/SettingsComponentTest.php`,
+and drop `Settings\Component` from `tests/Unit/ComponentCollectionTest.php` and
+`tests/Unit/PluginBootGateTest.php` and the example-option assertions, round-trip test and
+`tearDown()` cleanup from `tests/Integration/PluginBootTest.php` and
+`tests/Integration/PluginBootWithoutWooCommerceTest.php`. Finally, drop the settings sentence
+under Installation in `README.md` and the settings and stylesheet entries in this document.
 
 ## Version tags on transplant
 
