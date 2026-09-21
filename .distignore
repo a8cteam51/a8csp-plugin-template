@@ -13,8 +13,6 @@
 .git*
 .idea
 .vscode
-.gitattributes
-.gitignore
 .distignore
 node_modules
 tests
@@ -37,7 +35,6 @@ stylelint.config.js
 package*.json
 composer.json
 composer.lock
-README.scaffold.md
 /docs
 AGENTS.md
 CLAUDE.md
