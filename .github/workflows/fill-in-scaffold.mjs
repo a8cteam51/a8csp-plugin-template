@@ -132,7 +132,7 @@ const buildTemplate = async ( filePath ) => {
 
 	if ( 'README.md' !== filePath ) {
 		// Port literals are bare numbers, so they replace only inside their known anchors (the
-		// wp-env `"port":` keys and the tests/README ports table) -- a tree-wide bare `8890` would
+		// wp-env `"port":` keys and the tests/README ports table) — a tree-wide bare `8890` would
 		// also match inside package-lock.json integrity hashes. They also bypass the replacement
 		// map above: its values are JSON-escaped when landing in .json files, which would corrupt
 		// a match spanning structural JSON.

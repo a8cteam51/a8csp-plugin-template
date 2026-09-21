@@ -29,7 +29,7 @@ jobs:
 
     steps:
       # A run queued against a non-default ref must never fill in and push scaffolding commits there.
-      - name: Require the workflow ref to be the default branch.
+      - name: Require the workflow ref to be the default branch
         env:
           REF_NAME: ${{ github.ref_name }}
           DEFAULT_BRANCH: ${{ github.event.repository.default_branch }}
@@ -41,7 +41,7 @@ jobs:
 
       # Validate every input before checkout: a malformed value would push broken or injected PHP in
       # commits that trigger no CI, and an invalid repository stays pristine.
-      - name: Validate the scaffold identity inputs.
+      - name: Validate the scaffold identity inputs
         env:
           REPO_JSON: ${{ toJSON( github.event.repository ) }}
         run: |
@@ -134,42 +134,42 @@ jobs:
         with:
           node-version-file: 'package.json'
 
-      - name: Set github actions[bot] as the committer.
+      - name: Set github actions[bot] as the committer
         run: git config --local user.name 'github-actions[bot]' && git config --local user.email 'github-actions[bot]@users.noreply.github.com'
 
-      - name: Rename the readme and plugin file.
+      - name: Rename the readme and plugin file
         env:
           REPO_NAME: ${{ github.event.repository.name }}
         run: |
           git mv --force README.scaffold.md README.md
           git mv a8csp-template-plugin.php "$REPO_NAME.php"
 
-      - name: Commit the changed files.
+      - name: Commit the changed files
         run: git commit -am "chore -- rename files from scaffolding"
 
-      - name: Clear the changelog fragments.
+      - name: Clear the changelog fragments
         run: |
           # The template's one fragment only keeps its own changelog:validate non-vacuous.
           find changelog -type f ! -name '.gitkeep' -delete
 
-      - name: Commit the changed files.
+      - name: Commit the changed files
         run: git commit -am "chore -- clear scaffold changelog fragments"
 
-      - name: Setup PHP for the Composer resolve and the syntax sweep.
+      - name: Setup PHP for the Composer resolve and the syntax sweep
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.5'
           coverage: none
           tools: composer:v2
 
-      - name: Perform string replacements within the files.
+      - name: Perform string replacements within the files
         env:
           REPO_JSON: ${{ toJSON( github.event.repository ) }}
         run: node ./.github/workflows/fill-in-scaffold.mjs "$REPO_JSON"
 
       # The manifest's spans are post-substitution text, so the strip runs after the substitution
       # and before the syntax sweep.
-      - name: Strip the template's teaching content.
+      - name: Strip the template's teaching content
         env:
           STRIP_INPUT: ${{ inputs.strip-teaching-content }}
           STRIP_PAYLOAD: ${{ github.event.client_payload.strip-teaching-content }}
@@ -183,7 +183,7 @@ jobs:
       # A new repository starts on current dependencies, not on the template's possibly old lock,
       # holding npm to releases at least seven days old. --ignore-scripts skips install scripts; the
       # re-format and build steps below still run dependency code.
-      - name: Resolve npm dependencies afresh.
+      - name: Resolve npm dependencies afresh
         run: |
           rm -f package-lock.json
           npm install --ignore-scripts --min-release-age=7 2>&1 | tee "$RUNNER_TEMP/npm-install.log"
@@ -195,35 +195,35 @@ jobs:
 
       # Substitution changes identifier lengths inside Prettier-formatted JavaScript, so lines wrap
       # differently; re-formatting here keeps the generated repository's first lint run green.
-      - name: Re-format the substituted JavaScript.
+      - name: Re-format the substituted JavaScript
         run: npm run lint:scripts -- --fix
 
       # Substitution rewrote asset sources (slugs, text domains), so the committed build output is
-      # rebuilt to match what this tree itself produces -- the build-integrity gate diffs exactly that.
-      - name: Rebuild the committed assets from the substituted sources.
+      # rebuilt to match what this tree itself produces — the build-integrity gate diffs exactly that.
+      - name: Rebuild the committed assets from the substituted sources
         run: npm run build
 
       # A new repository starts on current Composer dependencies too; the lock is resolved, not installed.
-      - name: Resolve Composer dependencies afresh.
+      - name: Resolve Composer dependencies afresh
         run: composer update --no-install --prefer-stable --ignore-platform-req=php+ --no-interaction
 
       # This workflow's pushes trigger no CI, so the sweep covers substituted source and the rebuilt
       # PHP assets before anything is committed.
-      - name: Syntax-check every generated PHP file.
+      - name: Syntax-check every generated PHP file
         run: |
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
 
-      - name: Commit the changed files.
+      - name: Commit the changed files
         run: git commit -am "chore -- fill in scaffolding placeholders"
 
-      - name: Remove the spent fill-in-scaffold workflow and the template guard.
+      - name: Remove the spent fill-in-scaffold workflow and the template guard
         run: |
           rm .github/workflows/fill-in-scaffold.yml .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs .github/workflows/template-guard.yml
           git add .github/workflows
           git commit -m "chore -- remove the spent fill-in-scaffold workflow and the template guard"
 
-      - name: Publish all the changed commits.
+      - name: Publish all the changed commits
         env:
           GITHUB_TOKEN: ${{ github.token }}
           REPOSITORY: ${{ github.repository }}

@@ -94,13 +94,13 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PHP for the syntax sweep.
+      - name: Setup PHP for the syntax sweep
         uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
         with:
           php-version: '8.5'
           coverage: none
 
-      - name: Replicate the fill-in sequence.
+      - name: Replicate the fill-in sequence
         env:
           REPO_JSON: ${{ matrix.repo_json }}
           STRIP: ${{ matrix.strip }}
@@ -129,7 +129,7 @@ jobs:
 
       # .github is excluded because the real run deletes the spent machinery instead of
       # substituting inside it; the real run resolves both locks afresh after this point.
-      - name: Assert no template literal survives.
+      - name: Assert no template literal survives
         run: |
           set -euo pipefail
 
@@ -143,12 +143,12 @@ jobs:
           done
           exit "$fail"
 
-      - name: Syntax-check every generated PHP file.
+      - name: Syntax-check every generated PHP file
         run: |
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
 
-      - name: Assert the derived wp-env port block.
+      - name: Assert the derived wp-env port block
         run: |
           set -euo pipefail
 
@@ -159,11 +159,11 @@ jobs:
           grep -Fq "\"port\": $(( expected + 2 ))," .wp-env.multisite.json
           grep -Fq "\"port\": $(( expected + 3 ))," .wp-env.json
 
-      - name: Assert the strip phase removed the sample content.
+      - name: Assert the strip phase removed the sample content
         if: matrix.strip == true
         run: test ! -f includes/_disabled-example.php
 
-      - name: Setup Node.js for the generated repository's JavaScript lint.
+      - name: Setup Node.js for the generated repository's JavaScript lint
         if: matrix.lint == true
         uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
         with:
@@ -171,7 +171,7 @@ jobs:
 
       # Substitution re-flows Prettier-formatted lines, so this runs the fill-in's re-format step and
       # then the generated repository's own JavaScript lint over the rendered tree.
-      - name: Re-format and lint the rendered JavaScript.
+      - name: Re-format and lint the rendered JavaScript
         if: matrix.lint == true
         run: |
           npm ci

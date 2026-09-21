@@ -29,7 +29,7 @@ npm run build
 npm run wp-env:start
 ```
 
-The plugin is available at the wp-env port declared in `.wp-env.json`; `tests/README.md` documents the dedicated test environment. wp-env publishes the site on all network interfaces with fixed development credentials -- treat the dev site as visible to your local network, not just localhost.
+The plugin is available at the wp-env port declared in `.wp-env.json`; `tests/README.md` documents the dedicated test environment. wp-env publishes the site on all network interfaces with fixed development credentials — treat the dev site as visible to your local network, not just localhost.
 
 The architecture map, the component model, and the reshaping recipes (including watering the
 plugin down to plain WordPress) live in [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md); the test
@@ -39,7 +39,7 @@ workflow lives in [`tests/README.md`](tests/README.md).
 
 ### Releasing
 
-Every pull request that changes behaviour carries a changelog fragment:
+Every pull request that changes behavior carries a changelog fragment:
 
 ```sh
 composer changelog:add

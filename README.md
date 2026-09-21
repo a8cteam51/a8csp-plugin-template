@@ -59,7 +59,7 @@ Run watch builds:
 npm start
 ```
 
-`npm start` watches blocks, scripts, and Sass, but for `assets/css` the watcher runs Sass only -- the PostCSS vendor-prefix pass and the RTL stylesheet come from `npm run build`, so that watched CSS differs from a production build.
+`npm start` watches blocks, scripts, and Sass, but for `assets/css` the watcher runs Sass only — the PostCSS vendor-prefix pass and the RTL stylesheet come from `npm run build`, so that watched CSS differs from a production build.
 
 Run the local WordPress environment:
 

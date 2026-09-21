@@ -19,7 +19,7 @@ permissions: {}
 
 jobs:
   workflow-checks:
-    name: Workflow checks
+    name: Workflow Checks
     # A caller must grant every permission the called jobs declare, or the call fails at startup.
     permissions:
       contents: read
