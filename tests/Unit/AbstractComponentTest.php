@@ -29,6 +29,8 @@ final class AbstractComponentTest extends TestCase {
 		$GLOBALS['a8csp_template_test_hooks'] = array();
 
 		$component = new class() extends AbstractComponent {
+			// region METHODS.
+
 			/**
 			 * {@inheritDoc}
 			 *
@@ -39,6 +41,8 @@ final class AbstractComponentTest extends TestCase {
 			public function register_hooks(): void {
 				add_action( 'a8csp_template_test_hook', '__return_true' );
 			}
+
+			// endregion.
 		};
 
 		self::assertTrue( $component::should_load() );
