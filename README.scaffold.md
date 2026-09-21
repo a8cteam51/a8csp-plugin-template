@@ -16,7 +16,7 @@ With WooCommerce active at the required version, the plugin's settings appear in
 
 ## Updates
 
-The plugin updates itself from this repository's GitHub releases through its `Update URI` header, so WordPress offers a new release like any other plugin update. The check calls the GitHub API without authentication, which works only while the repository is public; OpsOasis creates repositories private, so a plugin generated through it does not update itself. An installed prerelease (a version containing `-`) follows every release; a stable installation follows stable releases only.
+The plugin updates itself from this repository's GitHub releases through its `Update URI` header, so WordPress offers a new release like any other plugin update — as long as the repository is public, because the check calls the GitHub API without authentication. OpsOasis creates repositories private, so a plugin generated through it does not update itself. An installed prerelease (a version containing `-`) follows every release; a stable installation follows stable releases only.
 
 ## Development
 
