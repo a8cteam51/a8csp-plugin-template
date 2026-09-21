@@ -21,15 +21,6 @@ use PHPUnit\Framework\TestCase;
  */
 final class UninstallTest extends TestCase {
 	/**
-	 * A canary option the footprint never lists. Its survival is what proves the test
-	 * exercises "delete only what's owned" rather than "delete everything".
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 */
-	private const string CANARY_OPTION = 'a8csp_template_test_uninstall_canary';
-
-	/**
 	 * Removes the canary regardless of how the test finished, since this suite runs against
 	 * a persistent wp-env database with no per-test transaction rollback (see tests/README.md).
 	 *
@@ -39,7 +30,7 @@ final class UninstallTest extends TestCase {
 	 * @return  void
 	 */
 	protected function tearDown(): void {
-		delete_option( self::CANARY_OPTION );
+		delete_option( 'a8csp_template_test_uninstall_canary' );
 
 		parent::tearDown();
 	}
@@ -71,7 +62,7 @@ final class UninstallTest extends TestCase {
 			update_user_meta( $user_id, $meta_key, 'sentinel' );
 		}
 
-		update_option( self::CANARY_OPTION, 'sentinel' );
+		update_option( 'a8csp_template_test_uninstall_canary', 'sentinel' );
 
 		foreach ( array( 'stable', 'prerelease' ) as $channel ) {
 			set_transient( 'a8csp_template_github_latest_release_' . $channel, 'sentinel', HOUR_IN_SECONDS );
@@ -91,7 +82,7 @@ final class UninstallTest extends TestCase {
 			self::assertSame( '', get_user_meta( $user_id, $meta_key, true ), "uninstall.php must delete the '{$meta_key}' user-meta key" );
 		}
 
-		self::assertSame( 'sentinel', get_option( self::CANARY_OPTION ), 'uninstall.php must not delete keys outside its footprint' );
+		self::assertSame( 'sentinel', get_option( 'a8csp_template_test_uninstall_canary' ), 'uninstall.php must not delete keys outside its footprint' );
 	}
 
 	/**

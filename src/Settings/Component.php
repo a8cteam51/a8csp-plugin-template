@@ -67,21 +67,9 @@ final class Component extends AbstractComponent {
 			)
 		);
 
-		add_settings_section(
-			'a8csp_template_example_section',
-			__( 'A8CSP Template Plugin', 'a8csp-plugin-template' ),
-			'__return_empty_string',
-			'general'
-		);
+		add_settings_section( 'a8csp_template_example_section', __( 'A8CSP Template Plugin', 'a8csp-plugin-template' ), '__return_empty_string', 'general' );
 
-		add_settings_field(
-			'a8csp_template_example_field',
-			__( 'Example option', 'a8csp-plugin-template' ),
-			array( $this, 'render_field' ),
-			'general',
-			'a8csp_template_example_section',
-			array( 'label_for' => 'a8csp_template_example_option' )
-		);
+		add_settings_field( 'a8csp_template_example_field', __( 'Example option', 'a8csp-plugin-template' ), array( $this, 'render_field' ), 'general', 'a8csp_template_example_section', array( 'label_for' => 'a8csp_template_example_option' ) );
 	}
 
 	/**
@@ -129,12 +117,7 @@ final class Component extends AbstractComponent {
 		}
 
 		$plugin_slug = a8csp_template_get_plugin_slug();
-		wp_enqueue_style(
-			"$plugin_slug-settings",
-			\constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/css/build/settings.css',
-			$asset_meta['dependencies'],
-			$asset_meta['version']
-		);
+		wp_enqueue_style( "$plugin_slug-settings", \constant( 'A8CSP_TEMPLATE_DIR_URL' ) . 'assets/css/build/settings.css', $asset_meta['dependencies'], $asset_meta['version'] );
 		wp_style_add_data( "$plugin_slug-settings", 'rtl', 'replace' );
 	}
 
