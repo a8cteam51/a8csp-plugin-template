@@ -185,6 +185,7 @@ jobs:
       # re-format and build steps below still run dependency code.
       - name: Resolve npm dependencies afresh
         run: |
+          set -euo pipefail
           rm -f package-lock.json
           npm install --ignore-scripts --min-release-age=7 2>&1 | tee "$RUNNER_TEMP/npm-install.log"
           # An npm without the option only warns and then resolves without the release-age window.
