@@ -466,7 +466,7 @@ const MANIFEST = [
 		path: 'functions.php',
 		from: block(
 			'// This accessor and the prefixed `get_plugin_slug()`, `get_plugin_name()` and `get_plugin_version()`',
-			'// getters in functions-bootstrap.php are the plugin\'s supported surface for a peer plugin; the',
+			"// getters in functions-bootstrap.php are the plugin's supported surface for a peer plugin; the",
 			'// kernel classes behind them carry `@internal` and may change shape without notice.',
 			'',
 			''
