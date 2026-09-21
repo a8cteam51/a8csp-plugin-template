@@ -109,28 +109,37 @@ WooCommerce tier:
    lines from the `footprint.php` manifest.
 5. Remove the `wp-plugin/woocommerce` development dependency from `composer.json`; run
    `composer update`.
-6. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
-7. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the
+6. Remove the `wp-content/plugins/woocommerce` mapping from all four `.wp-env*.json` files, drop
+   `woocommerce` from the `afterStart` plugin activations in `.wp-env.json`, `.wp-env.tests.json`
+   and `.wp-env.multisite.json`, and remove the `extra-plugins` input (and its comment) from
+   `.github/workflows/release.yml`.
+7. Remove the WooCommerce `scanDirectories` entry from `.phpstan.neon`.
+8. Remove the `before_woocommerce_init` compatibility block from the plugin entry file, and the
    `WC requires at least` / `WC tested up to` plugin-header lines.
-8. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`,
+9. Delete `tests/Integration/PluginBootWithoutWooCommerceTest.php`,
    `tests/Unit/IntegrationsComponentTest.php`,
    `tests/Unit/WooCommerceSubscriptionsComponentTest.php`, `tests/Unit/WooPaymentsTest.php`, and
    their `tests/Unit/wcs-stubs.php` / `tests/Unit/wcpay-stubs.php` stand-ins; drop the
    WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`,
    `tests/Unit/PluginBootGateTest.php`, and `tests/Unit/SettingsComponentTest.php` (including
    `tests/Unit/wc-host-stubs.php`).
-9. Remove the WooCommerce-less proof section from `tests/README.md`, the
-   `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
-   `integration-no-wc` job from `.github/workflows/tests.yml`.
-10. Rewrite the WooCommerce-flavored prose: the Requirements section and the settings sentence
+10. Remove the WooCommerce-less proof section from `tests/README.md`, the
+    `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
+    `integration-no-wc` job from `.github/workflows/tests.yml`.
+11. Rewrite the WooCommerce-flavored prose: the Requirements section and the settings sentence
     under Installation in `README.md`, and the WooCommerce references in this document.
-11. Run `composer quality-check`. What remains — blocks, settings, the component list, the
+12. Run `composer quality-check`. What remains — blocks, settings, the component list, the
     `includes/` loader, and a live uninstall footprint — is a complete plain WordPress plugin.
 
 **For a plugin that persists nothing:** delete `src/Settings/`, its `COMPONENTS` entry in
 `src/Plugin.php`, its option lines in the `footprint.php` manifest, `includes/settings.php`, and
 the example admin stylesheet (`assets/css/src/settings.scss` plus its `assets/css/build/`
-output).
+output) together with the `build:assets:styles`, `build:assets:styles-rtl` and
+`start:assets:styles` scripts in `package.json` that build only that stylesheet. Then delete
+`tests/Unit/SettingsComponentTest.php`, and drop `Settings\Component` from
+`tests/Unit/ComponentCollectionTest.php` and `tests/Unit/PluginBootGateTest.php` and the
+example-option assertions and round-trip test from `tests/Integration/PluginBootTest.php` and
+`tests/Integration/PluginBootWithoutWooCommerceTest.php`.
 
 ## Version tags on transplant
 
