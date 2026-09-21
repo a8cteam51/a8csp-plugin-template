@@ -145,6 +145,7 @@ jobs:
 
       - name: Syntax-check every generated PHP file
         run: |
+          set -euo pipefail
           find . -name '*.php' -not -path './vendor/*' -not -path './node_modules/*' -print0 \
             | xargs -0 -n1 -P4 php -l > /dev/null
 
