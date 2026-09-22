@@ -258,9 +258,17 @@ function a8csp_template_get_github_release_information( $result, $action, $args 
 		return $result;
 	}
 
+	// The plugin is not on wordpress.org, so without a known release the answer stays local: a
+	// lookup there would describe some other plugin with the same slug, or none.
 	$release = a8csp_template_get_github_release( $plugin_data['Version'] );
 	if ( null === $release ) {
-		return $result;
+		return (object) array(
+			'name'     => $plugin_data['Name'],
+			'slug'     => $plugin_data['TextDomain'],
+			'version'  => $plugin_data['Version'],
+			'external' => true,
+			'sections' => array( 'changelog' => esc_html( __( 'The release notes are unavailable right now. Try again in a few minutes.', 'a8csp-plugin-template' ) ) ),
+		);
 	}
 
 	// `external` keeps the details modal from linking the slug's wordpress.org page.

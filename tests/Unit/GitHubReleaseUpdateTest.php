@@ -392,6 +392,33 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	}
 
 	/**
+	 * Without a usable release, "View details" for the plugin's own slug still answers locally —
+	 * the installed version and no package — so core never looks the slug up on wordpress.org.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_plugin_information_for_the_own_slug_stays_local_without_a_release(): void {
+		self::stage_plugin_metadata( '1.0.0' );
+		$GLOBALS['a8csp_template_test_http_response'] = array(
+			'response' => array( 'code' => 500 ),
+			'body'     => '',
+		);
+
+		$information = a8csp_template_get_github_release_information( false, 'plugin_information', (object) array( 'slug' => 'a8csp-plugin-template' ) );
+
+		self::assertIsObject( $information );
+		self::assertSame( 'A8CSP Template Plugin', $information->name );
+		self::assertSame( 'a8csp-plugin-template', $information->slug );
+		self::assertSame( '1.0.0', $information->version );
+		self::assertTrue( $information->external );
+		self::assertObjectNotHasProperty( 'download_link', $information );
+	}
+
+	/**
 	 * Plugin-information requests for other slugs, other plugins_api actions, and requests an
 	 * earlier filter already answered pass through untouched and without a fetch.
 	 *
