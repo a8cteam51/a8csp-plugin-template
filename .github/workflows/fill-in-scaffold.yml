@@ -128,7 +128,7 @@ jobs:
             exit 1
           fi
 
-      # No credential persists on disk: the re-format and build steps execute dependency code.
+      # The checkout leaves no git credential behind: the re-format and build steps execute dependency code.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
