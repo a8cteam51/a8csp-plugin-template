@@ -82,7 +82,8 @@ final class PluginBootTest extends TestCase {
 
 	/**
 	 * The example option round-trips: a persisted value comes back through the typed reader, and
-	 * the settings field renders it escaped into its `value` attribute.
+	 * the settings field renders it escaped into its `value` attribute. The sentinel's quote and
+	 * ampersand survive `sanitize_text_field` but not escaping, so the raw form must not appear.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -90,15 +91,16 @@ final class PluginBootTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_example_option_round_trips_through_reader_and_field(): void {
-		update_option( 'a8csp_template_example_option', 'audit-sentinel' );
+		update_option( 'a8csp_template_example_option', 'audit"sentinel&' );
 
-		self::assertSame( 'audit-sentinel', a8csp_template_get_example_option() );
+		self::assertSame( 'audit"sentinel&', a8csp_template_get_example_option() );
 
 		\ob_start();
 		( new Settings\Component() )->render_field();
 		$field = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'value="' . esc_attr( 'audit-sentinel' ) . '"', $field );
+		self::assertStringContainsString( 'value="audit&quot;sentinel&amp;"', $field );
+		self::assertStringNotContainsString( 'audit"sentinel', $field );
 	}
 
 	// endregion.
