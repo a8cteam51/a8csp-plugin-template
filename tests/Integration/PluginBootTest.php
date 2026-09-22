@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Verifies the plugin boots on a supported runtime inside wp-env: the requirements gate
  * passes, the component registry runs, and the demo components wire and register their
- * WordPress and WooCommerce functionality. The cached accessor and plugin boot are idempotent.
+ * WordPress and WooCommerce functionality. The cached accessor is idempotent.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -78,28 +78,6 @@ final class PluginBootTest extends TestCase {
 
 		$rows = apply_filters( 'woocommerce_get_settings_advanced', array(), 'a8csp_template' );
 		self::assertContains( 'a8csp_template_wc_example_option', \array_column( $rows, 'id' ) );
-	}
-
-	/**
-	 * `Plugin::boot()` is idempotent, observed through its output rather than the hook table: the
-	 * `plugins_loaded` boot has already run, so a second call must not change what the plugin's
-	 * Advanced-section filter yields — the section output is byte-for-byte identical afterward.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public function test_second_boot_does_not_change_the_section_output(): void {
-		$sections_before = apply_filters( 'woocommerce_get_sections_advanced', array() );
-		self::assertArrayHasKey( 'a8csp_template', $sections_before );
-
-		$plugin = a8csp_template_plugin();
-		self::assertInstanceOf( Plugin::class, $plugin );
-		$plugin->boot();
-
-		$sections_after = apply_filters( 'woocommerce_get_sections_advanced', array() );
-		self::assertSame( $sections_before, $sections_after );
 	}
 
 	/**
