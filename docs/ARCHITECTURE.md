@@ -18,7 +18,7 @@ every surviving component is initialized before any hook can fire.
 - `functions-bootstrap.php` provides the GitHub release updater, plugin metadata,
   version-compatibility checks, the requirements gate, and its admin-notice reporter; both root
   bootstrap files stay parsable below the plugin's PHP floor, and CI lints them against the older
-  PHP versions.
+  PHP versions and runs the entry file there to prove the requirements gate stops at its notice.
 - `functions.php` provides the construction-only plugin accessor (booting stays tied to the
   `plugins_loaded` attachment in the entry file) and loads the PHP helper files under `includes/`.
 - `src/` follows one folder per feature, each owning a `Component` that composes it; the `src/`

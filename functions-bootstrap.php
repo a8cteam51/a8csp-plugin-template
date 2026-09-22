@@ -247,7 +247,9 @@ function a8csp_template_is_php_version_compatible( $min_php_version ) {
 }
 
 /**
- * Validates the plugin requirements.
+ * Validates the plugin requirements once per request; later calls return the result the entry
+ * file acted on. Callers read the result here, never through a constant: below PHP 8.1,
+ * `define()` rejects the `WP_Error` this returns.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -255,6 +257,11 @@ function a8csp_template_is_php_version_compatible( $min_php_version ) {
  * @return  true|\WP_Error
  */
 function a8csp_template_validate_requirements() {
+	static $result = null;
+	if ( null !== $result ) {
+		return $result;
+	}
+
 	$plugin_metadata = a8csp_template_get_plugin_metadata();
 	if ( ! isset( $plugin_metadata['RequiresPHP'] ) || '' === $plugin_metadata['RequiresPHP'] ) {
 		$plugin_metadata['RequiresPHP'] = '8.5';
@@ -274,7 +281,9 @@ function a8csp_template_validate_requirements() {
 		$wp_error->add( 'plugin_php_incompatible', '', array( 'requires_php' => $plugin_metadata['RequiresPHP'] ) );
 	}
 
-	return $wp_error->has_errors() ? $wp_error : true;
+	$result = $wp_error->has_errors() ? $wp_error : true;
+
+	return $result;
 }
 
 /**
