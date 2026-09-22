@@ -49,6 +49,7 @@ require_once A8CSP_TEMPLATE_DIR_PATH . 'functions-bootstrap.php';
 // The self-updater registers before the requirements gates below: an incompatible install is
 // the one that most needs to be offered the corrective update.
 add_filter( 'update_plugins_github.com', 'a8csp_template_check_github_release_update', 10, 3 );
+add_filter( 'plugins_api', 'a8csp_template_get_github_release_information', 10, 3 );
 
 // Registration-only since WP 6.7, so include time is safe — and required: core registers the
 // header path only for site-active plugins (wp-settings.php skips it in the network-activated
@@ -74,9 +75,8 @@ if ( ! \is_file( A8CSP_TEMPLATE_DIR_PATH . 'vendor/autoload.php' ) ) {
 require_once A8CSP_TEMPLATE_DIR_PATH . 'vendor/autoload.php';
 
 // Bootstrap the plugin (maybe)!
-\define( 'A8CSP_TEMPLATE_REQUIREMENTS_RESULT', a8csp_template_validate_requirements() );
-if ( is_wp_error( A8CSP_TEMPLATE_REQUIREMENTS_RESULT ) ) {
-	a8csp_template_output_requirements_error( A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
+if ( is_wp_error( a8csp_template_validate_requirements() ) ) {
+	a8csp_template_output_requirements_error( a8csp_template_validate_requirements() );
 } else {
 	require_once A8CSP_TEMPLATE_DIR_PATH . 'functions.php';
 	add_action( 'plugins_loaded', array( a8csp_template_plugin(), 'boot' ) );

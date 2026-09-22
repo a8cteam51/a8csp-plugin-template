@@ -17,7 +17,7 @@ final class RequirementsCheckTest extends TestCase {
 	// region TESTS.
 
 	/**
-	 * The requirements constant reflects the runtime it booted on.
+	 * The requirements result reflects the runtime it booted on.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -25,13 +25,11 @@ final class RequirementsCheckTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_requirements_gate_matches_runtime(): void {
-		self::assertTrue( \defined( 'A8CSP_TEMPLATE_REQUIREMENTS_RESULT' ) );
-
 		if ( \version_compare( $GLOBALS['wp_version'], '7.1', '<' ) ) {
-			self::assertInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
+			self::assertInstanceOf( \WP_Error::class, a8csp_template_validate_requirements() );
 			self::assertFalse( \function_exists( 'a8csp_template_plugin' ) );
 		} else {
-			self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
+			self::assertTrue( a8csp_template_validate_requirements() );
 		}
 	}
 

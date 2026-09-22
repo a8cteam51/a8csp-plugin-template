@@ -50,7 +50,8 @@ final class ComponentCollectionTest extends TestCase {
 
 	/**
 	 * A closed gate keeps its component out of the collection — no construction, no activity —
-	 * while an open gate admits its component; assembly itself registers nothing.
+	 * while an open gate admits its component; assembly itself registers nothing. The closed-gate
+	 * recording fixture logs its own construction, so an empty event log proves it was never built.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -58,10 +59,11 @@ final class ComponentCollectionTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_assemble_gates_before_construction(): void {
-		$components = ComponentCollection::assemble( array( Settings\Component::class, WooCommerceSubscriptions\Component::class ) );
+		$components = ComponentCollection::assemble( array( Settings\Component::class, WooCommerceSubscriptions\Component::class, ClosedGateRecordingComponent::class ) );
 
 		self::assertTrue( $components->has( Settings\Component::class ) );
 		self::assertFalse( $components->has( WooCommerceSubscriptions\Component::class ) );
+		self::assertSame( array(), $GLOBALS['a8csp_template_test_phase_events'] );
 		self::assertSame( array(), $GLOBALS['a8csp_template_test_hooks'] );
 	}
 
@@ -255,6 +257,53 @@ final class SecondPhaseRecordingComponent implements ComponentInterface {
 	public function register_hooks(): void {
 		$GLOBALS['a8csp_template_test_phase_events'][] = 'hooks:second';
 	}
+
+	// endregion.
+}
+
+/**
+ * A closed-gate component fixture whose constructor logs `construct:closed`, so a test can prove the
+ * collection never constructs a component its gate keeps out.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ */
+final class ClosedGateRecordingComponent extends AbstractComponent {
+	// region CONSTRUCTORS.
+
+	/**
+	 * ClosedGateRecordingComponent constructor.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 */
+	public function __construct() {
+		$GLOBALS['a8csp_template_test_phase_events'][] = 'construct:closed';
+	}
+
+	// endregion.
+
+	// region METHODS.
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 */
+	#[\Override]
+	public static function should_load(): bool {
+		return false;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 */
+	#[\Override]
+	public function register_hooks(): void {}
 
 	// endregion.
 }

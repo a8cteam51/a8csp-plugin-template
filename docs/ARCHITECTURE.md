@@ -18,7 +18,7 @@ every surviving component is initialized before any hook can fire.
 - `functions-bootstrap.php` provides the GitHub release updater, plugin metadata,
   version-compatibility checks, the requirements gate, and its admin-notice reporter; both root
   bootstrap files stay parsable below the plugin's PHP floor, and CI lints them against the older
-  PHP versions.
+  PHP versions and runs the entry file there to prove the requirements gate stops at its notice.
 - `functions.php` provides the construction-only plugin accessor (booting stays tied to the
   `plugins_loaded` attachment in the entry file) and loads the PHP helper files under `includes/`.
 - `src/` follows one folder per feature, each owning a `Component` that composes it; the `src/`
@@ -121,8 +121,8 @@ WooCommerce tier:
    WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`,
    `tests/Unit/ComponentCollectionTest.php`, `tests/Unit/PluginBootGateTest.php`, and
    `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`). That takes
-   `PluginBootGateTest`'s two host-gate tests with their notice helpers, `PluginBootTest`'s
-   section-output test, and the closed-gate case of `ComponentCollectionTest`'s gate test.
+   `PluginBootGateTest`'s two host-gate tests with their notice helpers and the closed-gate case
+   of `ComponentCollectionTest`'s gate test.
 10. Remove the WooCommerce-less proof section and the other `test:integration:no-wc` mentions
     from `tests/README.md`, the
     `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
@@ -155,7 +155,7 @@ WooCommerce tier:
    `tests/Unit/WooCommerceSubscriptionsComponentTest.php` and
    `tests/Unit/IntegrationsComponentTest.php`; and, from `tests/Integration/PluginBootTest.php`
    and `tests/Integration/PluginBootWithoutWooCommerceTest.php`, the settings and section
-   assertions, the section-output and round-trip tests, and the `tearDown()` cleanup.
+   assertions, the round-trip test, and the `tearDown()` cleanup.
 6. Rewrite the prose the removals leave false, which
    `git grep -n -i -E 'settings|example_option|option reader|footprint'` finds: the settings
    sentence under Installation in `README.md`, the settings steps and examples in

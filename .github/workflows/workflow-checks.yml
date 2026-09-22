@@ -3,9 +3,9 @@ name: Workflow Checks
 on:
   push:
     branches: [trunk]
-    paths: ['.github/workflows/**', '.github/zizmor.yml']
+    paths: ['.github/workflows/**', '.github/zizmor.yml', '.github/dependabot.yml']
   pull_request:
-    paths: ['.github/workflows/**', '.github/zizmor.yml']
+    paths: ['.github/workflows/**', '.github/zizmor.yml', '.github/dependabot.yml']
   schedule:
     # Keeps zizmor's online audits (e.g. known-vulnerable-actions) fresh between workflow changes.
     - cron: '0 6 * * 1'

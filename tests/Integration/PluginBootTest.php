@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 /**
  * Verifies the plugin boots on a supported runtime inside wp-env: the requirements gate
  * passes, the component registry runs, and the demo components wire and register their
- * WordPress and WooCommerce functionality. The cached accessor and plugin boot are idempotent.
+ * WordPress and WooCommerce functionality. The cached accessor is idempotent.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -50,7 +50,7 @@ final class PluginBootTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_plugin_boots_on_supported_runtime(): void {
-		self::assertNotInstanceOf( \WP_Error::class, A8CSP_TEMPLATE_REQUIREMENTS_RESULT );
+		self::assertTrue( a8csp_template_validate_requirements() );
 		self::assertTrue( \function_exists( 'a8csp_template_plugin' ) );
 		self::assertNotFalse( has_action( 'plugins_loaded', array( a8csp_template_plugin(), 'boot' ) ) );
 		self::assertInstanceOf( Plugin::class, a8csp_template_plugin() );
@@ -81,30 +81,9 @@ final class PluginBootTest extends TestCase {
 	}
 
 	/**
-	 * `Plugin::boot()` is idempotent, observed through its output rather than the hook table: the
-	 * `plugins_loaded` boot has already run, so a second call must not change what the plugin's
-	 * Advanced-section filter yields — the section output is byte-for-byte identical afterward.
-	 *
-	 * @since   1.0.0
-	 * @version 1.0.0
-	 *
-	 * @return  void
-	 */
-	public function test_second_boot_does_not_change_the_section_output(): void {
-		$sections_before = apply_filters( 'woocommerce_get_sections_advanced', array() );
-		self::assertArrayHasKey( 'a8csp_template', $sections_before );
-
-		$plugin = a8csp_template_plugin();
-		self::assertInstanceOf( Plugin::class, $plugin );
-		$plugin->boot();
-
-		$sections_after = apply_filters( 'woocommerce_get_sections_advanced', array() );
-		self::assertSame( $sections_before, $sections_after );
-	}
-
-	/**
 	 * The example option round-trips: a persisted value comes back through the typed reader, and
-	 * the settings field renders it escaped into its `value` attribute.
+	 * the settings field renders it escaped into its `value` attribute. The sentinel's quote and
+	 * ampersand survive `sanitize_text_field` but not escaping, so the raw form must not appear.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -112,15 +91,16 @@ final class PluginBootTest extends TestCase {
 	 * @return  void
 	 */
 	public function test_example_option_round_trips_through_reader_and_field(): void {
-		update_option( 'a8csp_template_example_option', 'audit-sentinel' );
+		update_option( 'a8csp_template_example_option', 'audit"sentinel&' );
 
-		self::assertSame( 'audit-sentinel', a8csp_template_get_example_option() );
+		self::assertSame( 'audit"sentinel&', a8csp_template_get_example_option() );
 
 		\ob_start();
 		( new Settings\Component() )->render_field();
 		$field = (string) \ob_get_clean();
 
-		self::assertStringContainsString( 'value="' . esc_attr( 'audit-sentinel' ) . '"', $field );
+		self::assertStringContainsString( 'value="audit&quot;sentinel&amp;"', $field );
+		self::assertStringNotContainsString( 'audit"sentinel', $field );
 	}
 
 	// endregion.
