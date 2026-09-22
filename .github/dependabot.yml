@@ -12,6 +12,9 @@ updates:
       default-days: 7
       exclude:
         - "a8cteam51/a8csp-configs"
+    ignore:
+      - dependency-name: "a8cteam51/a8csp-configs"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "ci"
     open-pull-requests-limit: 5
@@ -28,6 +31,9 @@ updates:
       default-days: 7
       exclude:
         - "a8csp/configs"
+    ignore:
+      - dependency-name: "a8csp/configs"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "composer"
     open-pull-requests-limit: 5
@@ -44,6 +50,9 @@ updates:
       default-days: 7
       exclude:
         - "@a8csp/configs"
+    ignore:
+      - dependency-name: "@a8csp/configs"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "npm"
     open-pull-requests-limit: 5
