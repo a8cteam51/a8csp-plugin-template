@@ -55,8 +55,8 @@ final class WooPaymentsTest extends TestCase {
 	}
 
 	/**
-	 * With the companion present, the gate opens and the hook phase registers exactly the one
-	 * metadata filter.
+	 * With the companion's main file loaded, the gate opens and the hook phase registers exactly
+	 * the one metadata filter.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0

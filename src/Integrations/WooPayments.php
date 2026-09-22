@@ -29,7 +29,9 @@ final class WooPayments extends AbstractComponent {
 	 */
 	#[\Override]
 	public static function should_load(): bool {
-		return \class_exists( 'WC_Payments' );
+		// WooPayments declares its main class on `plugins_loaded` priority 11, after this plugin
+		// boots at 10; its main file defines this constant as soon as it is included.
+		return \defined( 'WCPAY_PLUGIN_FILE' );
 	}
 
 	/**
