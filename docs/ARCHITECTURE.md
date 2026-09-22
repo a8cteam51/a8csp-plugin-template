@@ -121,8 +121,8 @@ WooCommerce tier:
    WooCommerce assertions and stand-ins from `tests/Integration/PluginBootTest.php`,
    `tests/Unit/ComponentCollectionTest.php`, `tests/Unit/PluginBootGateTest.php`, and
    `tests/Unit/SettingsComponentTest.php` (including `tests/Unit/wc-host-stubs.php`). That takes
-   `PluginBootGateTest`'s two host-gate tests with their notice helpers, `PluginBootTest`'s
-   section-output test, and the closed-gate case of `ComponentCollectionTest`'s gate test.
+   `PluginBootGateTest`'s two host-gate tests with their notice helpers and the closed-gate case
+   of `ComponentCollectionTest`'s gate test.
 10. Remove the WooCommerce-less proof section and the other `test:integration:no-wc` mentions
     from `tests/README.md`, the
     `test:integration:no-wc` scripts from `package.json` and `composer.json`, and the
@@ -155,7 +155,7 @@ WooCommerce tier:
    `tests/Unit/WooCommerceSubscriptionsComponentTest.php` and
    `tests/Unit/IntegrationsComponentTest.php`; and, from `tests/Integration/PluginBootTest.php`
    and `tests/Integration/PluginBootWithoutWooCommerceTest.php`, the settings and section
-   assertions, the section-output and round-trip tests, and the `tearDown()` cleanup.
+   assertions, the round-trip test, and the `tearDown()` cleanup.
 6. Rewrite the prose the removals leave false, which
    `git grep -n -i -E 'settings|example_option|option reader|footprint'` finds: the settings
    sentence under Installation in `README.md`, the settings steps and examples in
