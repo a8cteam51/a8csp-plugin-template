@@ -12,7 +12,8 @@ use PHPUnit\Framework\TestCase;
  * so a channel switch never serves the other channel's releases, the update package is the
  * release asset matched by name, an up-to-date installation still gets the release so core lists
  * it as up to date, and a failed fetch is negative-cached briefly so update checks don't hammer a
- * failing API. "View details" for the plugin's own slug shows the cached release.
+ * failing API. "View details" for the plugin's own slug shows the cached release, or answers from
+ * the plugin's own metadata when no release is known.
  *
  * Loading the real `functions-bootstrap.php` would shadow the canned metadata stubs other
  * tests in the shared process rely on, so every test runs `#[RunInSeparateProcess]`.
@@ -416,6 +417,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		self::assertSame( '1.0.0', $information->version );
 		self::assertTrue( $information->external );
 		self::assertObjectNotHasProperty( 'download_link', $information );
+		self::assertNotEmpty( $information->sections['changelog'] );
 	}
 
 	/**

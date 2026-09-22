@@ -236,8 +236,9 @@ function a8csp_template_check_github_release_update( $update, $plugin_data, $plu
 }
 
 /**
- * Answers the plugin-information request behind "View details" for this plugin's own slug with
- * its GitHub release, which core would otherwise look up on wordpress.org.
+ * Answers the plugin-information request behind "View details" for this plugin's own slug, from
+ * its GitHub release when one is known and from its own metadata otherwise, so core never looks
+ * the slug up on wordpress.org.
  *
  * @since   1.0.0
  * @version 1.0.0
@@ -267,7 +268,7 @@ function a8csp_template_get_github_release_information( $result, $action, $args 
 			'slug'     => $plugin_data['TextDomain'],
 			'version'  => $plugin_data['Version'],
 			'external' => true,
-			'sections' => array( 'changelog' => esc_html( __( 'The release notes are unavailable right now. Try again in a few minutes.', 'a8csp-plugin-template' ) ) ),
+			'sections' => array( 'changelog' => esc_html( __( 'The release notes are unavailable.', 'a8csp-plugin-template' ) ) ),
 		);
 	}
 
