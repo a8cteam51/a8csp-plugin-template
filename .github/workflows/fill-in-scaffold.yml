@@ -114,9 +114,10 @@ jobs:
             fi
           fi
 
-          # The repository name becomes the composer package slug and file identities.
-          if [[ ! "$repository_name" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
-            report_error 'repository name' "$repository_name" 'it must match ^[a-z0-9]+(-[a-z0-9]+)*$'
+          # The repository name becomes the composer package slug, file identities, and the block
+          # namespace, which the block editor rejects unless it starts with a letter.
+          if [[ ! "$repository_name" =~ ^[a-z][a-z0-9]*(-[a-z0-9]+)*$ ]]; then
+            report_error 'repository name' "$repository_name" 'it must start with a letter and match ^[a-z][a-z0-9]*(-[a-z0-9]+)*$'
           fi
 
           if [ "$invalid" -ne 0 ]; then
