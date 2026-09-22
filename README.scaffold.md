@@ -77,5 +77,5 @@ This plugin releases as a GitHub zip. Publishing it in the wordpress.org plugin 
 
 - a `readme.txt` in the directory's readme format;
 - the slug wordpress.org assigns from the plugin name, which can differ from this repository's name, with the `Text Domain` changed to match it so language packs apply;
-- removing the GitHub self-updater (the `Update URI` header and its `update_plugins_github.com` filter), because directory plugins may only update through wordpress.org;
+- removing the GitHub self-updater (the `Update URI` header and its `update_plugins_github.com` and `plugins_api` filters), because directory plugins may only update through wordpress.org;
 - a release step that deploys each tagged release to the plugin's wordpress.org SVN repository.

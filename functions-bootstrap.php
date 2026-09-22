@@ -110,26 +110,22 @@ function a8csp_template_get_plugin_version() {
 }
 
 /**
- * Filters the update-check result for this plugin against its GitHub releases.
+ * Returns the newest usable GitHub release on the installed version's channel, or null when none
+ * is known.
  *
  * A prerelease installation follows every published release; a stable installation follows only
- * the stable channel, which the latest-release endpoint provides by definition.
+ * the stable channel, which the latest-release endpoint provides by definition. Each channel's
+ * release is cached for an hour, and a failed fetch for five minutes.
  *
  * @since   1.0.0
  * @version 1.0.0
  *
- * @param   array<string, mixed>|false                 $update      The pending update data, or false when none is known yet.
- * @param   array{Version: string, TextDomain: string} $plugin_data The plugin's header data.
- * @param   string                                     $plugin_file The plugin file being checked.
+ * @param   string $installed_version The installed plugin version.
  *
- * @return  array<string, mixed>|false
+ * @return  array{version: string, url: string, package: string, body: string}|null
  */
-function a8csp_template_check_github_release_update( $update, $plugin_data, $plugin_file ) {
-	if ( \constant( 'A8CSP_TEMPLATE_BASENAME' ) !== $plugin_file || false !== $update ) {
-		return $update;
-	}
-
-	$prerelease_channel = \str_contains( (string) ( $plugin_data['Version'] ?? '' ), '-' );
+function a8csp_template_get_github_release( $installed_version ) {
+	$prerelease_channel = \str_contains( $installed_version, '-' );
 	$transient_key      = 'a8csp_template_github_latest_release_' . ( $prerelease_channel ? 'prerelease' : 'stable' );
 
 	$latest_release_info = get_transient( $transient_key );
@@ -192,22 +188,90 @@ function a8csp_template_check_github_release_update( $update, $plugin_data, $plu
 	}
 
 	if ( ! $release_is_usable ) {
+		return null;
+	}
+
+	$release_body = $latest_release_info['body'] ?? null;
+
+	return array(
+		'version' => \ltrim( $release_tag, 'v' ),
+		'url'     => $release_url,
+		'package' => $release_asset,
+		'body'    => \is_string( $release_body ) ? $release_body : '',
+	);
+}
+
+/**
+ * Filters the update-check result for this plugin against its GitHub releases.
+ *
+ * The release is returned even when it is not newer than the installed version: core then files
+ * the plugin under `no_update`, which is what marks it as update-supported and shows its
+ * auto-update toggle.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param   array<string, mixed>|false                 $update      The pending update data, or false when none is known yet.
+ * @param   array{Version: string, TextDomain: string} $plugin_data The plugin's header data.
+ * @param   string                                     $plugin_file The plugin file being checked.
+ *
+ * @return  array<string, mixed>|false
+ */
+function a8csp_template_check_github_release_update( $update, $plugin_data, $plugin_file ) {
+	if ( \constant( 'A8CSP_TEMPLATE_BASENAME' ) !== $plugin_file || false !== $update ) {
+		return $update;
+	}
+
+	$release = a8csp_template_get_github_release( (string) ( $plugin_data['Version'] ?? '' ) );
+	if ( null === $release ) {
 		return false;
 	}
 
-	$latest_release_version = \ltrim( $release_tag, 'v' );
-	if ( \version_compare( $plugin_data['Version'], $latest_release_version, '<' ) ) {
-		$update = array(
-			'slug'    => $plugin_data['TextDomain'],
-			'version' => $latest_release_version,
-			'url'     => $release_url,
-			'package' => $release_asset,
-		);
-	} else {
-		$update = false;
+	return array(
+		'slug'    => $plugin_data['TextDomain'],
+		'version' => $release['version'],
+		'url'     => $release['url'],
+		'package' => $release['package'],
+	);
+}
+
+/**
+ * Answers the plugin-information request behind "View details" for this plugin's own slug with
+ * its GitHub release, which core would otherwise look up on wordpress.org.
+ *
+ * @since   1.0.0
+ * @version 1.0.0
+ *
+ * @param   false|object|array<string, mixed> $result The response so far, or false when none is known yet.
+ * @param   string                            $action The plugins_api action.
+ * @param   object{slug?: string}             $args   The request arguments.
+ *
+ * @return  false|object|array<string, mixed>
+ */
+function a8csp_template_get_github_release_information( $result, $action, $args ) {
+	if ( 'plugin_information' !== $action || false !== $result ) {
+		return $result;
 	}
 
-	return $update;
+	$plugin_data = a8csp_template_get_plugin_metadata();
+	if ( ( $args->slug ?? null ) !== $plugin_data['TextDomain'] ) {
+		return $result;
+	}
+
+	$release = a8csp_template_get_github_release( $plugin_data['Version'] );
+	if ( null === $release ) {
+		return $result;
+	}
+
+	// `external` keeps the details modal from linking the slug's wordpress.org page.
+	return (object) array(
+		'name'          => $plugin_data['Name'],
+		'slug'          => $plugin_data['TextDomain'],
+		'version'       => $release['version'],
+		'download_link' => $release['package'],
+		'external'      => true,
+		'sections'      => array( 'changelog' => \nl2br( esc_html( $release['body'] ) ) ),
+	);
 }
 
 /**

@@ -10,8 +10,9 @@ use PHPUnit\Framework\TestCase;
  * follows only the latest-release endpoint while a prerelease installation scans the full release
  * list for the highest-versioned non-draft entry, each channel caches under its own transient key
  * so a channel switch never serves the other channel's releases, the update package is the
- * release asset matched by name, an up-to-date installation is offered nothing, and a failed
- * fetch is negative-cached briefly so update checks don't hammer a failing API.
+ * release asset matched by name, an up-to-date installation still gets the release so core lists
+ * it as up to date, and a failed fetch is negative-cached briefly so update checks don't hammer a
+ * failing API. "View details" for the plugin's own slug shows the cached release.
  *
  * Loading the real `functions-bootstrap.php` would shadow the canned metadata stubs other
  * tests in the shared process rely on, so every test runs `#[RunInSeparateProcess]`.
@@ -171,8 +172,10 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	}
 
 	/**
-	 * An up-to-date installation is offered nothing, and the usable release is cached for the
-	 * full hour so the next check skips the network.
+	 * An up-to-date installation still gets the release: core files a reply that is not newer
+	 * than the installed version under `no_update`, which is what marks the plugin as
+	 * update-supported and shows its auto-update toggle. The usable release is cached for the full
+	 * hour so the next check skips the network.
 	 *
 	 * @since   1.0.0
 	 * @version 1.0.0
@@ -180,7 +183,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	 * @return  void
 	 */
 	#[RunInSeparateProcess]
-	public function test_up_to_date_install_is_offered_nothing(): void {
+	public function test_up_to_date_install_gets_the_release_for_the_no_update_list(): void {
 		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
 			array(
 				'tag_name' => 'v2.0.0',
@@ -196,7 +199,8 @@ final class GitHubReleaseUpdateTest extends TestCase {
 
 		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '2.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
 
-		self::assertFalse( $update );
+		self::assertIsArray( $update );
+		self::assertSame( '2.0.0', $update['version'] );
 		self::assertSame( \constant( 'HOUR_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release_stable'], 'A usable release caches for the full hour even when no update is offered' );
 	}
 
@@ -347,6 +351,71 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		self::assertSame( 'https://example.com/beta.zip', $update['package'] );
 	}
 
+	/**
+	 * "View details" for the plugin's own slug shows its GitHub release — name, version, the
+	 * release notes as the changelog, and the package — from the release the update check already
+	 * cached, so the details request adds no fetch.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_plugin_information_for_the_own_slug_shows_the_cached_release(): void {
+		self::stage_plugin_metadata( '1.0.0' );
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				'tag_name' => 'v2.0.0',
+				'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v2.0.0',
+				'body'     => "Fixes the widget.\nAdds a setting.",
+				'assets'   => array(
+					array(
+						'name'                 => 'a8csp-plugin-template.zip',
+						'browser_download_url' => 'https://example.com/right.zip',
+					),
+				),
+			)
+		);
+
+		a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+		$information = a8csp_template_get_github_release_information( false, 'plugin_information', (object) array( 'slug' => 'a8csp-plugin-template' ) );
+
+		self::assertIsObject( $information );
+		self::assertSame( 'A8CSP Template Plugin', $information->name );
+		self::assertSame( 'a8csp-plugin-template', $information->slug );
+		self::assertSame( '2.0.0', $information->version );
+		self::assertSame( 'https://example.com/right.zip', $information->download_link );
+		self::assertStringContainsString( 'Fixes the widget.', $information->sections['changelog'] );
+		self::assertStringContainsString( 'Adds a setting.', $information->sections['changelog'] );
+		self::assertCount( 1, $GLOBALS['a8csp_template_test_http_requests'], 'The details request reuses the release the update check cached' );
+	}
+
+	/**
+	 * Plugin-information requests for other slugs, other plugins_api actions, and requests an
+	 * earlier filter already answered pass through untouched and without a fetch.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_plugin_information_passes_other_requests_through(): void {
+		self::stage_plugin_metadata( '1.0.0' );
+
+		$other_slug = a8csp_template_get_github_release_information( false, 'plugin_information', (object) array( 'slug' => 'woocommerce' ) );
+		self::assertFalse( $other_slug );
+
+		$other_action = a8csp_template_get_github_release_information( false, 'query_plugins', (object) array( 'slug' => 'a8csp-plugin-template' ) );
+		self::assertFalse( $other_action );
+
+		$answered = (object) array( 'name' => 'Answered elsewhere' );
+		self::assertSame( $answered, a8csp_template_get_github_release_information( $answered, 'plugin_information', (object) array( 'slug' => 'a8csp-plugin-template' ) ) );
+
+		self::assertSame( array(), $GLOBALS['a8csp_template_test_http_requests'], 'Pass-through paths must not touch the network' );
+	}
+
 	// endregion.
 
 	// region HELPERS.
@@ -384,6 +453,26 @@ final class GitHubReleaseUpdateTest extends TestCase {
 			'Version'    => $version,
 			'TextDomain' => 'a8csp-plugin-template',
 		);
+	}
+
+	/**
+	 * Stages the plugin metadata the plugin-information handler reads for itself, at the given
+	 * installed version.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @param   string $version The installed plugin version.
+	 *
+	 * @return  void
+	 */
+	private static function stage_plugin_metadata( string $version ): void {
+		\defined( 'A8CSP_TEMPLATE_FILE' ) || \define( 'A8CSP_TEMPLATE_FILE', '/tmp/plugins/a8csp-plugin-template/a8csp-template-plugin.php' );
+
+		require_once __DIR__ . '/wp-bootstrap-stubs.php';
+		require_once __DIR__ . '/wp-notice-stubs.php';
+
+		$GLOBALS['a8csp_template_test_plugin_data'] = self::plugin_data( $version ) + array( 'Name' => 'A8CSP Template Plugin' );
 	}
 
 	// endregion.
