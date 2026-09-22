@@ -18,7 +18,7 @@
     "npm": ">=11"
   },
   "devDependencies": {
-    "@a8csp/configs": "github:a8cteam51/a8csp-configs#trunk",
+    "@a8csp/configs": "github:a8cteam51/a8csp-configs#semver:^1",
     "@playwright/test": "^1.61.1",
     "@wordpress/block-editor": "^17.1.0",
     "@wordpress/blocks": "^16.0.0",
