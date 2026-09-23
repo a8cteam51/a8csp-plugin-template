@@ -296,6 +296,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 
 		self::assertCount( 2, $GLOBALS['a8csp_template_test_http_requests'], 'The stable check must fetch fresh rather than reuse the prerelease cache' );
 		self::assertStringEndsWith( '/releases/latest', $GLOBALS['a8csp_template_test_http_requests'][1] );
+		self::assertIsArray( $update );
 		self::assertSame( '2.0.0', $update['version'], 'The stable install follows the stable release, never the cached prerelease' );
 		self::assertSame( 'https://example.com/stable.zip', $update['package'] );
 	}
@@ -348,6 +349,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 
 		self::assertCount( 2, $GLOBALS['a8csp_template_test_http_requests'], 'The prerelease check must fetch fresh rather than reuse the stable cache' );
 		self::assertStringEndsWith( 'releases?per_page=10', $GLOBALS['a8csp_template_test_http_requests'][1] );
+		self::assertIsArray( $update );
 		self::assertSame( '3.0.0-beta.1', $update['version'], 'The prerelease install follows the prerelease, never the cached stable release' );
 		self::assertSame( 'https://example.com/beta.zip', $update['package'] );
 	}
@@ -382,7 +384,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
 		$information = a8csp_template_get_github_release_information( false, 'plugin_information', (object) array( 'slug' => 'a8csp-plugin-template' ) );
 
-		self::assertIsObject( $information );
+		self::assertInstanceOf( \stdClass::class, $information );
 		self::assertSame( 'A8CSP Template Plugin', $information->name );
 		self::assertSame( 'a8csp-plugin-template', $information->slug );
 		self::assertSame( '2.0.0', $information->version );
@@ -411,7 +413,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 
 		$information = a8csp_template_get_github_release_information( false, 'plugin_information', (object) array( 'slug' => 'a8csp-plugin-template' ) );
 
-		self::assertIsObject( $information );
+		self::assertInstanceOf( \stdClass::class, $information );
 		self::assertSame( 'A8CSP Template Plugin', $information->name );
 		self::assertSame( 'a8csp-plugin-template', $information->slug );
 		self::assertSame( '1.0.0', $information->version );
@@ -475,7 +477,7 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	 *
 	 * @param   string $version The installed plugin version.
 	 *
-	 * @return  array<string, string>
+	 * @return  array{Version: string, TextDomain: string}
 	 */
 	private static function plugin_data( string $version ): array {
 		return array(
