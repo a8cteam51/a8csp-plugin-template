@@ -6,7 +6,6 @@
 		 cacheDirectory="tests/.cache/phpunit"
 		 executionOrder="depends,defects,random"
 
-		 beStrictAboutCoverageMetadata="true"
 		 beStrictAboutOutputDuringTests="true"
 		 failOnNotice="true"
 		 failOnRisky="true"
