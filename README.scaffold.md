@@ -39,6 +39,8 @@ workflow lives in [`tests/README.md`](tests/README.md).
 
 ### Releasing
 
+Remove the examples this plugin does not need before its first release. They ship until removed, and the integrations in `src/Integrations/` change a live store: on a site running WooCommerce Subscriptions or WooPayments, they append an example note to every subscription price and add an example key to the metadata WooPayments sends with each payment. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) maps each example.
+
 Every pull request that changes behavior carries a changelog fragment:
 
 ```sh
