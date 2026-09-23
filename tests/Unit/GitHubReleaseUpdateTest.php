@@ -8,11 +8,12 @@ use PHPUnit\Framework\TestCase;
 /**
  * Proves the GitHub release updater's channel and packaging decisions: a stable installation
  * follows only the latest-release endpoint while a prerelease installation scans the full release
- * list for the highest-versioned non-draft entry, each channel caches under its own transient key
- * so a channel switch never serves the other channel's releases, the update package is the
- * release asset matched by name, an up-to-date installation still gets the release so core lists
- * it as up to date, and a failed fetch is negative-cached briefly so update checks don't hammer a
- * failing API. "View details" for the plugin's own slug shows the cached release, or answers from
+ * list for the highest-versioned non-draft entry, stable ones included, each channel caches under
+ * its own transient key so a channel switch never serves the other channel's releases, the update
+ * package is the release asset matched by name and a release without it offers nothing, an
+ * up-to-date installation still gets the release so core lists it as up to date, and a failed
+ * fetch or an unusable release is negative-cached briefly so update checks don't hammer a failing
+ * API. "View details" for the plugin's own slug shows the cached release, or answers from
  * the plugin's own metadata when no release is known.
  *
  * Loading the real `functions-bootstrap.php` would shadow the canned metadata stubs other
@@ -173,6 +174,51 @@ final class GitHubReleaseUpdateTest extends TestCase {
 	}
 
 	/**
+	 * A prerelease installation follows every release, stable ones included, so the stable release
+	 * that succeeds the installed prerelease is offered.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_prerelease_install_is_offered_the_stable_successor(): void {
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				array(
+					'draft'    => false,
+					'tag_name' => 'v1.2.0',
+					'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v1.2.0',
+					'assets'   => array(
+						array(
+							'name'                 => 'a8csp-plugin-template.zip',
+							'browser_download_url' => 'https://example.com/stable.zip',
+						),
+					),
+				),
+				array(
+					'draft'    => false,
+					'tag_name' => 'v1.2.0-beta.2',
+					'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v1.2.0-beta.2',
+					'assets'   => array(
+						array(
+							'name'                 => 'a8csp-plugin-template.zip',
+							'browser_download_url' => 'https://example.com/beta2.zip',
+						),
+					),
+				),
+			)
+		);
+
+		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.2.0-beta.2' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		self::assertIsArray( $update );
+		self::assertSame( '1.2.0', $update['version'], 'The stable successor outranks the installed prerelease' );
+		self::assertSame( 'https://example.com/stable.zip', $update['package'] );
+	}
+
+	/**
 	 * An up-to-date installation still gets the release: core files a reply that is not newer
 	 * than the installed version under `no_update`, which is what marks the plugin as
 	 * update-supported and shows its auto-update toggle. The usable release is cached for the full
@@ -219,6 +265,63 @@ final class GitHubReleaseUpdateTest extends TestCase {
 		$GLOBALS['a8csp_template_test_http_response'] = array(
 			'response' => array( 'code' => 500 ),
 			'body'     => '',
+		);
+
+		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		self::assertFalse( $update );
+		self::assertSame( array(), $GLOBALS['a8csp_template_test_transients']['a8csp_template_github_latest_release_stable'] );
+		self::assertSame( 5 * \constant( 'MINUTE_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release_stable'] );
+	}
+
+	/**
+	 * A release published without assets has no package to install, so it offers nothing and is
+	 * negative-cached like a failed fetch.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_release_without_assets_offers_nothing_and_negative_caches(): void {
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				'tag_name' => 'v2.0.0',
+				'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v2.0.0',
+				'assets'   => array(),
+			)
+		);
+
+		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
+
+		self::assertFalse( $update );
+		self::assertSame( array(), $GLOBALS['a8csp_template_test_transients']['a8csp_template_github_latest_release_stable'] );
+		self::assertSame( 5 * \constant( 'MINUTE_IN_SECONDS' ), $GLOBALS['a8csp_template_test_transient_ttls']['a8csp_template_github_latest_release_stable'] );
+	}
+
+	/**
+	 * A release whose assets do not include the plugin zip offers nothing and is negative-cached,
+	 * so another file attached to the release is never installed as the plugin.
+	 *
+	 * @since   1.0.0
+	 * @version 1.0.0
+	 *
+	 * @return  void
+	 */
+	#[RunInSeparateProcess]
+	public function test_release_without_the_plugin_zip_offers_nothing_and_negative_caches(): void {
+		$GLOBALS['a8csp_template_test_http_response'] = self::a_release_response(
+			array(
+				'tag_name' => 'v2.0.0',
+				'html_url' => 'https://github.com/a8cteam51/a8csp-plugin-template/releases/tag/v2.0.0',
+				'assets'   => array(
+					array(
+						'name'                 => 'checksums.txt',
+						'browser_download_url' => 'https://example.com/checksums.txt',
+					),
+				),
+			)
 		);
 
 		$update = a8csp_template_check_github_release_update( false, self::plugin_data( '1.0.0' ), \constant( 'A8CSP_TEMPLATE_BASENAME' ) );
