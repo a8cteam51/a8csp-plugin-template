@@ -59,6 +59,8 @@ every surviving component is initialized before any hook can fire.
 - `blocks/src/example-notice/` contains the example block source, while `blocks/build/` contains
   tracked build output; `npm run build` generates the committed `blocks/build/blocks-manifest.php`,
   which `src/Blocks/Component.php` uses to register all built blocks as one metadata collection.
+  Both `build:blocks` and `start:blocks` pass `--blocks-manifest`: the first compile empties
+  `blocks/build/`, so a watcher without the flag deletes the manifest and every block with it.
 - `assets/js/src/editor.js` defines the shared editor hook entry point, and
   `assets/css/src/settings.scss` the compiled admin stylesheet example; `npm run build` is the
   single build contract and produces every tracked `build/` output, RTL variants included.
