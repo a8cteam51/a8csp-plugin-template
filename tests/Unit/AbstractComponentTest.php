@@ -39,7 +39,7 @@ final class AbstractComponentTest extends TestCase {
 			 */
 			#[\Override]
 			public function register_hooks(): void {
-				add_action( 'a8csp_template_test_hook', '__return_true' );
+				add_action( 'a8csp_template_test_hook', static function (): void {} );
 			}
 
 			// endregion.

@@ -39,6 +39,8 @@ workflow lives in [`tests/README.md`](tests/README.md).
 
 ### Releasing
 
+Remove the examples this plugin does not need before its first release. They ship until removed, and the integrations in `src/Integrations/` change a live store: on a site running WooCommerce Subscriptions or WooPayments, they append an example note to every subscription price and add an example key to the metadata WooPayments sends with each payment. [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) maps each example.
+
 Every pull request that changes behavior carries a changelog fragment:
 
 ```sh
@@ -49,16 +51,18 @@ The command asks for a significance (`patch`, `minor`, `major`), a type, and the
 
 Releases are cut from trunk, in four steps.
 
-1. **Materialize the changelog.** `composer changelog:write` derives the next version from the newest `CHANGELOG.md` entry and the pending fragments' significance, writes that section, and deletes the fragments it consumed. There is nothing to derive from while the changelog is empty, so the first release names its version explicitly, as does any prerelease:
+1. **Materialize the changelog.** `composer changelog:write` derives the next version from the newest `CHANGELOG.md` entry and the pending fragments' significance, writes that section, and deletes the fragments it consumed. There is nothing to derive from while the changelog is empty, so the first release names its whole version with `--use-version`, a first prerelease included. After that, the derived version is not always the next one on the current line: from a prerelease entry it moves to the next line when the pending significance does not fit that line, and a `--prerelease` suffix that sorts before the current one moves it too. Preview it with `vendor/bin/changelogger version next`, which takes the same `--prerelease`, and pin the version with `--use-version` whenever the preview is not the release you mean:
 
    ```sh
+   composer changelog:write -- --use-version=1.0.0-beta.1
+   vendor/bin/changelogger version next --prerelease=beta.2
+   composer changelog:write -- --prerelease=beta.2
    composer changelog:write -- --use-version=1.0.0
-   composer changelog:write -- --prerelease=beta.1
    ```
 
 2. **Bump the other two versions to the same string.** The release refuses to run unless the plugin header's `Version:` in `EXAMPLE_REPO_SLUG.php`, `"version"` in `package.json`, and the newest `CHANGELOG.md` heading all state one version. The self-updater compares an installed copy against the header rather than against the tag, so the header bump belongs in the commit that gets tagged. Commit the three together and land them on trunk.
 
-3. **Let trunk go green, then rehearse.** The release reuses the trunk-push Quality and Tests runs from the exact commit it tags, so tag only once those have finished. With them green, run the **Release** workflow from the Actions tab leaving **Create the GitHub release** off: that exercises the version check, the provenance check, the build and the smoke install without creating anything.
+3. **Let trunk go green, then rehearse.** The release reuses the trunk-push Quality and Tests runs from the exact commit it tags, so tag only once those have finished. A later push to trunk cancels them if they are still running, and a cancelled run fails provenance as a red one does, so confirm this commit's own runs concluded successfully and re-run any that were cancelled. Those runs include legs outside the supported matrix, WordPress nightly and the next PHP, and every PHPUnit leg runs its tests in random order; a red leg that ships no defect still blocks provenance until a re-run passes. With them green, run the **Release** workflow from the Actions tab leaving **Create the GitHub release** off: that exercises the version check, the provenance check, the build and the smoke install without creating anything.
 
 4. **Tag the green commit and publish the tag.**
 

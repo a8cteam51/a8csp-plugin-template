@@ -149,9 +149,12 @@ final class MultisiteUninstallTest extends TestCase {
 			wp_delete_site( (int) $leftover_site_id );
 		}
 
+		$network = get_network();
+		self::assertInstanceOf( \WP_Network::class, $network );
+
 		$proof_site_id = wp_insert_site(
 			array(
-				'domain' => get_network()->domain,
+				'domain' => $network->domain,
 				'path'   => self::PROOF_SITE_PATH,
 			)
 		);

@@ -45,14 +45,13 @@
     "packages-update:wp": "wp-scripts packages-update --dist-tag=wp-7.1",
 
     "build": "NODE_ENV=production npm-run-all --sequential build:**",
-    "build:blocks": "wp-scripts build --webpack-src-dir=blocks/src --output-path=blocks/build",
-    "build:blocks-manifest": "wp-scripts build-blocks-manifest --input=blocks/build --output=blocks/build/blocks-manifest.php",
+    "build:blocks": "wp-scripts build --webpack-src-dir=blocks/src --output-path=blocks/build --blocks-manifest",
     "build:assets:scripts": "wp-scripts build assets/js/src/*.js --output-path=assets/js/build",
     "build:assets:styles": "sass assets/css/src:assets/css/build && postcss assets/css/build/settings.css --replace",
     "build:assets:styles-rtl": "rtlcss assets/css/build/settings.css assets/css/build/settings-rtl.css",
 
     "start": "npm-run-all --parallel start:**",
-    "start:blocks": "wp-scripts start --webpack-src-dir=blocks/src --output-path=blocks/build",
+    "start:blocks": "wp-scripts start --webpack-src-dir=blocks/src --output-path=blocks/build --blocks-manifest",
     "start:assets:scripts": "wp-scripts start assets/js/src/*.js --output-path=assets/js/build",
     "start:assets:styles": "sass --watch assets/css/src:assets/css/build",
 
@@ -62,7 +61,7 @@
 
     "lint": "npm-run-all --sequential lint:**",
     "lint:scripts": "wp-scripts lint-js blocks assets/js eslint.config.mjs postcss.config.js stylelint.config.js .github/workflows/fill-in-scaffold.mjs .github/workflows/fill-in-scaffold-content.mjs playwright.config.js tests/EndToEnd --no-error-on-unmatched-pattern",
-    "lint:styles": "wp-scripts lint-style blocks/**/*.{css,scss} assets/css/**/*.{css,scss} --allow-empty-input",
+    "lint:styles": "wp-scripts lint-style 'blocks/**/*.{css,scss}' 'assets/css/**/*.{css,scss}' --allow-empty-input",
     "lint:pkg-json": "wp-scripts lint-pkg-json",
     "lint:readme-md": "wp-scripts lint-md-docs README.md",
 
