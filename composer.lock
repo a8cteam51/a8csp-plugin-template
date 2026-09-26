@@ -81,16 +81,16 @@
         },
         {
             "name": "automattic/jetpack-changelogger",
-            "version": "v7.0.3",
+            "version": "v7.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Automattic/jetpack-changelogger.git",
-                "reference": "d40a20c4139e0e51ec91391b179ec8f5b2656fe7"
+                "reference": "c678744274bb83945113eb44a5cc479034884771"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Automattic/jetpack-changelogger/zipball/d40a20c4139e0e51ec91391b179ec8f5b2656fe7",
-                "reference": "d40a20c4139e0e51ec91391b179ec8f5b2656fe7",
+                "url": "https://api.github.com/repos/Automattic/jetpack-changelogger/zipball/c678744274bb83945113eb44a5cc479034884771",
+                "reference": "c678744274bb83945113eb44a5cc479034884771",
                 "shasum": ""
             },
             "require": {
@@ -143,9 +143,9 @@
                 "keepachangelog"
             ],
             "support": {
-                "source": "https://github.com/Automattic/jetpack-changelogger/tree/v7.0.3"
+                "source": "https://github.com/Automattic/jetpack-changelogger/tree/v7.0.4"
             },
-            "time": "2026-09-14T10:54:57+00:00"
+            "time": "2026-09-18T17:57:09+00:00"
         },
         {
             "name": "colinodell/json5",
