@@ -1,7 +1,7 @@
 name: Audit
 
-# Audits run when a lockfile changes. Advisories disclosed later are Dependabot alerts' job, and
-# those cost no Actions minutes.
+# Audits run when a lockfile changes. An advisory disclosed later shows up at the next lockfile change,
+# such as a monthly Dependabot update.
 on:
   pull_request:
     # ready_for_review runs the check when a draft is marked ready.
