@@ -49,7 +49,8 @@ jobs:
       wp-env-config-file: '.wp-env.tests.json'
       composer-script: 'test:integration'
 
-  # A change here cannot cause a nightly failure, so nightly runs only on request.
+  # Nightly tracks unreleased WordPress, so its failures mostly reflect upstream churn rather than
+  # the change under test. It runs on request; the template's weekly canary covers the shared code.
   integration-nightly:
     name: Integration (WP nightly)
     if: github.event_name == 'workflow_dispatch'
