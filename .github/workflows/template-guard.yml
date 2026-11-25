@@ -12,9 +12,14 @@ on:
   pull_request:
   push:
     branches: [trunk]
+  # Weekly, for the WordPress canary below; the other jobs re-prove generation on the current runner.
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Keyed by event too, so a scheduled run and a trunk push run don't cancel each other.
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions: {}
@@ -196,3 +201,33 @@ jobs:
       # The manifest check is a dependency-free string match, so the runner's built-in Node runs it.
       - name: Verify every strip-manifest span still matches exactly once
         run: node .github/workflows/fill-in-scaffold-content.mjs --check
+
+  # Generated plugins run nothing on a schedule, so the next WordPress release is tested here
+  # against the code they all start from, where public-repository minutes are free.
+  wordpress-canary:
+    name: 'WordPress canary: integration (${{ matrix.name }})'
+    if: github.repository_id == '1297277915' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # wp-env defaults to latest stable.
+          - name: 'WP latest'
+          - name: 'WP nightly'
+            wp-env-core: 'https://wordpress.org/nightly-builds/wordpress-latest.zip'
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-phpunit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    with:
+      wp-env-core: ${{ matrix.wp-env-core || '' }}
+      wp-env-config-file: '.wp-env.tests.json'
+      composer-script: 'test:integration'
+
+  wordpress-canary-e2e:
+    name: 'WordPress canary: End-to-End (WP nightly)'
+    if: github.repository_id == '1297277915' && (github.event_name == 'schedule' || github.event_name == 'workflow_dispatch')
+    permissions:
+      contents: read
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-playwright-e2e.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    with:
+      wp-env-core: 'https://wordpress.org/nightly-builds/wordpress-latest.zip'
