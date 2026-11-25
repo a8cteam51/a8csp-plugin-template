@@ -1,15 +1,20 @@
 name: Audit
 
+# Audits run when a lockfile changes. Advisories disclosed later are Dependabot alerts' job, and
+# those cost no Actions minutes.
 on:
   pull_request:
+    # ready_for_review runs the check when a draft is marked ready.
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths: ['composer.lock', 'package-lock.json', '.github/workflows/audit.yml']
   push:
     branches: [trunk]
-  schedule:
-    # Catches newly disclosed advisories between dependency bumps.
-    - cron: '0 7 * * 1'
+    paths: ['composer.lock', 'package-lock.json', '.github/workflows/audit.yml']
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Keyed by event too, so a manual run and a push run on the same branch don't cancel each other.
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
@@ -18,4 +23,6 @@ permissions:
 jobs:
   supply-chain:
     name: Supply-chain audit
-    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-supply-chain-audit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    # A draft pull request runs Quality only.
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-supply-chain-audit.yml@231be2507946169eeb18080c04a597be4e3fac7c # v1.2.0

@@ -15,28 +15,27 @@ permissions:
 jobs:
   php-lint:
     name: PHP Lint
-    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-php-lint.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-php-lint.yml@231be2507946169eeb18080c04a597be4e3fac7c # v1.2.0
     with:
       scripts: '["lint:php:phpcs", "lint:php:phpcs:tests", "lint:php:phpstan", "changelog:validate"]'
 
   lint-scripts-styles:
     name: JS + CSS Lint
-    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-scripts-styles-lint.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-scripts-styles-lint.yml@231be2507946169eeb18080c04a597be4e3fac7c # v1.2.0
 
   block-json:
     name: block.json schema
-    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-block-json-check.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-block-json-check.yml@231be2507946169eeb18080c04a597be4e3fac7c # v1.2.0
 
   php-syntax:
     name: PHP Syntax
-    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-php-syntax-check.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-php-syntax-check.yml@231be2507946169eeb18080c04a597be4e3fac7c # v1.2.0
 
+  # One job, not a matrix: GitHub bills every job by the minute, rounded up, and each version's
+  # check takes seconds. Each setup-php step switches the job's PHP to the next version, and every
+  # version runs even after an earlier one fails, so one run reports them all.
   belowfloor-syntax:
-    name: Below-floor syntax (PHP ${{ matrix.php }})
-    strategy:
-      fail-fast: false
-      matrix:
-        php: ['7.4', '8.0', '8.1', '8.2', '8.3', '8.4']
+    name: Below-floor syntax
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -44,17 +43,14 @@ jobs:
         with:
           persist-credentials: false
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
-        with:
-          php-version: ${{ matrix.php }}
-          coverage: none
-          tools: none
-
       # These four files must parse below the plugin's PHP floor. Generation renames the entry file
       # without rewriting .github/, so it is found by its "Plugin Name:" header.
-      - name: Check the below-floor files for syntax errors
-        id: syntax
+      #
+      # Parsing is not running: the check then includes the entry file against stubs of the WordPress
+      # calls it makes, and requires the requirements gate to stage its notice without loading
+      # functions.php. An empty autoloader gets past the missing-dependencies branch.
+      - name: Write the below-floor check
+        id: write
         run: |
           set -euo pipefail
 
@@ -64,20 +60,7 @@ jobs:
             echo "::error::expected exactly one root *.php file with a 'Plugin Name:' header, found $entry_count" >&2
             exit 1
           fi
-          php -l "${entry_files[0]}"
-          php -l "$GITHUB_WORKSPACE/functions-bootstrap.php"
-          php -l "$GITHUB_WORKSPACE/uninstall.php"
-          php -l "$GITHUB_WORKSPACE/footprint.php"
-          echo "entry-file=${entry_files[0]}" >> "$GITHUB_OUTPUT"
-
-      # Parsing is not running: this includes the entry file against stubs of the WordPress calls it
-      # makes, and requires the requirements gate to stage its notice without loading functions.php.
-      # An empty autoloader gets past the missing-dependencies branch.
-      - name: Run the requirements gate below the floor
-        env:
-          ENTRY_FILE: ${{ steps.syntax.outputs.entry-file }}
-        run: |
-          set -euo pipefail
+          echo "ENTRY_FILE=${entry_files[0]}" >> "$GITHUB_ENV"
 
           mkdir -p "$GITHUB_WORKSPACE/vendor"
           echo '<?php' > "$GITHUB_WORKSPACE/vendor/autoload.php"
@@ -108,7 +91,94 @@ jobs:
           }
           echo 'The requirements gate stopped at its notice on PHP ' . PHP_VERSION . "\n";
           PHP
+
+          cat > "$RUNNER_TEMP/below-floor-check.sh" <<'SH'
+          set -euo pipefail
+
+          php -l "$ENTRY_FILE"
+          php -l "$GITHUB_WORKSPACE/functions-bootstrap.php"
+          php -l "$GITHUB_WORKSPACE/uninstall.php"
+          php -l "$GITHUB_WORKSPACE/footprint.php"
           php "$RUNNER_TEMP/requirements-gate.php"
+          SH
+
+      - name: Setup PHP 7.4
+        id: php-74
+        if: ${{ !cancelled() && steps.write.outcome == 'success' }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '7.4'
+          coverage: none
+          tools: none
+
+      - name: Check the below-floor files on PHP 7.4
+        if: ${{ !cancelled() && steps.php-74.outcome == 'success' }}
+        run: bash "$RUNNER_TEMP/below-floor-check.sh"
+
+      - name: Setup PHP 8.0
+        id: php-80
+        if: ${{ !cancelled() && steps.write.outcome == 'success' }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.0'
+          coverage: none
+          tools: none
+
+      - name: Check the below-floor files on PHP 8.0
+        if: ${{ !cancelled() && steps.php-80.outcome == 'success' }}
+        run: bash "$RUNNER_TEMP/below-floor-check.sh"
+
+      - name: Setup PHP 8.1
+        id: php-81
+        if: ${{ !cancelled() && steps.write.outcome == 'success' }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.1'
+          coverage: none
+          tools: none
+
+      - name: Check the below-floor files on PHP 8.1
+        if: ${{ !cancelled() && steps.php-81.outcome == 'success' }}
+        run: bash "$RUNNER_TEMP/below-floor-check.sh"
+
+      - name: Setup PHP 8.2
+        id: php-82
+        if: ${{ !cancelled() && steps.write.outcome == 'success' }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.2'
+          coverage: none
+          tools: none
+
+      - name: Check the below-floor files on PHP 8.2
+        if: ${{ !cancelled() && steps.php-82.outcome == 'success' }}
+        run: bash "$RUNNER_TEMP/below-floor-check.sh"
+
+      - name: Setup PHP 8.3
+        id: php-83
+        if: ${{ !cancelled() && steps.write.outcome == 'success' }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: none
+
+      - name: Check the below-floor files on PHP 8.3
+        if: ${{ !cancelled() && steps.php-83.outcome == 'success' }}
+        run: bash "$RUNNER_TEMP/below-floor-check.sh"
+
+      - name: Setup PHP 8.4
+        id: php-84
+        if: ${{ !cancelled() && steps.write.outcome == 'success' }}
+        uses: shivammathur/setup-php@f3e473d116dcccaddc5834248c87452386958240 # 2.37.2
+        with:
+          php-version: '8.4'
+          coverage: none
+          tools: none
+
+      - name: Check the below-floor files on PHP 8.4
+        if: ${{ !cancelled() && steps.php-84.outcome == 'success' }}
+        run: bash "$RUNNER_TEMP/below-floor-check.sh"
 
   build-integrity:
     name: Build integrity

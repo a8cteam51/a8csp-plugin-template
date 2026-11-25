@@ -1,9 +1,8 @@
 name: Mutation Tests
 
+# Mutation testing is slow and its score changes only when the code or its tests do, so it runs on
+# request, from the Actions tab.
 on:
-  schedule:
-    # Mutation testing is slow, so it runs off the pull request and push path.
-    - cron: '0 5 * * 1'
   workflow_dispatch:
 
 concurrency:

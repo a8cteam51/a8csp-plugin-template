@@ -28,6 +28,11 @@ covers the test suites. The teaching-content strip matches each passage in
 `fill-in-scaffold-content.mjs` by its exact text, and `template-guard.yml` fails any change that
 leaves a passage matching zero or several times.
 
+Generated plugins run CI only when they change, so `template-guard.yml` also runs a weekly WordPress
+canary here: the integration suite against WordPress latest and nightly, and the end-to-end tests
+against nightly. A failure means the next WordPress release breaks code every generated plugin
+starts from.
+
 ### Requirements
 
 The plugin header, `composer.json`, `.wp-env.json`, and `package.json`'s `engines` declare the

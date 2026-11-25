@@ -119,5 +119,5 @@ the uninstall proofs leave their footprint to the `uninstall.php` run they asser
 
 `composer test:unit:mutation` runs Infection against the Unit suite's source. It sits outside the
 default `composer quality-check` target (only `quality-check:all` pulls it in) and does not gate
-pull requests — it runs on its own weekly schedule in CI (`.github/workflows/tests-mutation.yml`),
-since mutation testing is slow.
+pull requests — it runs on request from the Actions tab (`.github/workflows/tests-mutation.yml`),
+since mutation testing is slow and its score changes only with the code or its tests.
