@@ -22,6 +22,6 @@ jobs:
       contents: read
       actions: read
       security-events: write
-    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-codeql.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-codeql.yml@231be2507946169eeb18080c04a597be4e3fac7c # v1.2.0
     with:
       languages: '["actions", "javascript-typescript"]'
