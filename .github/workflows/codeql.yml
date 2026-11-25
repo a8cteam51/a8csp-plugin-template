@@ -14,6 +14,9 @@ permissions: {}
 jobs:
   codeql:
     name: CodeQL
+    # Private repositories on this organization's plan have no GitHub Advanced Security, so the
+    # analysis would skip anyway; skipping here starts no billed jobs.
+    if: github.event.repository.private == false
     # A caller must grant every permission the called jobs declare, or the call fails at startup.
     permissions:
       contents: read
