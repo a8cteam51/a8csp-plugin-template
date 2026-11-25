@@ -1,12 +1,14 @@
 name: Audit
 
+# Audits run when a lockfile changes. Advisories disclosed later are Dependabot alerts' job, and
+# those cost no Actions minutes.
 on:
   pull_request:
+    paths: ['composer.lock', 'package-lock.json', '.github/workflows/audit.yml']
   push:
     branches: [trunk]
-  schedule:
-    # Catches newly disclosed advisories between dependency bumps.
-    - cron: '0 7 * * 1'
+    paths: ['composer.lock', 'package-lock.json', '.github/workflows/audit.yml']
+  workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}

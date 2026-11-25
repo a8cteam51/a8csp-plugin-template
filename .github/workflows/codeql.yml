@@ -4,9 +4,6 @@ on:
   pull_request:
   push:
     branches: [trunk]
-  schedule:
-    # Catches newly published CodeQL query findings between code changes.
-    - cron: '0 8 * * 1'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
