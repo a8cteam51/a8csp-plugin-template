@@ -54,6 +54,9 @@ updates:
     ignore:
       - dependency-name: "@a8csp/configs"
         update-types: ["version-update:semver-major"]
+      # The @wordpress/* majors follow the plugin's WordPress floor through `npm run packages-update:wp`.
+      - dependency-name: "@wordpress/*"
+        update-types: ["version-update:semver-major"]
     commit-message:
       prefix: "npm"
     open-pull-requests-limit: 5
