@@ -2,19 +2,26 @@ name: Tests
 
 on:
   pull_request:
+    # ready_for_review starts the suite when a draft is marked ready.
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [trunk]
+  # Adds the WordPress nightly leg, such as before a WordPress release or before tagging one of ours.
+  workflow_dispatch:
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  # Keyed by event too, so a manual run can't cancel the trunk push run a release's provenance reads.
+  group: ${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 permissions:
   contents: read
 
+# A draft pull request runs Quality only; every job here starts once it is ready for review.
 jobs:
   unit:
     name: Unit (PHP ${{ matrix.php }})
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     strategy:
       fail-fast: false
       matrix:
@@ -27,6 +34,7 @@ jobs:
 
   integration:
     name: Integration (${{ matrix.name }})
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     strategy:
       fail-fast: false
       matrix:
@@ -35,12 +43,19 @@ jobs:
             wp-version: '7.1'
           # wp-env defaults to latest stable.
           - name: 'WP latest'
-          - name: 'WP nightly'
-            wp-env-core: 'https://wordpress.org/nightly-builds/wordpress-latest.zip'
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-phpunit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
     with:
       wp-version: ${{ matrix.wp-version || '' }}
-      wp-env-core: ${{ matrix.wp-env-core || '' }}
+      wp-env-config-file: '.wp-env.tests.json'
+      composer-script: 'test:integration'
+
+  # A change here cannot cause a nightly failure, so nightly runs only on request.
+  integration-nightly:
+    name: Integration (WP nightly)
+    if: github.event_name == 'workflow_dispatch'
+    uses: a8cteam51/a8csp-configs/.github/workflows/reusable-phpunit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
+    with:
+      wp-env-core: 'https://wordpress.org/nightly-builds/wordpress-latest.zip'
       wp-env-config-file: '.wp-env.tests.json'
       composer-script: 'test:integration'
 
@@ -48,6 +63,7 @@ jobs:
   # deactivated; the script fails on a skip, so a deactivation that did not take cannot pass.
   integration-no-wc:
     name: Integration (WooCommerce inactive)
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-phpunit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
     with:
       wp-env-config-file: '.wp-env.tests.json'
@@ -55,6 +71,7 @@ jobs:
 
   requirements:
     name: Requirements (below-floor WP)
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-phpunit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
     with:
       wp-env-config-file: '.wp-env.belowfloor.json'
@@ -62,6 +79,7 @@ jobs:
 
   multisite:
     name: Multisite (converted network)
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-phpunit.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
     with:
       wp-env-config-file: '.wp-env.multisite.json'
@@ -69,4 +87,5 @@ jobs:
 
   e2e:
     name: End-to-End
+    if: github.event_name != 'pull_request' || !github.event.pull_request.draft
     uses: a8cteam51/a8csp-configs/.github/workflows/reusable-playwright-e2e.yml@295fdb54961eb5a95ec9ed52f183cb44a16e004b # v1.1.0
